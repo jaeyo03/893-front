@@ -1,10 +1,19 @@
-import {Button} from "@/components/ui/button";
+import CategorySection from "@/components/molecules/CategorySection";
+import HomeTitle from "@/components/molecules/HomeTitle";
+import SpinningWord from "@/components/atoms/SpinningWord";
+import SearchInput from "@/components/atoms/SearchInput";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <div className="font-extrabold">메인페이지 입니다...</div>
-      <Button>Button</Button>
+    <div className="grid justify-center items-center gap-4 w-full">
+      <HomeTitle>
+        <SpinningWord/>
+        <span>&nbsp;경매에 참여해보세요</span>
+      </HomeTitle>
+      <div className="flex justify-center w-full">
+        <SearchInput/>
+      </div>
+      <CategorySection/>
     </div>
   );
 }

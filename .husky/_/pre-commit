@@ -1,0 +1,18 @@
+#!/bin/sh
+
+BRANCH_NAME=$(git branch --show-current)
+PATTERN="^(main|develop|feature|release|hotfix)"
+
+if ! [[ $BRANCH_NAME =~ $PATTERN ]]; then
+    echo "브랜치 이름이 규칙에 맞지 않습니다."
+    echo "PATTERN: ^(main|develop|feature|release|hotfix)/[A-Za-z]+-[0-9]+-.+$"
+    exit 1
+fi
+
+# ESLint 검사
+npm run lint
+
+if [ $? -ne 0 ]; then
+    echo "ESLint 검사 실패. 커밋이 중단됩니다."
+    exit 1
+fi

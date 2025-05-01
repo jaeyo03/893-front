@@ -22,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${pretendard.variable} font-pretendard`}
+        className={`${pretendard.variable} font-pretendard grid justify-center`}
       >
-        {children}
+        <div className="w-[1280px]">
+          {children}
+        </div>
       </body>
     </html>
   );

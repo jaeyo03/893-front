@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Camera, X } from "lucide-react";
 
-export default function ImageUploadBox() {
+export default function ImageUploader() {
   const [previews, setPreviews] = useState<string[]>([]); // 이미지 미리보기 상태
   const [representIndex, setRepresentIndex] = useState<number | null>(null); // 대표 이미지 인덱스 상태
 
@@ -47,37 +47,46 @@ export default function ImageUploadBox() {
     <div className="flex flex-col gap-2">
       {/* 이미지 미리보기들 */}
       <div className="flex flex-wrap gap-4">
-        {previews.map((src, index) => (
-          <div
-            key={index}
-            onClick={() => setRepresentIndex(index)} // 클릭 시 대표 이미지로 설정
-            className={`relative w-[144px] h-[144px] rounded-md overflow-hidden border-4 cursor-pointer ${
-              representIndex === index ? "border-main" : "border-transparent"
-            }`}
-          >
-            {/* 이미지 미리보기 */}
-            <img
-              src={src}
-              alt={`preview-${index}`}
-              className="object-cover w-full h-full"
-            />
-            {/* 삭제 버튼 */}
-            <button
-              onClick={() => handleDeleteImage(index)}
-              className="absolute p-1 rounded-full top-1 right-1 bg-white/80 hover:bg-white"
-              aria-label="이미지 삭제"
-            >
-              <X className="w-4 h-4 " />
-            </button>
-            {/*대표이미지 버튼*/}
-            <button
+        {[...previews]
+          .map((src, i) => ({ src, index: i })) // 원본 index 유지
+          .sort((a, b) => {
+            if (a.index === representIndex) return -1;
+            if (b.index === representIndex) return 1;
+            return 0;
+          }) // 대표 이미지를 앞으로
+          .map(({ src, index }) => (
+            <div
+              key={index}
               onClick={() => setRepresentIndex(index)}
-              className="absolute px-2 py-1 text-xs rounded-md bottom-1 left-1 bg-white/80 hover:bg-white"
+              className={`relative w-[144px] h-[144px] rounded-md overflow-hidden border-4 cursor-pointer ${
+                representIndex === index ? "border-main" : "border-transparent"
+              }`}
             >
-              {representIndex === index ? "대표 이미지" : "대표로 설정"}
-            </button>
-          </div>
-        ))}
+              <img
+                src={src}
+                alt={`preview-${index}`}
+                className="object-cover w-full h-full"
+              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // 대표 설정 클릭과 겹치지 않도록
+                  handleDeleteImage(index);
+                }}
+                className="absolute p-1 rounded-full top-1 right-1 bg-white/80 hover:bg-white"
+                aria-label="이미지 삭제"
+              >
+                <X className="w-4 h-4 " />
+              </button>
+              {representIndex === index && (
+                <button
+                  onClick={(e) => e.stopPropagation()} // 중복 방지
+                  className="absolute px-2 py-1 text-xs rounded-md bottom-1 left-1 bg-white/80 hover:bg-white"
+                >
+                  대표 이미지
+                </button>
+              )}
+            </div>
+          ))}
 
         {/* 업로드 버튼 - 10개 미만일 때만 노출 */}
         {previews.length < 10 && (

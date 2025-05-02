@@ -1,7 +1,6 @@
-'use client';
+
 
 import Image from 'next/image';
-import { Bookmark } from 'lucide-react'; // 아이콘 (lucide-react 설치 필요)
 
 type AuctionItemCardProps = {
   imageUrl: string;
@@ -11,7 +10,7 @@ type AuctionItemCardProps = {
 export default function AuctionItemCard({ imageUrl, label = '경매중' }: AuctionItemCardProps) {
   return (
     <div className="p-5">
-      <div className="relative border rounded-lg shadow-md overflow-hidden w-[600px] h-[600px] bg-white">
+      <div className="relative border rounded-lg overflow-hidden w-[600px] h-[600px] bg-white">
         
 
         {/* 이미지 */}
@@ -28,10 +27,7 @@ export default function AuctionItemCard({ imageUrl, label = '경매중' }: Aucti
           {label}
         </div>
 
-        {/* 북마크 아이콘 */}
-        <div className="absolute text-gray-700 bottom-2 right-2">
-          <Bookmark />
-        </div>
+        
       </div>
     </div>
   );

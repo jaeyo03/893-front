@@ -1,7 +1,7 @@
 import {HomeCategory} from "@/types/category";
 import CategoryButton from "@/components/atoms/CategoryButton";
 
-export default function CategorySection() {
+export default function CategorySearchSection() {
   const categories : HomeCategory[] = ['Computer', 'Audio', 'Stationery', 'Book', 'Appliance', 'Mobility'];
 
   return (

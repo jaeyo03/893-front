@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
-export default function AgreementCheckbox() {
+export default function SellerAgreementCheckbox({
+  onChange,
+}: {
+  onChange: (checked: boolean) => void;
+}) {
   const [agreed, setAgreed] = useState(false);
-
+  // 체크박스 상태 변경 핸들러
+  const handleChange = () => {
+    const newAgreed = !agreed;
+    setAgreed(newAgreed);
+    onChange(newAgreed); // 부모로 상태 전달
+  };
   return (
     <div
       className="flex justify-center items-start gap-[4px] flex-shrink-0 
@@ -19,7 +28,7 @@ export default function AgreementCheckbox() {
         type="checkbox"
         id="agree"
         checked={agreed}
-        onChange={() => setAgreed(!agreed)}
+        onChange={handleChange}
         className="hidden"
       />
 

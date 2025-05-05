@@ -16,6 +16,9 @@ const config: Config = {
   		},
   		colors: {
   			main: '#0064FF',
+			mainLight: '#718EFF',
+			mainLighter: 'AAB8FF',
+			mainLightest: 'DDE2FF',
   			divider: '#F1F4F6',
   			graybg: '#EEF0F2',
   			checkbox: '#E8ECEF',

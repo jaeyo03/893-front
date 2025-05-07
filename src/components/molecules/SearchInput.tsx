@@ -99,6 +99,7 @@ export default function SearchInput() {
     >
       <div className="flex items-center w-full justify-between p-4">
         <input
+          type="text"
           onClick={handleInputClick}
           onChange={handleInputChange}
           value={inputValue}

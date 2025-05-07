@@ -2,7 +2,7 @@
 
 import { count } from 'console';
 import { useState } from 'react';
-import { Bookmark,BookmarkCheck } from 'lucide-react';
+import { User,Bookmark,BookmarkCheck } from 'lucide-react';
 
 export default function ProductInfo() {
   const [bidAmount, setBidAmount] = useState< number | string>(30000);
@@ -20,7 +20,8 @@ export default function ProductInfo() {
     style={{maxWidth:'620px'}}>
       <div className="mb-4">
         <h1 className="text-xl font-bold">경매 제목</h1>
-        <p className="text-gray-600">👤 판매자 e-mail</p>
+        <p className="text-gray-600">
+          <User size={30}/> 판매자 e-mail</p>
       </div>
 
 

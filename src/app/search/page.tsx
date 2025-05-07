@@ -3,9 +3,9 @@ import CategoryFilter from "@/components/templates/searchpage/CategoryFilter";
 import PriceFilter from "@/components/molecules/searchpage/PriceFilter";
 import AuctionStatusFilter from "@/components/templates/searchpage/AuctionStatusFilter";
 import ProductStatusFilter from "@/components/templates/searchpage/ProductStatusFilter";
-import { RefreshCcw } from "lucide-react";
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
+import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
 
 export default function SearchPage() {
   return (
@@ -21,10 +21,7 @@ export default function SearchPage() {
             <div className="font-bold text-xl">
               검색 필터
             </div>
-            <button className="flex items-center gap-2 text-sm text-gray-500">
-              초기화
-              <RefreshCcw size={20}/>
-            </button>
+            <FilterRefreshButton/>
           </div>
           <CategoryFilter/>
           <PriceFilter/>

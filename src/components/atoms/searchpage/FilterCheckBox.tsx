@@ -5,7 +5,7 @@ interface FilterCheckBoxProps {
   name: string;
   label: string;
   checked: boolean;
-  onChange: (value : string, checked : boolean) => void;
+  onChange: (key : string, checked : boolean) => void;
 }
 
 export default function FilterCheckBox({ id, name, label, checked, onChange }: FilterCheckBoxProps) {
@@ -19,7 +19,7 @@ export default function FilterCheckBox({ id, name, label, checked, onChange }: F
           name={name} 
           className="peer cursor-pointer appearance-none h-4 w-4 border-2 border-[#E8ECEF] rounded bg-white checked:bg-blue-500 checked:border-blue-500 focus:outline-none"
           checked={checked}
-          onChange={(e) => onChange(e.target.value, e.target.checked)}
+          onChange={(e) => onChange(id, e.target.checked)}
         />
         <svg
           className="absolute left-0 top-0 fill-white w-4 h-4 pointer-events-none hidden peer-checked:block" 

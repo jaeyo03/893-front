@@ -8,18 +8,18 @@ import { useCallback } from "react";
 export default function ProductSort() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const currentSort = searchParams.get('sort')
+  const currentSort = searchParams.get('sortBy')
 
   const handleSortChange = useCallback((sort: string) => {
     const params = new URLSearchParams(searchParams.toString())
 
     if (sort) {
-      params.set('sort', sort)
+      params.set('sortBy', sort)
     } else {
-      params.delete('sort')
+      params.delete('sortBy')
     }
 
-    router.push(`/search?${params.toString()}`)
+    router.replace(`/search?${params.toString()}`)
   }, [router, searchParams])
 
   return (
@@ -28,15 +28,15 @@ export default function ProductSort() {
         정렬 기준 선택
       </div>
       <div className="px-4 py-2 flex items-center gap-4 h-10">
-        <SortButton label="최신순" selected={currentSort === 'newest'} onClick={() => handleSortChange('newest')} />
+        <SortButton label="최신순" selected={currentSort === 'latest'} onClick={() => handleSortChange('latest')} />
         <div className="w-1 h-1 bg-neutral-400/60" />
-        <SortButton label="낮은 시작 가격순" selected={currentSort === 'lowest'} onClick={() => handleSortChange('lowest')} />
+        <SortButton label="낮은 시작 가격순" selected={currentSort === 'price_asc'} onClick={() => handleSortChange('price_asc')} />
         <div className="w-1 h-1 bg-neutral-400/60" />
-        <SortButton label="높은 시작 가격순" selected={currentSort === 'highest'} onClick={() => handleSortChange('highest')} />
+        <SortButton label="높은 시작 가격순" selected={currentSort === 'price_desc'} onClick={() => handleSortChange('price_desc')} />
         <div className="w-1 h-1 bg-neutral-400/60" />
-        <SortButton label="입찰자순" selected={currentSort === 'bidders'} onClick={() => handleSortChange('bidders')} />
+        <SortButton label="입찰자순" selected={currentSort === 'bidder_count_desc'} onClick={() => handleSortChange('bidder_count_desc')} />
         <div className="w-1 h-1 bg-neutral-400/60" />
-        <SortButton label="찜순" selected={currentSort === 'likes'} onClick={() => handleSortChange('likes')} />
+        <SortButton label="찜순" selected={currentSort === 'scrap_count_desc'} onClick={() => handleSortChange('scrap_count_desc')} />
       </div>
     </div>
   )

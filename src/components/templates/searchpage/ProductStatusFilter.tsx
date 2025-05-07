@@ -9,30 +9,24 @@ import { useCallback } from "react";
 export default function ProductStatusFilter() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const currentProductStatus = searchParams.getAll('productStatus')
+  const productNew = searchParams.get('isBrandNew')
+  const productLikeNew = searchParams.get('isLikeNew')
+  const productGentlyUsed = searchParams.get('isGentlyUsed')
+  const productHeavilyUsed = searchParams.get('isHeavilyUsed')
+  const productDamaged = searchParams.get('isDamaged')
 
   // 체크박스 상태에 따라 URL 업데이트
-  const handleProductStatusChange = useCallback((value: string, isChecked: boolean) => {
+  const handleProductStatusChange = useCallback((key: string, isChecked: boolean) => {
     const params = new URLSearchParams(searchParams.toString())
-    
-    if (isChecked) {
-      if (!currentProductStatus.includes(value)) {
-        params.append('productStatus', value)
-      }
-    } else {
-      // 체크 해제된 경우 해당 값만 제거
-      params.delete('productStatus') // 먼저 모든 productStatus 제거
-      
-      // 체크 해제된 값을 제외한 나머지 값들 다시 추가
-      currentProductStatus.forEach(status => {
-        if (status !== value) {
-          params.append('productStatus', status)
-        }
-      })
+
+    if (isChecked) { // 체크박스가 체크되면 해당 키를 추가
+      params.set(key, "true")
+    } else { // 체크박스가 해제되면 해당 키를 제거
+      params.delete(key)
     }
     
-    router.push(`/search?${params.toString()}`)
-  }, [router, currentProductStatus, searchParams])
+    router.replace(`/search?${params.toString()}`)
+  }, [router, searchParams])
   
   return (
     <div>
@@ -43,11 +37,11 @@ export default function ProductStatusFilter() {
       </div>
       <div className="px-4 py-2 w-full">
         <FilterFieldSet>
-            <FilterCheckBox id="new" name="new" label="새상품" checked={currentProductStatus.includes('new')} onChange={handleProductStatusChange}/>
-            <FilterCheckBox id="no-use" name="no-use" label="사용감 없음" checked={currentProductStatus.includes('no-use')} onChange={handleProductStatusChange}/>
-            <FilterCheckBox id="light-use" name="light-use" label="사용감 적음" checked={currentProductStatus.includes('light-use')} onChange={handleProductStatusChange}/>
-            <FilterCheckBox id="heavy-use" name="heavy-use" label="사용감 많음" checked={currentProductStatus.includes('heavy-use')} onChange={handleProductStatusChange}/>
-            <FilterCheckBox id="broken" name="broken" label="고장/파손" checked={currentProductStatus.includes('broken')} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isBrandNew" name="isBrandNew" label="새상품" checked={productNew === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isLikeNew" name="isLikeNew" label="사용감 없음" checked={productLikeNew === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isGentlyUsed" name="isGentlyUsed" label="사용감 적음" checked={productGentlyUsed === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isHeavilyUsed" name="isHeavilyUsed" label="사용감 많음" checked={productHeavilyUsed === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isDamaged" name="isDamaged" label="고장/파손" checked={productDamaged === "true"} onChange={handleProductStatusChange}/>
         </FilterFieldSet>
       </div>
     </div>

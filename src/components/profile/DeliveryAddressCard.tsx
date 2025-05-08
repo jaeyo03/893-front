@@ -16,7 +16,7 @@ type DeliveryAddressCardProps = {
   onSetMain?: () => void;
 };
 
-export default function DeliveryAddressCard({ data, onChange, onDelete, onSetMain }: DeliveryAddressCardProps) {
+export default function DeliveryAddressCard({ data, onDelete, onSetMain }: DeliveryAddressCardProps) {
   return (
     <div className="border rounded-md p-4 bg-gray-50 mb-3">
       <div className="flex justify-between items-center mb-2">

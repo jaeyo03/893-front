@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User,Pencil } from "lucide-react";
 import { useState } from "react";
-import { Dialog,DialogContent,DialogDescription,DialogTrigger,DialogTitle,DialogFooter,DialogHeader } from "@/components/ui/dialog";
+import { Dialog,DialogContent,DialogTrigger,DialogTitle,DialogFooter,DialogHeader } from "@/components/ui/dialog";
 import  DeliveryAddressCard  from "@/components/profile/DeliveryAddressCard";
 
 type AddressInfo = {
@@ -29,7 +29,7 @@ export default function UserProfile() {
     phone: "010-1234-5678",
   });
 
-  const [selectedAddress,setSelectedAddress] = useState(userInfo.address);
+  const [selectedAddress] = useState(userInfo.address);
 
   const [addresses, setAddresses] = useState<AddressInfo[]>([
     {

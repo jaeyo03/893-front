@@ -6,7 +6,7 @@ interface AuctionStatus {
   className: string;
 }
 
-const getAuctionStatus = (isWinning:Boolean) : AuctionStatus=>{
+const getAuctionStatus = (isWinning:boolean) : AuctionStatus=>{
   return isWinning
   ?{label:"입찰 중",className:"bg-main"}
   :{label:"경매 중",className:"bg-warningkeword"}

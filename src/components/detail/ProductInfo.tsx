@@ -48,8 +48,7 @@ export default function ProductInfo() {
 
   return (
     <div className="pt-5">
-      <div className="mx-auto "
-      style={{maxWidth:'620px'}}>
+      <div className="mx-auto max-w-[620px]">
         <div className="mb-4">
           <div className='flex items-center justify-between'>
             <h1 className="text-xl font-bold">경매 제목</h1>

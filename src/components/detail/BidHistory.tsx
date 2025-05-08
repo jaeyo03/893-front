@@ -35,7 +35,7 @@ export default function BidHistory() {
   );
 
   return (
-    <div className="max-w-md p-4 mx-auto border rounded-lg shadow-sm" style={{ maxWidth: '620px' }}>
+    <div className="max-w-620px p-4 mx-auto border rounded-lg shadow-sm ">
       <h2 className="pr-4 mb-2 text-lg text-end bg-detailbid"> 입찰 내역</h2>
       {renderTable(bidData)}
 

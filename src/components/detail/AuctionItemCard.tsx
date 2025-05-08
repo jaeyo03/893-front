@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 type AuctionItemCardProps = {
   imageUrl: string;
-  label?: string; // "경매중" 등
+  label: string; // "경매중,경매전,경매 완료" 
 };
 
 export default function AuctionItemCard({ imageUrl, label = '경매중' }: AuctionItemCardProps) {
@@ -17,10 +17,7 @@ export default function AuctionItemCard({ imageUrl, label = '경매중' }: Aucti
         <Image
           src={imageUrl}
           alt="Auction item"
-          width={600}
-          height={600}
-          style={{objectFit: 'cover'}}
-          className="object-cover"
+          className="object-cover  w-[600px] h-[600px]"
         />
         {/* 경매 상태 뱃지 */}
         <div className="absolute px-2 py-1 text-sm font-bold text-white bg-blue-600 rounded top-2 left-2">

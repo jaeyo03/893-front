@@ -17,7 +17,9 @@ export default function AuctionItemCard({ imageUrl, label = '경매중' }: Aucti
         <Image
           src={imageUrl}
           alt="Auction item"
-          className="object-cover  w-[600px] h-[600px]"
+          width={600}
+          height={600}
+          className="object-cover "
         />
         {/* 경매 상태 뱃지 */}
         <div className="absolute px-2 py-1 text-sm font-bold text-white bg-blue-600 rounded top-2 left-2">

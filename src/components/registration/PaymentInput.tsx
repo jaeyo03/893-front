@@ -9,39 +9,38 @@ export interface AuctionPriceInputProps {
 
 // 숫자를 한글 금액으로 변환
 function numberToKorean(num: number): string {
-  const hanA = ["", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"];
-  const unitA = ["", "십", "백", "천"];
-  const levelUnit = ["", "만", "억", "조"];
+  if (num === 0) return "0원";
 
-  if (num === 0) return "영원";
+  const unitDigit = ["", "십", "백", "천"];
+  const unitLevel = ["", "만", "억", "조", "경"];
 
   let result = "";
   let level = 0;
 
   while (num > 0) {
-    let part = num % 10000;
+    const part = num % 10000;
     if (part !== 0) {
-      let str = "";
-      let digit = 0;
-      while (part > 0) {
-        const n = part % 10;
-        if (n !== 0) {
-          // '일'은 생략하는 조건 추가 (단, 일의 자리 제외)
-          const digitStr = n === 1 && digit > 0 ? "" : hanA[n];
-          str = digitStr + unitA[digit] + str;
+      let section = "";
+      const digits = String(part).padStart(4, "0").split("").map(Number);
+
+      digits.forEach((digit, i) => {
+        const pos = 3 - i; // 천백십일 순서
+        if (digit !== 0) {
+          section += `${digit}${unitDigit[pos]}`;
         }
-        digit++;
-        part = Math.floor(part / 10);
-      }
-      result = str + levelUnit[level] + result;
+      });
+
+      result = section + unitLevel[level] + result;
     }
+
     level++;
     num = Math.floor(num / 10000);
   }
 
   return result + "원";
 }
-export default function AuctionPriceInput({
+
+export default function PaymentInput({
   value,
   onChange,
 }: AuctionPriceInputProps) {
@@ -50,6 +49,7 @@ export default function AuctionPriceInput({
   useEffect(() => {
     // 부모에서 받은 value가 변경되었을 때 inputValue도 업데이트
     setInputValue(value ? value.toLocaleString() : "");
+    console.log("value", value);
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +61,7 @@ export default function AuctionPriceInput({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md gap-1">
+    <div className="flex flex-col w-full max-w-[1240px] max-h-[48px] gap-1">
       <input
         type="text"
         inputMode="numeric"
@@ -71,7 +71,7 @@ export default function AuctionPriceInput({
         className="px-4 py-2 text-left border rounded-md border-registerline font-extralight focus:outline-none focus:ring-2 focus:ring-main text-resgisterchecktext"
       />
       <div className="text-xs font-thin text-right text-registertextcnt">
-        {value > 0 ? numberToKorean(value) : ""}
+        {numberToKorean(value)}
       </div>
     </div>
   );

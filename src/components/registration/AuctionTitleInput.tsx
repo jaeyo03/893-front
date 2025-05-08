@@ -23,7 +23,7 @@ export default function AuctionTitleInput({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md gap-1">
+    <div className="flex flex-col w-full max-w-[1240px] max-h-[48px] gap-1">
       {/* 입력창 */}
       <input
         id="auction-title"

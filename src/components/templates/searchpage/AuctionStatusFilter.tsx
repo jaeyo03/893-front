@@ -35,9 +35,9 @@ export default function AuctionStatusFilter() {
       </div>
       <div className="px-4 py-2"> 
         <FilterFieldSet>
-            <FilterCheckBox id="isActive" name="isActive" label="시작 전" checked={auctionActive === "true"} onChange={handleAuctionStatusChange}  />
-            <FilterCheckBox id="isPending" name="isPending" label="진행중" checked={auctionPending === "true"} onChange={handleAuctionStatusChange}/>
-            <FilterCheckBox id="isCompleted" name="isCompleted" label="경매 완료" checked={auctionCompleted === "true"} onChange={handleAuctionStatusChange}/>
+          <FilterCheckBox id="isActive" name="isActive" label="시작 전" checked={auctionActive === "true"} onChange={handleAuctionStatusChange}  />
+          <FilterCheckBox id="isPending" name="isPending" label="진행중" checked={auctionPending === "true"} onChange={handleAuctionStatusChange}/>
+          <FilterCheckBox id="isCompleted" name="isCompleted" label="경매 완료" checked={auctionCompleted === "true"} onChange={handleAuctionStatusChange}/>
         </FilterFieldSet>
       </div>
     </div>

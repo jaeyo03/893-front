@@ -4,6 +4,7 @@ import { useState } from "react";
 import ImageUploader from "@/components/registration/ImageUploader"; // 이미지 업로더 컴포넌트
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
 import PaymentInput from "@/components/registration/PaymentInput";
+import NotificationDropdown from "@/components/notification/NotificationDropdown";
 export default function Registration() {
   const [images, setImages] = useState<File[]>([]); // 이미지 상태 관리
   const [title, setTitle] = useState<string>(""); // 경매 제목 상태 관리
@@ -16,6 +17,7 @@ export default function Registration() {
       <h1 className="mb-4 text-xl font-bold">등록 페이지</h1>
       <div className="mb-4">
         <h1 className="mb-2 text-lg font-semibold">테스트</h1>
+
         {/* <ImageUploader /> */}
         {/* <AuctionTitleInput value={title} onChange={setTitle} /> */}
         <PaymentInput value={0} onChange={() => {}} />

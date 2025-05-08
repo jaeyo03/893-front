@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
+import { Timer } from 'lucide-react';
+import { TriangleAlert } from 'lucide-react';
+import WarningModal from './WarningModal';
 
 export default function ProductInfo() {
   const [bidAmount, setBidAmount] = useState<number>(30000);
@@ -10,6 +13,7 @@ export default function ProductInfo() {
   const [isBookmarked,setIsBookmarked] = useState(false);
   const [bookmarkCount,setBookmarkCount] = useState(1);
   const [cancelTimer,setCancelTimer] = useState(10);
+  const [show, setShow] = useState(false);
 
   useEffect(()=>{
     let timer: NodeJS.Timeout | undefined;
@@ -46,6 +50,10 @@ export default function ProductInfo() {
     setBookmarkCount((count)=>(isBookmarked ? count -1:count+1));
   }
 
+  function setOpen(arg0: boolean): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="pt-5">
       <div className="mx-auto max-w-[620px]">
@@ -67,7 +75,8 @@ export default function ProductInfo() {
             <div className="w-1/2">
               <p className="text-sm text-black">남은 시간</p>
               <p className="flex items-center gap-1 text-xl font-bold text-blue-600">
-                ⏰ 12:38:45
+                <Timer className="w-5 h-5" />
+              12:38:45
               </p>
             </div>
           </div>
@@ -88,8 +97,8 @@ export default function ProductInfo() {
             <button onClick={handleBookmarkToggle}>
               <Bookmark
               className={`w-5 h-5 ${
-                isBookmarked ? 'text-black fill-black'
-                : 'text-gray-400 hover:text-black hover:fill-black'
+                isBookmarked ? 'text-red fill-red'
+                : 'text-gray-400 hover:text-red hover:fill-red'
               }`}
               />
               </button>
@@ -120,11 +129,24 @@ export default function ProductInfo() {
               className="w-full px-2 py-1 text-right border rounded"
               />
             <button className="w-[72px] h-[32px] text-sm text-white bg-main rounded hover:bg-blue-700"
-            onClick={handleBid}>
+              onClick={handleBid}>
               입찰하기
             </button>
+            <div
+              className="relative inline-block"
+              onMouseEnter={() => setShow(true)}
+              onMouseLeave={() => setShow(false)}
+            >
+              <TriangleAlert className="w-5 h-5 cursor-pointer" fill="red" color="white" />
+
+              <WarningModal
+                isOpen={show}
+                positionClass="left-1/2 top-full mt-2 -translate-x-1/2"
+              />
+            </div>
+            
           </div>
-          <p className="mt-1 text-xs font-thin text-right text-red mr-[72px]">
+          <p className="mt-1  text-xs font-thin text-right text-red mr-[100px]">
             {(() => {
               if (typeof bidAmount !== 'number' || bidAmount <= 0) return '';
 

@@ -1,15 +1,18 @@
+"use client"
+
 import { Clock, X } from "lucide-react";
+import Link from "next/link";
 
 interface RecentSearchWordButtonProps {
 	searchKeywordId: number;
 	searchKeyword: string;
 	createdAt: string;
-	handleDeleteSearch: (event: React.MouseEvent, searchKeywordId: number) => void;
+	handleDeleteSearch: (searchKeywordId: number) => void;
 }
 
 export default function RecentSearchWordButton({ searchKeywordId, searchKeyword, createdAt, handleDeleteSearch } : RecentSearchWordButtonProps) {
   return (
-    <button className="group hover:bg-[#EFF2F4] h-10 w-full cursor-pointer flex items-center justify-between p-4">
+    <Link href={`/search?keyword=${searchKeyword}`} className="group hover:bg-[#EFF2F4] h-10 w-full cursor-pointer flex items-center justify-between p-4">
 			<div className="flex items-center justify-center gap-2">
 				<div className="rounded-3xl bg-[#EFF2F4] h-7 w-7 flex items-center justify-center">
 					<Clock size={16} />
@@ -24,11 +27,11 @@ export default function RecentSearchWordButton({ searchKeywordId, searchKeyword,
 				</div>
 				<div 
 					className="cursor-pointer"
-					onClick={(e) => handleDeleteSearch(e, searchKeywordId)}
+					onClick={() => handleDeleteSearch(searchKeywordId)}
 				>
 					<X size={22} color="#898989" className="hover:text-[#6c6c6c]"/>
 				</div>
 			</div>
-  	</button>
+  	</Link>
   )
 }

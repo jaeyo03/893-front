@@ -70,16 +70,18 @@
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-input {
+
+input[type="text"] {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
 
-input:focus {
+input[type="text"]:focus {
   outline: none;
 }

@@ -6,10 +6,12 @@ import searchData from "@/data/searchData.json";
 import RecentSearchWordButton from "@/components/atoms/RecentSearchWordButton";
 import RecommendSearchWord from "../atoms/RecommendSearchWordButton";
 import RelatedSearchWordButton from "../atoms/RelatedSearchWordButton";
+import { useRouter } from "next/navigation";
 
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
 export default function SearchInput() {
+  const router = useRouter();
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('CLOSED');
   const formRef = useRef<HTMLFormElement>(null);
   const [recentSearches, setRecentSearches] = useState(searchData.recentSearches); // TODO 추후 백엔드 연동
@@ -74,6 +76,20 @@ export default function SearchInput() {
     setSearchStatus('RELATED'); // 검색어 추가 시 관련 검색어 표시
   }
 
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (inputValue.trim()) {
+      router.replace(`/search?keyword=${encodeURIComponent(inputValue.trim())}`);
+      setSearchStatus('CLOSED');
+      
+      const newSearch = {
+        text: inputValue.trim(),
+        date: new Date().toLocaleDateString()
+      };
+      setRecentSearches(prev => [newSearch, ...prev.slice(0, 4)]); // 최대 5개 유지
+    }
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (formRef.current && !formRef.current.contains(event.target as Node)) {
@@ -94,11 +110,13 @@ export default function SearchInput() {
     <form 
       ref={formRef}
       name="search" 
-      method="get" 
+      method="get"
+      onSubmit={handleSearch}
       className={`border-main border-[1.5px] w-[692px] h-[59px] relative rounded-[12px] ${isSearchContentOpen ? 'rounded-b-none' : ''}`}
     >
       <div className="flex items-center w-full justify-between p-4">
         <input
+          type="text"
           onClick={handleInputClick}
           onChange={handleInputChange}
           value={inputValue}
@@ -107,11 +125,11 @@ export default function SearchInput() {
         />
         <div className="flex items-center gap-2">
           {isRelatedSearchContentOpen && (
-            <button onClick={handleDeleteAllSearches} className="rounded-full bg-[#EFF2F4] flex items-center justify-center">
+            <button type="button" onClick={handleDeleteAllSearches} className="rounded-full bg-[#EFF2F4] flex items-center justify-center">
               <X size={16} color="#898989"/>
             </button>
           )}
-          <button onClick={handleChevronClick}>
+          <button type="button" onClick={handleChevronClick}>
             {isSearchContentOpen ? (
               <ChevronUp size={22} />
             ) : (
@@ -119,7 +137,7 @@ export default function SearchInput() {
             )}
           </button>
           <div className="h-3 border-gray-300 border-[0.5px]"/>
-          <button>
+          <button type="submit">
             <Search size={22} />
           </button>
         </div>
@@ -143,7 +161,7 @@ export default function SearchInput() {
               <div className="border-t border-t-[#E5E9EC]">
                 <div className="pr-4 pl-4 pt-4 pb-2 text-[#373737] flex text-sm items-center justify-between">
                   <div>최근 검색어</div>
-                  <button onClick={handleDeleteAllSearches} className="text-[#898989]">전체 삭제</button>
+                  <button type="button" onClick={handleDeleteAllSearches} className="text-[#898989]">전체 삭제</button>
                 </div>
                 {recentSearches.length > 0 ? (
                   recentSearches.map((search, index) => (
@@ -170,7 +188,7 @@ export default function SearchInput() {
                 </div>
               </div>
               <div className="pl-4 pr-4 pt-2 pb-2 border-t-[1px] border-[#EFF2F4] flex justify-end">
-                <button onClick={handleCloseSearchContent} className="text-[#898989]">
+                <button type="button" onClick={handleCloseSearchContent} className="text-[#898989]">
                   닫기
                 </button>
               </div>

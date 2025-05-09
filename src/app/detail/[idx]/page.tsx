@@ -25,6 +25,7 @@ export default function DetailPage({params} : DetailPageProps) {
       currentPrice: 89000,
       bidderCount: 13,
       scrapCount: 10,
+      itemId : itemId
     },
     // 다른 상품도 추가 가능
   ];
@@ -36,7 +37,11 @@ export default function DetailPage({params} : DetailPageProps) {
         </div>
 
         <div style={{ flex: 1, maxWidth: '620px' }}>
-          <ProductInfo />
+          <ProductInfo
+            currentPrice= {30000}
+            bidCount={4}
+            bidderCount={2}
+            endTime="2025-05-09 15:30:00" />
           <BidHistory />
         </div>
 

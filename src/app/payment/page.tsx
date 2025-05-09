@@ -1,7 +1,4 @@
 'use client'
-import ShippingInfo from "@/components/payment/ShippingInfo";
-import PaymentMethodSelector from "@/components/payment/PaymentMehodSelector";
-import FinalPaymentSummary from "@/components/payment/FinalPaymentSummary";
 import PaymentHeader from "@/components/payment/PaymentHead";
 
 export default function Payment(){

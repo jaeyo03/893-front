@@ -4,9 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User,Pencil } from "lucide-react";
 import { useState } from "react";
+
 import { Dialog,DialogContent,DialogDescription,DialogTrigger,DialogTitle,DialogFooter,DialogHeader } from "@/components/ui/dialog";
 import  DeliveryAddressCard  from "@/components/profile/Address/DeliveryAddressCard";
 import AddressModal from "./Address/AddressModal";
+
+
 type AddressInfo = {
   label: string;
   name: string;
@@ -27,6 +30,7 @@ export default function UserProfile() {
     address: "대표 배송지",
     phone: "010-1234-5678",
   });
+
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);

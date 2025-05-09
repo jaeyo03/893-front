@@ -1,5 +1,6 @@
 "use client";
 
+import DaumPostcodeModal from "./DaumPostcodeModal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -29,6 +30,7 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -72,6 +74,7 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
     });
     setErrors({});
   };
+
 
   if (!isOpen) return null;
 
@@ -118,15 +121,26 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
             {errors.phone && <p className="text-red text-xs mt-1">{errors.phone}</p>}
           </div>
 
+          {/* 주소 검색 + readOnly 필드 */}
           <div className="col-span-2">
-            <input
-              type="text"
-              name="address"
-              placeholder="도로명 주소"
-              value={form.address}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded ${errors.address ? "border-red" : "border-gray-300"}`}
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="address"
+                value={form.address}
+                placeholder="도로명 주소"
+                readOnly
+                className={`w-full p-2 border rounded ${errors.address ? "border-red" : "border-gray-300"}`}
+              />
+              <Button
+                type="button"
+                onClick={() => setIsPostcodeOpen(true)}
+                className="mt-2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
+              >
+                주소 검색
+              </Button>
+            </div>
+            
             {errors.address && <p className="text-red text-xs mt-1">{errors.address}</p>}
           </div>
 
@@ -160,6 +174,18 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
           </Button>
           <Button onClick={handleSubmit}>저장</Button>
         </div>
+
+        {isPostcodeOpen && (
+          <DaumPostcodeModal
+            onClose={() => setIsPostcodeOpen(false)}
+            onComplete={(data) => {
+              setForm((prev) => ({
+                ...prev,
+                address: data.address,
+              }));
+            }}
+          />
+        )}
       </div>
     </div>
   );

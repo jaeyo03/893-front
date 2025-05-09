@@ -21,10 +21,10 @@ export function Header() {
       active: pathname === "/",
     },
     {
-      href: "/auctions",
+      href: "/search",
       label: "경매 검색",
       icon: <Gavel className="w-4 h-4 mr-2" />,
-      active: pathname === "/auctions" || pathname.startsWith("/auctions/"),
+      active: pathname === "/search" || pathname.startsWith("/search/"),
     },
     {
       href: "/notifications",

@@ -41,7 +41,7 @@ export default function DetailPage({params} : DetailPageProps) {
             currentPrice= {30000}
             bidCount={4}
             bidderCount={2}
-            endTime="17:30:30" />
+            endTime="2025/05/09 14:30:00" />
           <BidHistory />
         </div>
 

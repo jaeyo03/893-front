@@ -3,7 +3,7 @@
 
 interface WarningModalProps {
   isOpen: boolean;
-  positionClass?: string; // 위치 조정용 클래스
+  positionClass : string; // 위치 조정용 클래스
 }
 
 export default function WarningModal({ isOpen, positionClass }: WarningModalProps) {

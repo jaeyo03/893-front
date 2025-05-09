@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bookmark, Timer, TriangleAlert } from 'lucide-react';
+import { Bookmark, Timer, TriangleAlert, User } from 'lucide-react';
 import WarningModal from './WarningModal';
 
 interface ProductInfoProps {
@@ -93,9 +93,12 @@ export default function ProductInfo({
         <div className="mb-4">
           <div className='flex items-center justify-between'>
             <h1 className="text-xl font-bold">경매 제목</h1>
-            <p className="text-gray-600">👤 판매자 e-mail</p>
+            <p className="flex items-center gap-1 text-gray-600">
+              <User className="w-4 h-4" />
+              판매자 e-mail
+            </p>
           </div>
-          <p className='text-xs font-thin'>카테고리/카테고리중/카테고리소</p>
+          <p className='text-xs font-thin'>카테고리대 &gt; 카테고리중 &gt; 카테고리소</p>
         </div>
 
         <div className="p-4 mb-4 border border-blue-400 rounded-lg">

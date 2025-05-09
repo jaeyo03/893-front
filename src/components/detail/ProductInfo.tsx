@@ -43,12 +43,14 @@ export default function ProductInfo({
   }, [isHighestBidder, cancelTimer]);
 
   const formatTime = (seconds: number) => {
-    const min = String(Math.floor(seconds / 60)).padStart(1, '0');
+    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
     const sec = String(seconds % 60).padStart(2, '0');
-    return `${min}:${sec}`;
+    return `${hours}:${min}:${sec}`;
   };
 
   const handleBid = () => {
+    if(isHighestBidder && cancelTimer > 0) return;
     if (bidAmount % 100 !== 0) return;
     if (bidAmount >= currentPrice + 100) {
       setLastBidPrice(currentPrice);
@@ -69,6 +71,21 @@ export default function ProductInfo({
     setIsBookmarked((prev) => !prev);
     setBookmarkCount((count) => (isBookmarked ? count - 1 : count + 1));
   };
+
+  const [remainingTime, setRemainingTime] = useState<number>(
+    Math.max(Math.floor((new Date(endTime).getTime() - new Date().getTime()) / 1000), 0)
+  );
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const end = new Date(endTime);
+      const diff = Math.floor((end.getTime() - now.getTime()) / 1000);
+      setRemainingTime(diff > 0 ? diff : 0);
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [endTime]);
 
   return (
     <div className="pt-5">
@@ -91,7 +108,7 @@ export default function ProductInfo({
               <p className="text-sm text-black">남은 시간</p>
               <p className="flex items-center gap-1 text-xl font-bold text-blue-600">
                 <Timer className="w-5 h-5" />
-                {endTime}
+                {formatTime(remainingTime)}
               </p>
             </div>
           </div>

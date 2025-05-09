@@ -15,7 +15,7 @@ import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeBu
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton"; // 경매 시간 설정 버튼 컴포넌트트
 
 export default function Registration() {
-  //const [images, setImages] = useState<File[]>([]); // 이미지 상태 관리 */추가예정 (업로드된 이미지 파일들)
+  const [images, setImages] = useState<File[]>([]); // 이미지 상태 관리 */추가예정 (업로드된 이미지 파일들)
   const [title, setTitle] = useState<string>(""); // 경매 제목 상태 관리
   const [price, setPrice] = useState<number>(0); // 경매 시작 가격 상태 관리
   const [detail, setDetail] = useState<string>(""); // 상세 설명 상태 관리

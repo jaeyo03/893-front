@@ -29,6 +29,7 @@ export default function UserProfile() {
     email: "user@example.com",
     address: "대표 배송지",
     phone: "010-1234-5678",
+    imageUrl: "/images/신짱구.png",
   });
 
   const [addressModalOpen, setAddressModalOpen] = useState(false);
@@ -78,11 +79,12 @@ export default function UserProfile() {
   };
   // 정보 수정 함수
   const handleSave = () => {
-    // 예시: 수정된 정보로 상태 업데이트
+    //수정된 정보로 상태 업데이트
     const mainAddress = addresses.find((addr) => addr.isMain)
     setUserInfo({
       ...userInfo,
-      address: mainAddress ? mainAddress.label : "", // 예시로 변경
+      address: mainAddress ? mainAddress.label : "", // 없을 경우 공백
+      phone: mainAddress ? mainAddress.phone : "",
     });
     setDialogOpen(false)
   };
@@ -101,13 +103,18 @@ export default function UserProfile() {
       <div className="flex">
         {/* 좌측 아바타 */}
         <div className="mr-6 flex flex-col items-center w-24">
-          <div className="ml-6 w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-3xl mr-6">
-            <User size={40} />
+          <div className="ml-6 w-24 h-24 rounded-full border flex items-center justify-center text-3xl mr-6 overflow-hidden">
+          {userInfo.imageUrl ? (
+            <img
+              src={userInfo.imageUrl}
+              alt="사용자 이미지"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User size={40} className="text-gray-500" />
+          )}
           </div>
-          {/* 편집 아이콘 추가 */}
-          <div className="absolute w-8 h-8 bottom-[48px] left-[84px] rounded-full flex items-center justify-center bg-white border-[1px]">
-            <Pencil size={20} className="text-black cursor-pointer" />
-          </div>
+          
           {/* 이미지 하단 유저 이름 */}
           <div className="mt-2 text-sm font-semibold text-center">{userInfo.name}</div>
         </div>

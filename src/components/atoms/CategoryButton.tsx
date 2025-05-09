@@ -22,7 +22,7 @@ export default function CategoryButton({ category } : {category : HomeCategory})
   }
 
   return (
-    <Link className="bg-[#F3F4F5] h-[141px] w-[155px] rounded-[12px] cursor-pointer p-2 grid gap-4" href={'/'}>
+    <Link className="bg-[#F3F4F5] h-[141px] w-[155px] rounded-[12px] cursor-pointer p-2 grid gap-4" href={`/search?mainCategoryId=${category}`}>
       <Image
         src={imageUrl[category]}
         alt={`${category} icon`}

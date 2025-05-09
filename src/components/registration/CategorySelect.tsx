@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 
 const data = {
   전자기기: {
@@ -30,29 +32,55 @@ const data = {
   },
 } as const;
 
-type Step1Category = keyof typeof data;
-type Step2Category<T extends Step1Category> = keyof (typeof data)[T];
+export type CategoryValue = {
+  mainCategory: string;
+  subCategory: string;
+  detailCategory: string;
+};
 
-export default function CategorySelector() {
-  const [step1, setStep1] = useState<Step1Category | null>(null);
-  const [step2, setStep2] = useState<Step2Category<Step1Category> | null>(null);
+type Props = {
+  value: CategoryValue;
+  onChange: (value: CategoryValue) => void;
+};
+
+export default function CategorySelector({ value, onChange }: Props) {
+  const [step1, setStep1] = useState<string | null>(null);
+  const [step2, setStep2] = useState<string | null>(null);
   const [step3, setStep3] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (value.mainCategory && value.subCategory && value.detailCategory) {
+      setStep1(value.mainCategory);
+      setStep2(value.subCategory);
+      setStep3(value.detailCategory);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (step1 && step2 && step3) {
+      onChange({
+        mainCategory: step1,
+        subCategory: step2,
+        detailCategory: step3,
+      });
+    }
+  }, [step1, step2, step3, onChange]);
 
   return (
     <div className="flex w-full max-w-[1280px] h-[240px] border-none rounded overflow-hidden text-resgisterchecktext font-thin text-[13.125px]">
       {/* 1단계 */}
       <div
-        className={`w-1/3 overflow-y-auto border border-solid rounded${
-          step1 ? " border-r border" : ""
+        className={`w-1/3 overflow-y-auto border border-solid rounded ${
+          step1 ? " border-r" : ""
         } scrollbar-none`}
       >
-        {(Object.keys(data) as Step1Category[]).map((category) => (
+        {Object.keys(data).map((category) => (
           <div
             key={category}
             onClick={() => {
               setStep1(category);
-              setStep2(null); // 중분류 초기화
-              setStep3(null); // 하위 항목 초기화
+              setStep2(null);
+              setStep3(null);
             }}
             className={`px-4 py-2 cursor-pointer ${
               step1 === category
@@ -67,40 +95,42 @@ export default function CategorySelector() {
 
       {/* 2단계 */}
       <div
-        className={`w-1/3 overflow-y-auto scrollbar-none border-solid rounded${
+        className={`w-1/3 overflow-y-auto scrollbar-none border-solid rounded ${
           step1 ? "border-r border" : ""
         }`}
       >
         {step1 &&
-          (Object.keys(data[step1]) as Step2Category<typeof step1>[]).map(
-            (subcategory) => (
-              <div
-                key={subcategory}
-                onClick={() => {
-                  setStep2(subcategory);
-                  setStep3(null); // 하위 항목 초기화
-                }}
-                className={`px-4 py-2 cursor-pointer ${
-                  step2 === subcategory
-                    ? "bg-divider font-semibold"
-                    : "hover:bg-divider "
-                }`}
-              >
-                {subcategory}
-              </div>
-            )
-          )}
+          Object.keys(data[step1 as keyof typeof data]).map((subcategory) => (
+            <div
+              key={subcategory}
+              onClick={() => {
+                setStep2(subcategory);
+                setStep3(null);
+              }}
+              className={`px-4 py-2 cursor-pointer ${
+                step2 === subcategory
+                  ? "bg-divider font-semibold"
+                  : "hover:bg-divider"
+              }`}
+            >
+              {subcategory}
+            </div>
+          ))}
       </div>
 
       {/* 3단계 */}
       <div
-        className={`w-1/3 overflow-y-auto scrollbar-none border-solid rounded${
+        className={`w-1/3 overflow-y-auto scrollbar-none border-solid rounded ${
           step1 && step2 ? "border-r border" : ""
         }`}
       >
-        {step1 && step2 && step2 in data[step1] && (
+        {step1 && step2 && (
           <div className="flex flex-col">
-            {(data[step1][step2] as string[]).map((item) => (
+            {(
+              data[step1 as keyof typeof data][
+                step2 as keyof (typeof data)[keyof typeof data]
+              ] as string[]
+            ).map((item) => (
               <div
                 key={item}
                 onClick={() => setStep3(item)}

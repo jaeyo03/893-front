@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogTrigger,
@@ -5,40 +7,56 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
+import { useState, useEffect } from "react";
 
-export default function AuctionStartTimeButton() {
-  const [hour, setHour] = useState(0);
-  const [minute, setMinute] = useState(0);
+// ✅ props 기반 구조
+interface AuctionStartTimeButtonProps {
+  value: { hour: number; minute: number };
+  onChange: (value: { hour: number; minute: number }) => void;
+  disabled?: boolean; // 수정페이지일 경우 비활성화 처리용
+}
+
+export default function AuctionStartTimeButton({
+  value,
+  onChange,
+  disabled = false,
+}: AuctionStartTimeButtonProps) {
   const [open, setOpen] = useState(false);
-
-  const formattedTime =
-    hour === 0 && minute === 0
-      ? "경매 시작 시간 (최대 24시간)"
-      : `${hour.toString().padStart(2, "0")} 시간 ${minute
-          .toString()
-          .padStart(2, "0")} 분 후 경매가 시작됩니다.`;
+  const [tempHour, setTempHour] = useState(value.hour);
+  const [tempMinute, setTempMinute] = useState(value.minute);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
-  const handleConfirm = () => {
-    alert(
-      `${hour.toString().padStart(2, "0")} 시간간 ${minute
-        .toString()
-        .padStart(2, "0")} 분 후에 경매가 시작됩니다.`
-    );
-    setOpen(false);
-  };
+  const formattedTime =
+    value.hour === 0 && value.minute === 0
+      ? "경매 시작 시간 (최대 24시간)"
+      : `${value.hour.toString().padStart(2, "0")} 시간 ${value.minute
+          .toString()
+          .padStart(2, "0")} 분 후 경매가 시작됩니다.`;
+
+  useEffect(() => {
+    if (disabled) {
+      onChange({ hour: 0, minute: 0 });
+    }
+  }, [disabled, onChange]);
+
+  useEffect(() => {
+    if (open) {
+      setTempHour(value.hour);
+      setTempMinute(value.minute);
+    }
+  }, [open, value.hour, value.minute]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
+          disabled={disabled}
           onClick={() => setOpen(true)}
           className="w-[560px] h-[50px] bg-white border border-registerline text-resgistertext text-[16px] font-thin rounded-[6px] px-[16px] shadow-none text-left hover:bg-divider"
         >
@@ -48,10 +66,9 @@ export default function AuctionStartTimeButton() {
 
       <DialogContent className="w-[200px] h-[400px] p-4 flex flex-col justify-between items-center">
         <div className="relative flex items-center justify-center gap-2 pt-6">
-          {/* 중앙 강조 영역 */}
           <div className="absolute top-[calc(50%-20px)] w-full h-[40px] bg-main/10 z-10 rounded-lg" />
 
-          {/* 시 Swiper */}
+          {/* 시 선택 */}
           <Swiper
             direction="vertical"
             slidesPerView={5}
@@ -61,7 +78,7 @@ export default function AuctionStartTimeButton() {
             freeMode
             onSlideChange={(swiper) => {
               const realIndex = swiper.realIndex % 24;
-              setHour(realIndex);
+              setTempHour(realIndex);
             }}
             className="h-[280px] w-[80px]"
           >
@@ -75,7 +92,7 @@ export default function AuctionStartTimeButton() {
             ))}
           </Swiper>
 
-          {/* 분 Swiper */}
+          {/* 분 선택 */}
           <Swiper
             direction="vertical"
             slidesPerView={5}
@@ -85,7 +102,7 @@ export default function AuctionStartTimeButton() {
             freeMode
             onSlideChange={(swiper) => {
               const realIndex = swiper.realIndex % 60;
-              setMinute(realIndex);
+              setTempMinute(realIndex);
             }}
             className="h-[280px] w-[80px]"
           >
@@ -109,7 +126,10 @@ export default function AuctionStartTimeButton() {
           </Button>
           <Button
             className="w-full bg-white shadow-none text-main font-medium text-[19px] hover:text-main/50 hover:bg-white border-none"
-            onClick={handleConfirm}
+            onClick={() => {
+              onChange({ hour: tempHour, minute: tempMinute });
+              setOpen(false);
+            }}
           >
             적용
           </Button>

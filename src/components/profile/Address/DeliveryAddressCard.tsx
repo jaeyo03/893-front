@@ -6,7 +6,6 @@ type DeliveryAddressCardProps = {
     label: string;
     name: string;
     phone: string;
-    city: string;
     address: string;
     detail: string;
     isMain: boolean;
@@ -40,7 +39,6 @@ export default function DeliveryAddressCard({ data, onDelete, onSetMain }: Deliv
         )}
       </div>
       <div className="text-sm space-y-1 mt-2">
-        <div>주소 : {data.city}</div>
         <div>휴대폰 : {data.phone}</div>
         <div>배송지 : {data.address}</div>
         <div>상세 주소 : {data.detail}</div>

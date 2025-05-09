@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { User,Pencil } from "lucide-react";
 import { useState } from "react";
 import { Dialog,DialogContent,DialogDescription,DialogTrigger,DialogTitle,DialogFooter,DialogHeader } from "@/components/ui/dialog";
-import  DeliveryAddressCard  from "@/components/profile/DeliveryAddressCard";
-import AddressModal from "./AddressModal";
+import  DeliveryAddressCard  from "@/components/profile/Address/DeliveryAddressCard";
+import AddressModal from "./Address/AddressModal";
 type AddressInfo = {
   label: string;
   name: string;

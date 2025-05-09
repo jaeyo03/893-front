@@ -31,7 +31,7 @@ export default function RootLayout({
           <div className="container flex h-16 items-center">
             <Header />
             <div className="ml-auto flex items-center space-x-4">
-              <Link href="/auth/register">
+              <Link href="/auth/login">
                 <Button size="sm" className="bg-main hover:bg-mainLight">로그인</Button>
               </Link>
             </div>

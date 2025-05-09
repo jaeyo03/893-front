@@ -6,7 +6,7 @@ interface PurchaseStatus {
   label: string;
   className: string;
 }
-const getPurchaseStatus = (isPurchased:Boolean) : PurchaseStatus=>{
+const getPurchaseStatus = (isPurchased:boolean) : PurchaseStatus=>{
   return isPurchased
   ?{label:"구매완료",className:"bg-main"}
   :{label:"구매 전",className:"bg-warningkeword"}

@@ -4,14 +4,16 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User,Pencil } from "lucide-react";
 import { useState } from "react";
+
 import { Dialog,DialogContent,DialogDescription,DialogTrigger,DialogTitle,DialogFooter,DialogHeader } from "@/components/ui/dialog";
-import  DeliveryAddressCard  from "@/components/profile/DeliveryAddressCard";
+import  DeliveryAddressCard  from "@/components/profile/Address/DeliveryAddressCard";
+import AddressModal from "./Address/AddressModal";
+
 
 type AddressInfo = {
   label: string;
   name: string;
   phone: string;
-  city: string;
   address: string;
   detail: string;
   isMain: boolean;
@@ -29,14 +31,15 @@ export default function UserProfile() {
     phone: "010-1234-5678",
   });
 
-  const [selectedAddress,setSelectedAddress] = useState(userInfo.address);
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   const [addresses, setAddresses] = useState<AddressInfo[]>([
     {
       label: "배송지",
       name: "user",
       phone: "010 - xxxx - xxxx",
-      city: "서울",
       address: "",
       detail: "",
       isMain: true,
@@ -45,27 +48,11 @@ export default function UserProfile() {
       label: "집",
       name: "user",
       phone: "010 - xxxx - xxxx",
-      city: "서울",
       address: "",
       detail: "",
       isMain: false,
     },
   ]);
-
-  const addNewAddress = () => {
-    setAddresses((prev) => [
-      ...prev,
-      {
-        label: "새 배송지",
-        name: "user",
-        phone: "",
-        city: "",
-        address: "",
-        detail: "",
-        isMain: false,
-      },
-    ]);
-  };
 
   const setMainAddress = (index: number) => {
     setAddresses((prev) =>
@@ -77,16 +64,36 @@ export default function UserProfile() {
   };
 
   const deleteAddress = (index: number) => {
-    setAddresses((prev) => prev.filter((_, i) => i !== index));
+    setAddresses((prev) => {
+      const isDeletingMain = prev[index].isMain;
+      const updated = prev.filter((_,i) => i !== index);
+
+      if (isDeletingMain && updated.length > 0){
+        updated[0].isMain = true;
+      }
+
+      return [...updated];
+    })
+    
   };
   // 정보 수정 함수
   const handleSave = () => {
     // 예시: 수정된 정보로 상태 업데이트
+    const mainAddress = addresses.find((addr) => addr.isMain)
     setUserInfo({
       ...userInfo,
-      address: selectedAddress, // 예시로 변경
+      address: mainAddress ? mainAddress.label : "", // 예시로 변경
     });
     setDialogOpen(false)
+  };
+
+  const handleDeleteClick = (index: number) => {
+    if (addresses.length === 1) {
+      setDeleteIndex(index);
+      setDeleteConfirmOpen(true);
+    } else {
+      deleteAddress(index);
+    }
   };
 
   return (
@@ -145,22 +152,60 @@ export default function UserProfile() {
                 <DeliveryAddressCard
                   key={index}
                   data={addr}
-                  onDelete={() => deleteAddress(index)}
+                  onDelete={() => handleDeleteClick(index)}
                   onSetMain={() => setMainAddress(index)}
                 />
               ))}
+              <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>배송지를 삭제하시겠습니까?</DialogTitle>
+                    <DialogDescription>
+                      배송지가 1개뿐입니다. 삭제하면 기본 배송지가 사라집니다.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+                      취소
+                    </Button>
+                    <Button
+                      className="bg-destructive text-white"
+                      onClick={() => {
+                        if (deleteIndex !== null) deleteAddress(deleteIndex);
+                        setDeleteConfirmOpen(false);
+                        setDeleteIndex(null);
+                      }}
+                    >
+                      삭제
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* + 버튼 */}
             <div className="flex justify-center mt-4">
               <button
-                onClick={addNewAddress}
+                onClick={() => setAddressModalOpen(true)}
                 className="w-8 h-8 border rounded-full text-xl flex items-center justify-center hover:bg-gray-100"
               >
                 +
               </button>
+              
             </div>
-
+            <AddressModal
+              isOpen={addressModalOpen}
+              onClose={() => setAddressModalOpen(false)}
+              onSave={(newAddress) => {
+                setAddresses((prev) => {
+                  const updated = newAddress.isMain
+                    ? prev.map((a) => ({ ...a, isMain: false }))
+                    : prev;
+                  return [...updated, newAddress];
+                });
+                setAddressModalOpen(false);
+              }}
+            />
 
             <DialogFooter className="mt-4">
               <Button className="bg-main" onClick={handleSave}>저장</Button>

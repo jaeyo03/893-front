@@ -1,6 +1,6 @@
 'use client'
 import { Bookmark } from 'lucide-react';
-import { useEffect,useState } from 'react';
+import { useState } from 'react';
 
 interface AuctionCardProps {
   imageUrl: string;
@@ -24,7 +24,6 @@ export default function AuctionCard({
   imageUrl,
   title,
   status,
-  startTime,
   endTime,
   currentPrice,
   bidderCount,
@@ -32,12 +31,12 @@ export default function AuctionCard({
   isScrapped = false,
 }: AuctionCardProps) {
   const [isScraped,setIsScraped] = useState(false);
-  const [bookmarkCount,setBookmarkCount] = useState(1);
+  const [,setBookmarkCount] = useState(1);
   const statusInfo = statusMap[status] ?? { label: "알 수 없음", color: "bg-red-500" };
 
   const handleScrapToggle = () =>{
     setIsScraped((prev) => !prev);
-    setBookmarkCount((count)=>(isScraped ? count -1:count+1));
+    setBookmarkCount((bookmarkCount)=>(isScraped ? bookmarkCount -1:bookmarkCount+1));
   }
   return (
     <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
@@ -50,7 +49,6 @@ export default function AuctionCard({
         className="absolute p-1 bottom-2 right-2">
           <Bookmark
             className={`w-5 h-5 ${isScrapped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
-            
           />
         </button>
       </div>

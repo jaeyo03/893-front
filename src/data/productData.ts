@@ -10,10 +10,15 @@ export interface RelatedProduct {
   bidCount: number;
   bidderCount: number;
   scrapCount: number;
-  mainCategory: string;
-  subCategory: string;
-  lastCategory: string;
+  category: Category;
   itemId: number;
+}
+
+export interface Category{
+  id :number;
+  mainCategory:string;
+  subCategory:string;
+  detailCategory:string;
 }
 
 export const getProductDescription = (itemId: number): string => {
@@ -34,9 +39,14 @@ export const getRelatedProducts = (itemId: number): RelatedProduct[] => {
       bidCount: 3,
       bidderCount:2,
       scrapCount: 10,
-      mainCategory: "의류",
-      subCategory: "신발",
-      lastCategory: "아디다스",
+      category:
+        {
+          id : 1,
+          mainCategory: "의류",
+          subCategory: "신발",
+          detailCategory: "아디다스",
+        }
+      ,
       itemId: itemId,
       sellerEmail: "g***@gmail.com"
     },

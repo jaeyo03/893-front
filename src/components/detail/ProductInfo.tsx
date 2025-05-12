@@ -65,9 +65,9 @@ export default function ProductInfo({ relatedProducts }: ProductInfoProps) {
         <ProductHeader
           title={relatedProducts.title}
           sellerEmail={relatedProducts.sellerEmail}
-          mainCategory={relatedProducts.mainCategory}
-          subCategory={relatedProducts.subCategory}
-          lastCategory={relatedProducts.lastCategory}/>
+          mainCategory={relatedProducts.category.mainCategory}
+          subCategory={relatedProducts.category.subCategory}
+          lastCategory={relatedProducts.category.detailCategory}/>
       </div>
       <div className="mx-auto max-w-[620px] border border-blue-400 rounded-lg p-4">
         <div className="mb-4">

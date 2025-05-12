@@ -25,9 +25,9 @@ export default function SellerProductInfo({ relatedProducts }: ProductInfoProps)
       <div className="mx-auto max-w-[620px] mb-4">
         <SellerProductHeader
           title={relatedProducts.title}
-          mainCategory={relatedProducts.mainCategory}
-          subCategory={relatedProducts.subCategory}
-          lastCategory={relatedProducts.lastCategory}/>
+          mainCategory={relatedProducts.category.mainCategory}
+          subCategory={relatedProducts.category.subCategory}
+          lastCategory={relatedProducts.category.detailCategory}/>
       </div>
       <div className="mx-auto max-w-[620px] border border-blue-400 rounded-lg p-4">
         <div className="mb-4">

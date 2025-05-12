@@ -5,11 +5,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import AuctionItemCard from "./AuctionItemCard"
 
-export default function ImageSlider(){
-  const images =['/images/adidas_shoe.jpg',
-    '/images/converse.avif',
-    '/images/nike_shoe.jpg',
-  ];
+interface ImageSliderProps{
+  images: string[];
+}
+
+export default function ImageSlider({images} : ImageSliderProps){
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const goToNext = () => {

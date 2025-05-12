@@ -5,13 +5,30 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Home, Gavel, Bell, User, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "@/components/notification/NotificationDropdown";
 
 export function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  const notificationWrapperRef = useRef<HTMLDivElement | null>(null);
+
+  // 외부 클릭 시 알림창 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationWrapperRef.current &&
+        !notificationWrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const routes = [
     {
@@ -49,11 +66,15 @@ export function Header() {
       <div className="items-center hidden space-x-1 md:flex">
         {routes.map((route) =>
           route.href === "/notifications" ? (
-            <div key={route.href} className="relative">
+            <div
+              key={route.href}
+              className="relative"
+              ref={notificationWrapperRef}
+            >
               <button
                 onClick={() => {
-                  setIsNotificationOpen((prev) => !prev); // 알림 드롭다운 열기/닫기
-                  setIsMenuOpen(false); // 모바일 메뉴 닫기
+                  setIsNotificationOpen((prev) => !prev);
+                  setIsMenuOpen(false);
                 }}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
@@ -68,7 +89,7 @@ export function Header() {
 
               {isNotificationOpen && (
                 <NotificationDropdown
-                  onClose={() => setIsNotificationOpen((prev) => !prev)}
+                  onClose={() => setIsNotificationOpen(false)}
                 />
               )}
             </div>
@@ -83,8 +104,8 @@ export function Header() {
                   : "hover:bg-muted"
               )}
               onClick={() => {
-                setIsNotificationOpen(false); // 알림 드롭다운 닫기
-                setIsMenuOpen(false); // 모바일 메뉴 닫기
+                setIsNotificationOpen(false);
+                setIsMenuOpen(false);
               }}
             >
               {route.icon}
@@ -94,7 +115,6 @@ export function Header() {
         )}
       </div>
 
-      {/* 모바일 메뉴 버튼 */}
       <div className="ml-auto md:hidden">
         <Button
           variant="ghost"
@@ -110,7 +130,6 @@ export function Header() {
         </Button>
       </div>
 
-      {/* 모바일 메뉴 드롭다운 */}
       {isMenuOpen && (
         <div className="absolute left-0 right-0 z-50 border-b top-16 bg-background md:hidden">
           <div className="container py-2">
@@ -123,8 +142,8 @@ export function Header() {
                   route.active ? "bg-primary/10 text-primary" : "text-secondary"
                 )}
                 onClick={() => {
-                  setIsNotificationOpen(false); // 다른 메뉴 누르면 알림 드롭다운 닫기
-                  setIsMenuOpen(false); // 모바일 메뉴도 닫기
+                  setIsNotificationOpen(false);
+                  setIsMenuOpen(false);
                 }}
               >
                 {route.icon}

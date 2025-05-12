@@ -60,3 +60,18 @@ export const getBids = (): Bid[] => [
 export const getCanceledBids = (): Bid[] => [
   { rank: 1, email: '변학도', amount: 27000, time: '12:10:03' },
 ];
+
+export interface AuctionStatsProps {
+  relatedProducts: RelatedProduct;
+  isBookmarked: boolean;
+  bookmarkCount: number;
+  onBookmarkToggle: () => void;
+}
+
+export interface BidInteractionProps {
+  currentPrice: number;
+  onBid: (amount: number) => void;
+  onCancelBid: () => void;
+  isHighestBidder: boolean;
+  cancelTimer: number;
+}

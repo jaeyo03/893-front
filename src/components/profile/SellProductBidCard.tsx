@@ -1,30 +1,22 @@
 'use client'
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import { Bookmark } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { bidInfo,getAuctionStatus } from "./constants/MyPageProduct";
 
 interface Props{
   productId:number;
 }
 
-export default function ProductBidCard({productId} : Props) {
+export default function SellerProductBidCard({ productId } :Props) {
 
   const router = useRouter();
   const status = getAuctionStatus(bidInfo.isWinning);
 
-  const [isScraped,setIsScraped] = useState(false);
-  const handleScrapToggle = (e:React.MouseEvent) =>{
-    e.stopPropagation();
-    setIsScraped((prev) => !prev);
-  }
-
   const handclick = () => {
     router.push(`/seller/detail/${productId}`);
   }
-
   return (
     <div className="flex justify-center w-full">
       <Card 
@@ -44,19 +36,21 @@ export default function ProductBidCard({productId} : Props) {
               <span className="w-1/2">{bidInfo.myBid}</span>
               <span className="w-1/2 text-left">{bidInfo.currentBid}</span>
             </div>
-            <button onClick={handleScrapToggle}
-              className="relative p-1 right-2">
-                <Bookmark
-                  className={`w-5 h-5 ${ isScraped? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
-                />
-              </button>
-            <p className="text-xs mt-1">남은 시간: {bidInfo.remainingTime}</p>
+
+            <p className="text-xs mt-6">남은 시간: {bidInfo.remainingTime}</p>
           </div>
 
           <div className="flex flex-col justify-between items-center ml-4 h-full py-2">
             <span className={`text-xs text-white px-3 py-1 rounded-full ${status.className}`}>
               {status.label}
             </span>
+            <Button 
+              className="mt-auto text-xs border-2 border-red text-red bg-white px-2 py-1 hover:bg-red hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              삭제하기
+            </Button>
           </div>
         </div>
       </Card>

@@ -86,6 +86,13 @@ export default function UserProfile() {
     if (isMain && updated.length > 0) updated[0].isMain = true;
 
     setAddresses([...updated]);
+    if (updated.length === 0) {
+      setUserInfo((prev) => ({
+        ...prev,
+        address: "",
+        phone: "",
+      }));
+    }
   };
 
   const handleSave = () => {
@@ -213,7 +220,24 @@ export default function UserProfile() {
             <AddressModal
               isOpen={addressModalOpen}
               onClose={() => setAddressModalOpen(false)}
-              onSave={handleAddAddress}
+              onSave={(newAddress) => {
+                setAddresses((prev) => {
+                  const isFirst = prev.length === 0;
+            
+                  const updated = newAddress.isMain || isFirst
+                    ? prev.map((a) => ({ ...a, isMain: false }))
+                    : prev;
+            
+                  return [
+                    ...updated,
+                    {
+                      ...newAddress,
+                      isMain: newAddress.isMain || isFirst, // 첫 주소면 자동으로 isMain: true
+                    },
+                  ];
+                });
+                setAddressModalOpen(false);
+              }}
             />
 
             <DialogFooter className="mt-4">

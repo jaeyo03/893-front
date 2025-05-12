@@ -1,106 +1,184 @@
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import NotificationContents from "./NotificationContents";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/ko";
+import { onMessageListener } from "@/lib/firebase-messaging";
 
+// ✅ dayjs 플러그인 초기화
+dayjs.extend(relativeTime);
+dayjs.locale("ko");
+
+// ✅ 날짜를 '방금 전' 또는 'MM월 DD일' 형식으로 변환
+function convertTimeToDisplay(dateString: string) {
+  const date = dayjs(dateString);
+  const todayStart = dayjs().startOf("day");
+  return date.isAfter(todayStart) ? date.fromNow() : date.format("MM월 DD일");
+}
+
+// ✅ 외부로부터 전달받는 props 타입
 type Props = {
   onClose: () => void;
 };
 
+// ✅ 알림 객체 타입 정의
+type Notification = {
+  id: number;
+  notificationType: "Buyer" | "Seller";
+  title: string;
+  content: string;
+  createdAt: string;
+  auctionId: number;
+  isRead: boolean;
+  thumbnailUrl: string;
+};
+
 export default function NotificationDropdown({ onClose }: Props) {
-  // const [isOpen, setIsOpen] = useState(false);
+  // ✅ 탭 선택 상태 (전체 / 구매 / 판매)
   const [selectedTab, setSelectedTab] = useState<"전체" | "구매" | "판매">(
     "전체"
   );
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      image: "/images/신짱구.png",
-      title: "스타벅스 텀블러",
-      date: "4시간 전",
-      category: "구매",
-      content: "[사용자명]님이 [금액]에 입찰하셨습니다.",
-    },
-    // {
-    //   id: 2,
-    //   image: "/images/sample2.png",
-    //   title: "애플워치 3세대 44MM 팜ㅍㅍㅍㅍㅍㅍㅍㅍㅍㅍ",
-    //   date: "4월22일일",
-    //   category: "판매",
-    //   content: "경매 종료까지 [X]분 남았습니다.",
-    // },
-  ]);
+
+  // ✅ 알림 리스트 상태
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  // ✅ 알림 내 옵션 버튼 열림 여부 → 배경 dim 처리용
   const [isDimmed, setIsDimmed] = useState(false);
 
+  // ✅ 현재 옵션이 열린 알림의 ID
+  const [optionTargetId, setOptionTargetId] = useState<number | null>(null);
+
+  // ✅ 바깥 클릭 감지를 위한 참조
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const filteredNotifications = notifications.filter((n) => {
-    if (selectedTab === "전체") return true;
-    return n.category === selectedTab;
-  });
 
+  // ✅ 최초 진입 시 기존 알림 목록 불러오기 (백엔드 API 호출)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        onClose(); // 드롭다운 외부 클릭 시 닫기
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
+    async function fetchNotifications() {
+      const res = await fetch("/api/notification");
+      const data = await res.json();
+      const list = data.data.notificationList;
+      const formatted = list.map((n: Notification) => ({
+        id: n.id,
+        image: n.thumbnailUrl,
+        title: n.title,
+        date: convertTimeToDisplay(n.createdAt),
+        createdAt: n.createdAt,
+        category: n.notificationType === "Buyer" ? "구매" : "판매",
+        content: n.content,
+        auctionId: n.auctionId,
+        isRead: n.isRead,
+      }));
+      setNotifications(formatted);
+    }
+    fetchNotifications();
+  }, []);
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+  // ✅ FCM 실시간 알림 수신 처리
+  useEffect(() => {
+    onMessageListener()
+      .then((payload: any) => {
+        const { title, body } = payload.notification;
+        const { category, image, auctionId } = payload.data || {};
+        const newNotification = {
+          id: Date.now(),
+          image: image || "/images/default.png",
+          title: title || "알림",
+          date: "방금 전",
+          createdAt: dayjs().toISOString(),
+          category: category === "Buyer" ? "구매" : "판매",
+          content: body || "",
+          auctionId: auctionId ? parseInt(auctionId) : 0,
+          isRead: false,
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+      })
+      .catch((err) => {
+        console.error("💥 FCM 수신 실패:", err);
+      });
+  }, []);
 
-  const handleDelete = (id: number) => {
+  // ✅ 알림 삭제
+  const handleDelete = async (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-    // 여기에 백엔드 API 호출 추가 예정
+    try {
+      await fetch(`/api/notification/${id}`, { method: "DELETE" });
+    } catch (err) {
+      console.error("삭제 실패", err);
+    }
+    setOptionTargetId(null);
   };
+
+  // ✅ 알림 읽음 처리
+  const markAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+  };
+
+  // ✅ 오늘 기준으로 알림 분류
+  const todayStart = dayjs().startOf("day");
+
+  const todayNotifications = notifications.filter(
+    (n) =>
+      dayjs(n.createdAt).isAfter(todayStart) &&
+      (selectedTab === "전체" || n.category === selectedTab)
+  );
+
+  const pastNotifications = notifications.filter(
+    (n) =>
+      dayjs(n.createdAt).isBefore(todayStart) &&
+      (selectedTab === "전체" || n.category === selectedTab)
+  );
+
   return (
     <div className="relative" ref={dropdownRef}>
       <div className="absolute right-0 mt-2 w-[390px] h-[740px] bg-[#F5F6F8] border rounded-lg shadow-lg z-50 overflow-y-auto">
-        <header className="flex top-0 left-0 right-0 bg-white border-b z-50">
-          <div className="flex items-center justify-between w-full p-4">
-            <h2 className="text-[22px] font-bold text-[#1E1E23]">알림</h2>
-            <button type="button" className="ml-auto p-2" onClick={onClose}>
-              <X className="w-[24px] h-[24px] text-[#1E1E23]" />
-            </button>
-          </div>
+        {/* ✅ 삭제 버튼이 열렸을 때 배경 블라인드 처리 */}
+        {optionTargetId && (
+          <div className="absolute inset-0 bg-black bg-opacity-30 z-40 pointer-events-none rounded-lg" />
+        )}
+
+        {/* ✅ 상단 헤더 */}
+        <header className="flex bg-white border-b z-50 p-4 justify-between items-center">
+          <h2 className="text-[22px] font-bold text-[#1E1E23]">알림</h2>
+          <button type="button" className="p-2" onClick={onClose}>
+            <X className="w-[24px] h-[24px] text-[#1E1E23]" />
+          </button>
         </header>
-        <div className="flex flex-col items-start justify-between w-full p-4">
-          <div className="text-[#1E1E23] font-bold text-[19px] pt-[9px]">
-            오늘 받은 알림
-          </div>
-          <div className="flex flex-col items-center justify-between p-4 gap-5 w-full">
-            {notifications.length === 0 ? (
-              <p className="text-[#1E1E23]">알림이 없습니다.</p>
-            ) : (
-              notifications.map((notification) => (
+
+        {/* ✅ 오늘 받은 알림 섹션 */}
+        {todayNotifications.length > 0 && (
+          <div className="flex flex-col items-start w-full p-4">
+            <div className="text-[#1E1E23] font-bold text-[19px] pt-[9px]">
+              오늘 받은 알림
+            </div>
+            <div className="flex flex-col gap-5 w-full">
+              {todayNotifications.map((n) => (
                 <NotificationContents
-                  key={notification.id}
-                  id={notification.id}
-                  image={notification.image}
-                  title={notification.title}
-                  date={notification.date}
-                  category={notification.category}
-                  content={notification.content}
-                  onDelete={handleDelete}
+                  key={n.id}
+                  {...n}
                   setDimmed={setIsDimmed}
+                  markAsRead={markAsRead}
+                  onRequestOptions={() => setOptionTargetId(n.id)}
                 />
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-        {/* ////////이전 알림 섹션/////// */}
+        )}
+
+        {/* ✅ 이전 알림 섹션 */}
         <div className="w-full px-4 pt-4">
-          {/* 탭 버튼 */}
           <div className="text-[#1E1E23] font-bold text-[19px] pt-[9px] pb-[10px]">
             이전 알림
           </div>
+
+          {/* 탭 버튼 (전체 / 구매 / 판매) */}
           <div className="flex space-x-4 mb-4">
             {["전체", "구매", "판매"].map((tab) => (
               <button
                 key={tab}
-                onClick={() => setSelectedTab(tab as "전체" | "구매" | "판매")}
+                onClick={() => setSelectedTab(tab as any)}
                 className={`w-[60px] h-[37px] px-4 py-2 rounded-[17px] border ${
                   selectedTab === tab
                     ? "bg-[#4173F51A] text-alarmcategory border-[#4173F54D] font-bold text-[14px]"
@@ -112,45 +190,47 @@ export default function NotificationDropdown({ onClose }: Props) {
             ))}
           </div>
 
-          {/* 알림 리스트 */}
-          <div className="flex flex-col items-center justify-between p-4 gap-5 w-full">
-            {filteredNotifications.length === 0 ? (
-              <p className="text-[#1E1E23]">알림이 없습니다.</p>
-            ) : (
-              filteredNotifications.map((notification) => (
-                <NotificationContents
-                  key={notification.id}
-                  id={notification.id}
-                  image={notification.image}
-                  title={notification.title}
-                  date={notification.date}
-                  category={notification.category}
-                  content={notification.content}
-                  onDelete={handleDelete}
-                  setDimmed={setIsDimmed}
-                />
-              ))
-            )}
+          {/* 이전 알림 리스트 */}
+          <div className="flex flex-col gap-5 w-full">
+            {pastNotifications.map((n) => (
+              <NotificationContents
+                key={n.id}
+                {...n}
+                setDimmed={setIsDimmed}
+                markAsRead={markAsRead}
+                onRequestOptions={() => setOptionTargetId(n.id)}
+              />
+            ))}
           </div>
         </div>
-        <footer className="flex justify-center items-center bottom-[40px] left-0 right-0 z-50 text-main text-[13px] font-normal">
+
+        {/* ✅ 하단 고정 삭제/닫기 버튼 */}
+        {optionTargetId && (
+          <div className="absolute bottom-4 w-full px-4 space-y-2 z-50">
+            <div className="w-full h-[60px] bg-white border shadow-sm rounded-[12px]">
+              <button
+                onClick={() => handleDelete(optionTargetId)}
+                className="flex justify-start items-center px-4 py-2 w-full h-full font-bold text-main hover:bg-gray-400/10 rounded-[12px]"
+              >
+                <Trash2 className="mr-2" size={20} /> 삭제하기
+              </button>
+            </div>
+            <div className="w-full h-[43px] bg-white border shadow-sm rounded-[12px]">
+              <button
+                onClick={() => setOptionTargetId(null)}
+                className="flex items-center justify-center px-4 py-2 w-full h-full font-normal text-main hover:bg-gray-400/10 rounded-[12px]"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ 하단 안내 문구 */}
+        <footer className="flex justify-center items-center pt-6 text-main text-[13px] font-normal">
           최근 7일 동안 받은 알림을 모두 확인했습니다.
         </footer>
       </div>
     </div>
   );
 }
-
-// 삭제 모달
-// 헤더 알림 아이콘 적용
-// 알림 아이콘 클릭 시 드롭다운 열기
-// 무한 스크롤
-// 알림 내용 클릭 시 상세 페이지로 이동
-// 알림 내용 클릭 시 읽음 처리 API 호출
-// 알림 삭제 모달
-// 알림 삭제 기능
-// 알림 삭제 API 호출
-// 백엔드 데이터 확인
-// 시간 24시간 기준? 일자 기준?
-// 시간 변환 -> 1시간 전, 4월 22일 등 <-- 백에서 어떻게 보내주는지 확인 필요
-// 내가 보내줘야 하는 데이터는 무엇인지 확인 필요

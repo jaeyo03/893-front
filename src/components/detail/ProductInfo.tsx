@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { RelatedProduct } from '@/data/productData';
 import { AuctionState } from './AuctionState';
 import BidInteraction from './BidInteraction';
+import ProductHeader from './ProductHeader';
 
 interface ProductInfoProps {
   relatedProducts: RelatedProduct;
@@ -59,7 +60,15 @@ export default function ProductInfo({ relatedProducts }: ProductInfoProps) {
   };
 
   return (
-    <div className="pt-5">
+    <div className="pt-5 ">
+      <div className="mx-auto max-w-[620px] mb-4">
+        <ProductHeader
+          title={relatedProducts.title}
+          sellerEmail={relatedProducts.sellerEmail}
+          mainCategory={relatedProducts.mainCategory}
+          subCategory={relatedProducts.subCategory}
+          lastCategory={relatedProducts.lastCategory}/>
+      </div>
       <div className="mx-auto max-w-[620px] border border-blue-400 rounded-lg p-4">
         <div className="mb-4">
           <AuctionState

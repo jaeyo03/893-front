@@ -5,6 +5,7 @@ import { Bookmark, Timer, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AuctionStatsProps } from '@/data/productData';
 
+
 export function AuctionState({
   relatedProducts,
   isBookmarked,
@@ -12,11 +13,6 @@ export function AuctionState({
   onBookmarkToggle
 }: AuctionStatsProps) {
   const {
-    title,
-    sellerEmail,
-    mainCategory,
-    subCategory,
-    lastCategory,
     currentPrice,
     bidCount,
     bidderCount,
@@ -47,17 +43,6 @@ export function AuctionState({
 
   return (
     <div >
-      <div className="mb-4">
-        <div className='flex items-center justify-between'>
-          <h1 className="text-xl font-bold">{title}</h1>
-          <p className="flex items-center gap-1 text-gray-600">
-            <User className="w-4 h-4" />
-            {sellerEmail}
-          </p>
-        </div>
-        <p className='text-xs font-thin'>{mainCategory} &gt; {subCategory} &gt; {lastCategory}</p>
-      </div>
-
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-sm text-black">현재가</p>

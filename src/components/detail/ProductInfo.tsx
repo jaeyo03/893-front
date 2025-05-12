@@ -3,20 +3,26 @@
 import { useState, useEffect } from 'react';
 import { Bookmark, Timer, TriangleAlert, User } from 'lucide-react';
 import WarningModal from './WarningModal';
+import { RelatedProduct } from '@/data/productData';
 
 interface ProductInfoProps {
-  currentPrice: number;
-  bidCount: number;
-  bidderCount: number;
-  endTime: string;
+  relatedProducts: RelatedProduct;
 }
 
-export default function ProductInfo({
-  currentPrice: initialPrice,
-  bidCount: initialBidCount,
-  bidderCount,
-  endTime,
+export default function ProductInfo({relatedProducts
 }: ProductInfoProps) {
+  const {
+    title,
+    sellerEmail,
+    mainCategory,
+    subCategory,
+    lastCategory,
+    currentPrice: initialPrice,
+    bidCount: initialBidCount,
+    bidderCount,
+    endTime,
+  } = relatedProducts;
+
   const [bidAmount, setBidAmount] = useState<number>(30000);
   const [isHighestBidder, setIsHighestBidder] = useState(false);
   const [currentPrice, setCurrentPrice] = useState<number>(initialPrice);
@@ -52,7 +58,7 @@ export default function ProductInfo({
   const handleBid = () => {
     if(isHighestBidder && cancelTimer > 0) return;
     if (bidAmount % 100 !== 0) return;
-    if (bidAmount >= currentPrice + 100) {
+    if (bidAmount >= relatedProducts.currentPrice + 100) {
       setLastBidPrice(currentPrice);
       setCurrentPrice(bidAmount);
       setIsHighestBidder(true);
@@ -92,13 +98,13 @@ export default function ProductInfo({
       <div className="mx-auto max-w-[620px]">
         <div className="mb-4">
           <div className='flex items-center justify-between'>
-            <h1 className="text-xl font-bold">경매 제목</h1>
+            <h1 className="text-xl font-bold">{title}</h1>
             <p className="flex items-center gap-1 text-gray-600">
               <User className="w-4 h-4" />
-              판매자 e-mail
+              {sellerEmail}
             </p>
           </div>
-          <p className='text-xs font-thin'>카테고리대 &gt; 카테고리중 &gt; 카테고리소</p>
+          <p className='text-xs font-thin'>{mainCategory} &gt; {subCategory} &gt; {lastCategory}</p>
         </div>
 
         <div className="p-4 mb-4 border border-blue-400 rounded-lg">
@@ -132,8 +138,8 @@ export default function ProductInfo({
               <Bookmark
                 className={`w-5 h-5 ${
                   isBookmarked
-                    ? 'text-red fill-red'
-                    : 'text-gray-400 hover:text-red hover:fill-red'
+                    ? 'text-black fill-black'
+                    : 'text-gray-400 hover:text-black hover:fill-black'
                 }`}
               />
             </button>

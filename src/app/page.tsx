@@ -2,7 +2,11 @@ import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
 import CategorySearchSection from "@/components/molecules/CategorySearchSection";
 import SearchInput from "@/components/templates/SearchInput";
+
 import ProductCard from "@/components/detail/Product/ProductCard";
+
+import ProductCard from "@/components/detail/ProductCard";
+import { Metadata } from "next";
 // async function getProducts() {
 //   const res = await fetch('http://localhost:3000/mocks/products.json'); // TODO 추후 백엔드 URI로 변경
 
@@ -12,6 +16,11 @@ import ProductCard from "@/components/detail/Product/ProductCard";
 
 //   return res;
 // }
+
+export const metadata: Metadata = {
+  title: "중고 경매 플랫폼 팔구삼 893",
+  description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
+}
 
 export default async function Home() {
   // const products = await getProducts(); // TODO 추후 상품 섹션과 연결

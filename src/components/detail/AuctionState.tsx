@@ -1,23 +1,24 @@
-// AuctionStats.tsx
 'use client';
 
-import { Bookmark, Timer, User } from 'lucide-react';
+import { Bookmark, Timer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AuctionStatsProps } from '@/types/productData';
 
-
 export function AuctionState({
-  relatedProducts,
+  product,
+  auctionBidData,
   isBookmarked,
   bookmarkCount,
   onBookmarkToggle
 }: AuctionStatsProps) {
-  const {
-    currentPrice,
-    bidCount,
-    bidderCount,
-    endTime,
-  } = relatedProducts;
+  const { basePrice, endTime } = product;
+
+  const currentPrice = auctionBidData.bids?.length
+    ? Math.max(...auctionBidData.bids.map((bid) => bid.bidPrice))
+    : basePrice;
+
+  const bidCount = auctionBidData.totalBid;
+  const bidderCount = auctionBidData.totalBidder;
 
   const [remainingTime, setRemainingTime] = useState<number>(
     Math.max(Math.floor((new Date(endTime).getTime() - new Date().getTime()) / 1000), 0)
@@ -25,12 +26,9 @@ export function AuctionState({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = new Date();
-      const end = new Date(endTime);
-      const diff = Math.floor((end.getTime() - now.getTime()) / 1000);
+      const diff = Math.floor((new Date(endTime).getTime() - Date.now()) / 1000);
       setRemainingTime(diff > 0 ? diff : 0);
     }, 1000);
-
     return () => clearInterval(interval);
   }, [endTime]);
 
@@ -42,7 +40,7 @@ export function AuctionState({
   };
 
   return (
-    <div >
+    <div>
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-sm text-black">현재가</p>
@@ -69,13 +67,9 @@ export function AuctionState({
       </div>
 
       <div className="flex items-center gap-1 text-gray-700">
-        <button onClick={onBookmarkToggle}>
+        <button onClick={onBookmarkToggle} aria-label="북마크 토글">
           <Bookmark
-            className={`w-5 h-5 ${
-              isBookmarked
-                ? 'text-black fill-black'
-                : 'text-gray-400 hover:text-black hover:fill-black'
-            }`}
+            className={`w-5 h-5 ${isBookmarked ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
           />
         </button>
         <span className="text-sm">{bookmarkCount}</span>

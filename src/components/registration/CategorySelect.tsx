@@ -126,21 +126,21 @@ export default function CategorySelector({ value, onChange }: Props) {
         }`}
       >
         {step1?.children?.map((sub) => (
-            <div
+          <div
             key={sub.id}
-              onClick={() => {
+            onClick={() => {
               setStep2(sub);
-                setStep3(null);
-              }}
-              className={`px-4 py-2 cursor-pointer ${
+              setStep3(null);
+            }}
+            className={`px-4 py-2 cursor-pointer ${
               step2?.id === sub.id
-                  ? "bg-divider font-semibold"
-                  : "hover:bg-divider"
-              }`}
-            >
+                ? "bg-divider font-semibold"
+                : "hover:bg-divider"
+            }`}
+          >
             {sub.name}
-            </div>
-          ))}
+          </div>
+        ))}
       </div>
 
       {/* Step 3 */}
@@ -150,15 +150,15 @@ export default function CategorySelector({ value, onChange }: Props) {
         }`}
       >
         {step2?.children?.map((detail) => (
-              <div
+          <div
             key={detail.id}
             onClick={() => setStep3(detail)}
-                className={`px-4 py-2 cursor-pointer ${
+            className={`px-4 py-2 cursor-pointer ${
               step3?.id === detail.id
-                    ? "bg-divider font-semibold"
+                ? "bg-divider font-semibold"
                 : "hover:bg-divider"
-                }`}
-              >
+            }`}
+          >
             {detail.name}
           </div>
         ))}

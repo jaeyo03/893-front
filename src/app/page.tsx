@@ -2,7 +2,7 @@ import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
 import CategorySearchSection from "@/components/molecules/CategorySearchSection";
 import SearchInput from "@/components/templates/SearchInput";
-import ProductCard from "@/components/detail/ProductCard";
+import ProductCard from "@/components/detail/Product/ProductCard";
 // async function getProducts() {
 //   const res = await fetch('http://localhost:3000/mocks/products.json'); // TODO 추후 백엔드 URI로 변경
 

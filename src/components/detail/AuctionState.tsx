@@ -3,7 +3,7 @@
 
 import { Bookmark, Timer, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { AuctionStatsProps } from '@/data/productData';
+import { AuctionStatsProps } from '@/types/productData';
 
 
 export function AuctionState({

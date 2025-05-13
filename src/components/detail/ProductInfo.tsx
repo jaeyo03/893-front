@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RelatedProduct } from '@/data/productData';
+import { RelatedProduct } from '@/types/productData';
 import { AuctionState } from './AuctionState';
 import BidInteraction from './BidInteraction';
 import ProductHeader from './ProductHeader';

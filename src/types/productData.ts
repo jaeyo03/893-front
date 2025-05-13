@@ -61,16 +61,6 @@ export interface Bid {
   time: string;
 }
 
-export const getBids = (): Bid[] => [
-  { rank: 1, email: '홍길동', amount: 30000, time: '12:35:12' },
-  { rank: 2, email: '이몽룡', amount: 28000, time: '12:30:44' },
-  { rank: 3, email: '성춘향', amount: 25000, time: '12:20:15' },
-];
-
-export const getCanceledBids = (): Bid[] => [
-  { rank: 1, email: '변학도', amount: 27000, time: '12:10:03' },
-];
-
 export interface AuctionStatsProps {
   relatedProducts: RelatedProduct;
   isBookmarked: boolean;

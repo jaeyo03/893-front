@@ -1,7 +1,7 @@
 'use client'
 import { Bookmark } from 'lucide-react';
 import { useState } from 'react';
-import { RelatedProduct } from '@/data/productData';
+import { RelatedProduct } from '@/types/productData';
 
 interface AuctionCardProps{
   product : RelatedProduct

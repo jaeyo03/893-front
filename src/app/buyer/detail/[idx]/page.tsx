@@ -2,8 +2,11 @@ import ImageSlider from "@/components/detail/ImageSlider";
 import ProductInfo from "@/components/detail/ProductInfo";
 import GoodsInfo from "@/components/detail/GoodsInfo"
 import ProductCard from "@/components/detail/ProductCard";
-import { getProductDescription,getRelatedProducts,getBids,getCanceledBids } from "@/data/productData";
+import { getProductDescription,getRelatedProducts} from "@/types/productData";
 import BidHistory from "@/components/detail/BidHistory";
+import { Bid } from "@/types/productData";
+
+import axios from "axios"
 
 
 interface DetailPageProps{
@@ -13,13 +16,36 @@ interface DetailPageProps{
 }
 
 
-export default function DetailPage({params} : DetailPageProps) {
+export default async function DetailPage({params} : DetailPageProps) {
   const itemId = params.idx
   const product = getProductDescription(itemId);
   const relatedProducts = getRelatedProducts(itemId);
-  const bids = getBids();
-  const canceledBids = getCanceledBids();
-
+  
+  let bidData: Bid[] = [];
+  let cancelData: Bid[] = [];
+  
+  try {//서버 api 호출, 경매 내역 데이터 불러오기
+    const response = await axios.get(`http://localhost:8080/api/auctions/${itemId}/bids`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  
+    const data = response.data.data;
+  
+    const transform = (bids: any[]) =>
+      bids.map((bid: any, i: number) => ({
+        rank: i + 1,
+        email: bid.bidderEmail,
+        amount: bid.bidPrice,
+        time: bid.createdAt,
+      }));
+  
+    bidData = transform(data.bids);
+    cancelData = transform(data.cancelledBids || []);
+  } catch (error) {
+    console.error("입찰 내역 불러오기 실패:", error);
+  }
 
   return(
     <>
@@ -39,7 +65,7 @@ export default function DetailPage({params} : DetailPageProps) {
           
           {/* BidHistory에 마진 추가 */}
           <div className="mb-4">
-            <BidHistory bidData={bids} cancelData={canceledBids} />
+            <BidHistory bidData={bidData} cancelData={cancelData} />
           </div>
         </div>
 

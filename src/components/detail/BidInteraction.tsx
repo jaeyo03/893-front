@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import WarningModal from './WarningModal';
-import { BidInteractionProps } from '@/data/productData';
+import { BidInteractionProps } from '@/types/productData';
 
 
 export default function BidInteraction({

@@ -4,8 +4,8 @@ import Link from "next/link";
 import {usePathname, useRouter} from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Gavel, Bell, User, Menu, X, Search } from "lucide-react";
-import { useState } from "react";
+import {Home, Gavel, Bell, User, Menu, X, Search} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "@/components/notification/NotificationDropdown";
 
 export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -13,6 +13,23 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const router = useRouter();
+
+  const notificationWrapperRef = useRef<HTMLDivElement | null>(null);
+
+  // 외부 클릭 시 알림창 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationWrapperRef.current &&
+        !notificationWrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsNotificationOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const routes : { href: string; label: string; icon: JSX.Element; active?: boolean }[] = [
     {

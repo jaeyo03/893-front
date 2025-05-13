@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface AuctionTitleInputProps {
   value: string;
   onChange: (value: string) => void;
   maxLength?: number;
 }
+
 export default function AuctionTitleInput({
   value,
   onChange,
@@ -14,17 +15,23 @@ export default function AuctionTitleInput({
 }: AuctionTitleInputProps) {
   const [count, setCount] = useState(value.length);
 
+  // 입력값이 변경될 때마다 카운트 업데이트
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     if (newValue.length <= maxLength) {
-      onChange(newValue); // 부모 컴포넌트에서 상태 관리
-      setCount(newValue.length);
+      onChange(newValue); // 부모 컴포넌트로 값 전달
+      setCount(newValue.length); // 글자 수 업데이트
     }
   };
 
+  // 수정 페이지에서는 초기 값에 따라 글자 수 재설정
+  useEffect(() => {
+    setCount(value.length); // 초기 값이 변경될 때마다 카운트 업데이트
+  }, [value]);
+
   return (
     <div className="flex flex-col w-full max-w-[1240px] max-h-[48px] gap-1">
-      {/* 입력창 */}
+      {/* 경매 제목 입력창 */}
       <input
         id="auction-title"
         type="text"
@@ -41,5 +48,3 @@ export default function AuctionTitleInput({
     </div>
   );
 }
-
-// 길이 및 UI/UX 수정하기기

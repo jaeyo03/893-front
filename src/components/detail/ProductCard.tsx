@@ -1,18 +1,12 @@
 'use client'
 import { Bookmark } from 'lucide-react';
 import { useState } from 'react';
+import { RelatedProduct } from '@/data/productData';
 
-interface AuctionCardProps {
-  imageUrl: string;
-  title: string;
-  status : string;
-  startTime : string;
-  endTime: string;
-  currentPrice: number;
-  bidderCount: number;
-  scrapCount: number;
-  isScrapped?: boolean;
+interface AuctionCardProps{
+  product : RelatedProduct
 }
+
 const statusMap: Record<string, { label: string; color: string }> = {
   active: { label: "경매 중", color: "bg-main" },
   end: { label: "종료", color: "bg-red" },
@@ -20,16 +14,16 @@ const statusMap: Record<string, { label: string; color: string }> = {
 };
 
 
-export default function AuctionCard({
-  imageUrl,
-  title,
-  status,
-  endTime,
-  currentPrice,
-  bidderCount,
-  scrapCount,
-  isScrapped = false,
-}: AuctionCardProps) {
+export default function AuctionCard({product} : AuctionCardProps) {
+  const {
+    imageUrl,
+    status,
+    title,
+    scrapCount,
+    endTime,
+    bidderCount,
+    currentPrice,
+  } = product;
   const [isScraped,setIsScraped] = useState(false);
   const [,setBookmarkCount] = useState(1);
   const statusInfo = statusMap[status] ?? { label: "알 수 없음", color: "bg-red-500" };
@@ -38,6 +32,7 @@ export default function AuctionCard({
     setIsScraped((prev) => !prev);
     setBookmarkCount((bookmarkCount)=>(isScraped ? bookmarkCount -1:bookmarkCount+1));
   }
+  
   return (
     <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
       <div className="relative">
@@ -48,13 +43,13 @@ export default function AuctionCard({
         <button onClick={handleScrapToggle}
         className="absolute p-1 bottom-2 right-2">
           <Bookmark
-            className={`w-5 h-5 ${isScrapped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
+            className={`w-5 h-5 ${ isScraped? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
           />
         </button>
       </div>
 
       <div className="pt-3 space-y-1">
-        <p className="text-sm font-medium">{title}</p>
+        <p className="text-sm font-medium">{}</p>
         <div className="flex items-center gap-1 text-xs text-gray-600">
           <span>🕒 경매 종료 :</span>
           <span>{endTime}</span>

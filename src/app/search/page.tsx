@@ -30,58 +30,16 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
     queryString = `?${queryString}`;
   }
 
-  console.log(`API 호출 URL: /api/auctions/search${queryString}`);
-  
-  // TODO - 백엔드 ui로 변경
-  // const response = await fetch(`/api/auctions/search?${queryString}`);
-  // if (!response.ok) {
-  //   throw new Error("Failed to fetch products");
-  // }
-  // return response.json();
-  
-  return [
-    {
-      id: 1,
-      imageUrl: "https://via.placeholder.com/150",
-      title: "상품 1",
-      status: "진행중",
-      startTime: "2024-01-01",
-      endTime: "2024-01-10",
-      currentPrice: 10000,
-      bidderCount: 5,
-      scrapCount: 3,
-      isScrapped: false
-    },
-    {
-      id: 2,
-      imageUrl: "https://via.placeholder.com/150",
-      title: "상품 2",
-      status: "종료",
-      startTime: "2024-01-05",
-      endTime: "2024-01-15",
-      currentPrice: 15000,
-      bidderCount: 8,
-      scrapCount: 12,
-      isScrapped: true
-    },
-    {
-      id: 3,
-      imageUrl: "https://via.placeholder.com/150",
-      title: "상품 3",
-      status: "진행중",
-      startTime: "2024-01-10",
-      endTime: "2024-01-20",
-      currentPrice: 25000,
-      bidderCount: 15,
-      scrapCount: 7,
-      isScrapped: false
-    }
-  ];
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search?${queryString}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+  return response.json();
 }
 
 export default async function SearchPage({ searchParams } : { searchParams : { [key: string]: string | string[] | undefined } }) {
   const products = await getSearchProducts(searchParams);
-  
+  console.log(products);
   return (
     <div className="grid mt-4 gap-4">
       <div className="flex justify-center gap-10 items-center">

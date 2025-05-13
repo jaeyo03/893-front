@@ -2,6 +2,9 @@ import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
 import CategorySearchSection from "@/components/molecules/CategorySearchSection";
 import SearchInput from "@/components/templates/SearchInput";
+
+import ProductCard from "@/components/detail/Product/ProductCard";
+
 import ProductCard from "@/components/detail/ProductCard";
 import { Metadata } from "next";
 // async function getProducts() {

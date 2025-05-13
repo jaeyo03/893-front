@@ -1,10 +1,5 @@
+import { Bid } from "@/types/productData";
 
-export interface Bid {
-  rank: number;
-  email: string;
-  amount: number;
-  time: string;
-}
 interface BidHistoryProps{
   bidData: Bid[];
   cancelData: Bid[];
@@ -25,10 +20,10 @@ export default function BidHistory({bidData,cancelData}: BidHistoryProps) {
       <tbody>
         {data.map((item, idx) => (
           <tr key={idx} className="border-b">
-            <td className="px-1 py-2">{item.rank}</td>
-            <td className="px-1 py-2">{item.email}</td>
-            <td className="px-1 py-2">₩{item.amount.toLocaleString()}</td>
-            <td className="px-1 py-2">{item.time}</td>
+            <td className="px-1 py-2">{idx+1}</td>
+            <td className="px-1 py-2">{item.bidderEmail}</td>
+            <td className="px-1 py-2">₩{item.bidPrice.toLocaleString()}</td>
+            <td className="px-1 py-2">{item.createdAt}</td>
           </tr>
         ))}
       </tbody>

@@ -1,28 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RelatedProduct } from '@/data/productData';
-import { AuctionState } from './AuctionState';
-import BidInteraction from './BidInteraction';
+import { Product,AuctionBidData } from '@/types/productData';
+import { AuctionState } from '../../AuctionState';
+import BidInteraction from '../../Bid/BidInteraction';
 import ProductHeader from './ProductHeader';
 
 interface ProductInfoProps {
-  relatedProducts: RelatedProduct;
+  product: Product;
+  auctionBidData: AuctionBidData;
 }
 
-export default function ProductInfo({ relatedProducts }: ProductInfoProps) {
-  const {
-    currentPrice: initialPrice,
-    bidCount: initialBidCount,
-  } = relatedProducts;
-
-  const [currentPrice, setCurrentPrice] = useState<number>(initialPrice);
-  const [lastBidPrice,setLastBidPrice] = useState<number>(initialPrice)
-  const [bidCount, setBidCount] = useState<number>(initialBidCount);
-  const [isHighestBidder, setIsHighestBidder] = useState(false);
-  const [cancelTimer, setCancelTimer] = useState(0);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [bookmarkCount, setBookmarkCount] = useState(1);
+export default function ProductInfo({ product,auctionBidData }: ProductInfoProps) {
+  const [currentPrice, setCurrentPrice] = useState<number>(product.basePrice);
+  const [lastBidPrice,setLastBidPrice] = useState<number>(product.basePrice)
+  const [, setBidCount] = useState<number>(auctionBidData.totalBid);
+  const [isHighestBidder, setIsHighestBidder] = useState<boolean>(false);
+  const [cancelTimer, setCancelTimer] = useState<number>(0);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
+  const [bookmarkCount, setBookmarkCount] = useState<number>(1);
 
   // 타이머 감소
   useEffect(() => {
@@ -63,20 +59,17 @@ export default function ProductInfo({ relatedProducts }: ProductInfoProps) {
     <div className="pt-5 ">
       <div className="mx-auto max-w-[620px] mb-4">
         <ProductHeader
-          title={relatedProducts.title}
-          sellerEmail={relatedProducts.sellerEmail}
-          mainCategory={relatedProducts.category.mainCategory}
-          subCategory={relatedProducts.category.subCategory}
-          lastCategory={relatedProducts.category.detailCategory}/>
+          title={product.title}
+          sellerEmail={product.sellerEmailMasked}
+          mainCategory={product.category.mainCategory}
+          subCategory={product.category.subCategory}
+          lastCategory={product.category.detailCategory}/>
       </div>
       <div className="mx-auto max-w-[620px] border border-blue-400 rounded-lg p-4">
         <div className="mb-4">
           <AuctionState
-            relatedProducts={{
-              ...relatedProducts,
-              currentPrice,
-              bidCount,
-            }}
+            product={product}
+            auctionBidData={auctionBidData}
             isBookmarked={isBookmarked}
             bookmarkCount={bookmarkCount}
             onBookmarkToggle={() => {

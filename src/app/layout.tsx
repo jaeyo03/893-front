@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Header } from "@/components/Header";
+import { cookies } from 'next/headers'
 
 const pretendard = localFont({
   src: "../fonts/PretendardVariable.woff2",
@@ -22,6 +21,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies()
+  const isLoggedIn = cookieStore.has('accessToken')
+  console.log(isLoggedIn)
   return (
     <html lang="ko">
       <body
@@ -29,12 +31,7 @@ export default function RootLayout({
       >
         <header className="sticky top-0 z-50 w-full border-b bg-background">
           <div className="container flex h-16 items-center">
-            <Header />
-            <div className="ml-auto flex items-center space-x-4">
-              <Link href="/auth/login">
-                <Button size="sm" className="bg-main hover:bg-mainLight">로그인</Button>
-              </Link>
-            </div>
+            <Header isLoggedIn={isLoggedIn} />
           </div>
         </header>
         <div className="w-[1280px]">

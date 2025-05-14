@@ -44,7 +44,7 @@ export default function EditRegistration() {
   const [durationTime, setDurationTime] = useState({ hour: 0, minute: 0 });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const auctionId = 10; // 실제로는 props나 router에서 받아야 함
+  const auctionId = 13; ////////////////////////////////////// 실제로는 props나 router에서 받아야 함
 
   const validateForm = () => {
     const totalImageCount = images.length + serverImages.length;
@@ -68,21 +68,20 @@ export default function EditRegistration() {
     return true;
   };
 
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0); // 대표 이미지 인덱스 추가
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
-    if (productStatus === null || productStatus < 0) {
-      alert("상품 상태를 선택해주세요.");
-      return;
-    }
 
-    const label = productConditions[productStatus];
+    const label = productConditions[productStatus!];
     const itemCondition = convertLabelToServerValue(label);
 
-    if (!itemCondition) {
-      alert("상품 상태가 올바르지 않거나 서버에서 허용되지 않습니다.");
-      return;
-    }
-    const allImages = [...serverImages, ...images].map((img, idx) => ({
+    const allImagesRaw = [...serverImages, ...images];
+    const reorderedImages = [
+      allImagesRaw[mainImageIndex],
+      ...allImagesRaw.filter((_, idx) => idx !== mainImageIndex),
+    ];
+    const allImages = reorderedImages.map((img, idx) => ({
       imageId:
         "imageId" in img && typeof img.imageId === "number"
           ? img.imageId
@@ -93,11 +92,11 @@ export default function EditRegistration() {
     const requestPayload = {
       title,
       description: detail,
-      itemCondition, // ex: "brand_new"
+      itemCondition,
       basePrice: price,
       startDelay: startTime.hour * 60 + startTime.minute,
       durationTime: durationTime.hour * 60 + durationTime.minute,
-      mainImageIndex: 0,
+      mainImageIndex: 0, // 항상 대표 이미지가 첫 번째
       category: {
         id: category.id,
         mainCategory: category.mainCategory,
@@ -106,26 +105,23 @@ export default function EditRegistration() {
       },
       images: allImages,
     };
+    console.log("🧩 이미지 시퀀스 확인:");
+    console.log(
+      reorderedImages.map((img, idx) => ({
+        imageId: "imageId" in img ? img.imageId : "(신규)",
+        imageSeq: idx,
+      }))
+    );
 
-    // ✅ 디버깅 로그 추가 (try 전에 출력)
-    console.log("🟢 requestPayload preview:");
+    console.log("📦 전체 requestPayload:");
     console.log(JSON.stringify(requestPayload, null, 2));
-    console.log("🟡 itemCondition:", requestPayload.itemCondition);
-    console.log("🟡 category:", requestPayload.category);
-    console.log("🟡 images:", requestPayload.images);
-
     const formData = new FormData();
-
-    // 이미지 추가 (파일만 추가)
     images.forEach((image) => {
       formData.append("images", image);
     });
-
     formData.append(
       "request",
-      new Blob([JSON.stringify(requestPayload)], {
-        type: "application/json",
-      })
+      new Blob([JSON.stringify(requestPayload)], { type: "application/json" })
     );
 
     try {
@@ -195,11 +191,15 @@ export default function EditRegistration() {
             onChange={setImages}
             serverImages={serverImages}
             onDeleteServerImage={(index) => {
-              const newList = [...serverImages];
-              newList.splice(index, 1);
-              setServerImages(newList);
+              setServerImages((prev) => {
+                const updated = prev.filter((_, i) => i !== index);
+
+                return [...updated]; // ✅ 새로운 참조 배열로 상태 변경
+              });
             }}
             onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
+            mainImageIndex={mainImageIndex}
+            onChangeMainImageIndex={setMainImageIndex}
           />
         </div>
 

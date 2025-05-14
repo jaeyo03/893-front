@@ -18,7 +18,7 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
   const [lastBidPrice, setLastBidPrice] = useState<number>(currentPrice);
   const [isHighestBidder, setIsHighestBidder] = useState<boolean>(false);
   const [myBidId,setMyBidId] = useState<number>(0);
-  const [myBidEmail,setMyBidEmail] = useState<string>();
+  const [,setMyBidEmail] = useState<string>();
   const [cancelTimer, setCancelTimer] = useState<number>(0);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
   const [bookmarkCount, setBookmarkCount] = useState<number>(1);

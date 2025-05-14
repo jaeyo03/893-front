@@ -4,7 +4,7 @@ import CategorySearchSection from "@/components/molecules/CategorySearchSection"
 import SearchInput from "@/components/templates/SearchInput";
 import { Metadata } from "next";
 import QueryProvider from "@/components/QueryProvider";
-import ProductCard from "@/components/detail/Product/ProductCard";
+import AuctionCard from "@/components/detail/Product/AuctionCard";
 import {getSearchProducts} from "@/lib/api/search";
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default async function Home() {
       </div>
       <div className="grid grid-cols-5 gap-4 mt-8 mb-8">
         {products.data.auctionList.map((product) => (
-          <ProductCard
+          <AuctionCard
             key={product.id}
             product={product}
           />

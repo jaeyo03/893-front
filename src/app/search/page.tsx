@@ -6,7 +6,7 @@ import ProductStatusFilter from "@/components/templates/searchpage/ProductStatus
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
-import ProductCard from "@/components/detail/Product/ProductCard";
+import AuctionCard from "@/components/detail/Product/AuctionCard";
 import { getRelatedWords, getSearchProducts } from "@/lib/api/search";
 import QueryProvider from "@/components/QueryProvider";
 
@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams } : { searchParams : { [
           <ProductSort/>
           <div className="grid grid-cols-4 gap-4 mt-4">
             {products.data.auctionList.map((product) => (
-              <ProductCard
+              <AuctionCard
                 key={product.id}
                 product={product}
               />

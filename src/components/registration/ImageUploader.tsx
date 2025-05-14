@@ -56,6 +56,7 @@ export default function ImageUploader({
         })) ?? [];
 
       setPreviews([...serverPreviews, ...localPreviews]);
+      console.log("🔍 이미지 미리보기 URL", previews);
     };
 
     makePreviews();

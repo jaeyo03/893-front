@@ -5,6 +5,8 @@ import {
   DialogTrigger,
   DialogContent,
   DialogFooter,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
@@ -12,6 +14,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface AuctionTimeButtonProps {
   value: { hour: number; minute: number };
@@ -56,6 +59,14 @@ export default function AuctionTimeButton({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTitle>
+        <VisuallyHidden>경매 진행 시간 설정</VisuallyHidden>
+      </DialogTitle>
+      <DialogDescription>
+        <VisuallyHidden>
+          경매 진행 시간 을 시, 분 단위로 설정할 수 있습니다.
+        </VisuallyHidden>
+      </DialogDescription>
       <DialogTrigger asChild>
         <Button
           onClick={() => setOpen(true)}

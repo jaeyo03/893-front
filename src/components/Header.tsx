@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Gavel, Bell, User, Menu, X, Search } from "lucide-react";
+import {Home, Gavel, Bell, User, Menu, X, Search} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "@/components/notification/NotificationDropdown";
 
@@ -31,12 +31,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const routes: {
-    href: string;
-    label: string;
-    icon: JSX.Element;
-    active?: boolean;
-  }[] = [
+  const routes : { href: string; label: string; icon: JSX.Element; active?: boolean }[] = [
     {
       href: "/",
       label: "홈",
@@ -58,24 +53,24 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   if (isLoggedIn) {
-  }
-  routes.push({
-    href: "/notifications",
-    label: "알림",
-    icon: <Bell className="w-4 h-4 mr-2" />,
-  });
-  const handleLogout = async () => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+    routes.push(
       {
-        method: "POST",
-        credentials: "include",
-      }
+        href: "/notifications",
+        label: "알림",
+        icon: <Bell className="w-4 h-4 mr-2" />,
+      },
     );
+  }
+
+  const handleLogout = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    })
     if (response.ok) {
       router.refresh();
     }
-  };
+  }
 
   return (
     <>
@@ -159,9 +154,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
                   href={route.href}
                   className={cn(
                     "flex items-center px-4 py-3 text-sm font-medium",
-                    route.active
-                      ? "bg-primary/10 text-primary"
-                      : "text-secondary"
+                    route.active ? "bg-primary/10 text-primary" : "text-secondary"
                   )}
                   onClick={() => {
                     setIsNotificationOpen(false); // 다른 메뉴 누르면 알림 드롭다운 닫기
@@ -179,25 +172,12 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
       <div className="ml-auto flex items-center space-x-4">
         {isLoggedIn ? (
           <>
-            <Link
-              href="/registration"
-              className="text-sm font-medium cursor-pointer hover:underline"
-            >
-              상품 등록하기
-            </Link>
-            <Button
-              size="sm"
-              className="bg-main hover:bg-mainLight"
-              onClick={handleLogout}
-            >
-              로그아웃
-            </Button>
+            <Link href="/registration" className="text-sm font-medium cursor-pointer hover:underline">상품 등록하기</Link>
+            <Button size="sm" className="bg-main hover:bg-mainLight" onClick={handleLogout}>로그아웃</Button>
           </>
         ) : (
           <Link href="/login">
-            <Button size="sm" className="bg-main hover:bg-mainLight">
-              로그인
-            </Button>
+            <Button size="sm" className="bg-main hover:bg-mainLight">로그인</Button>
           </Link>
         )}
       </div>

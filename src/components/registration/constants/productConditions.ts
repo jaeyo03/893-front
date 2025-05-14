@@ -17,7 +17,7 @@ export const productConditionDescriptions = [
 ] as const;
 
 // 라벨 → 서버 전송용 코드
-export function convertLabelToServerValue(label: string): string | null {
+export function convertLabelToServerValue(label: string): string {
   const map: Record<string, string> = {
     "새 상품 (미사용)": "brand_new",
     "사용감 없음": "like_new",
@@ -25,7 +25,7 @@ export function convertLabelToServerValue(label: string): string | null {
     "사용감 많음": "heavily_used",
     "고장/파손 상품": "damaged",
   };
-  return map[label] ?? null;
+  return map[label] ?? "unknown";
 }
 
 // 서버에서 받은 코드 → 라벨로 변환

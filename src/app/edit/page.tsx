@@ -16,7 +16,6 @@ import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeBu
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
 import {
   productConditions,
-  convertLabelToServerValue,
   convertServerValueToLabel,
 } from "@/components/registration/constants/productConditions";
 
@@ -44,7 +43,7 @@ export default function EditRegistration() {
   const [durationTime, setDurationTime] = useState({ hour: 0, minute: 0 });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const auctionId = 13; ////////////////////////////////////// 실제로는 props나 router에서 받아야 함
+  const auctionId = 123; // 실제로는 props나 router에서 받아야 함
 
   const validateForm = () => {
     const totalImageCount = images.length + serverImages.length;
@@ -68,35 +67,38 @@ export default function EditRegistration() {
     return true;
   };
 
-  const [mainImageIndex, setMainImageIndex] = useState<number>(0); // 대표 이미지 인덱스 추가
-
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    const label = productConditions[productStatus!];
-    const itemCondition = convertLabelToServerValue(label);
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
 
-    const allImagesRaw = [...serverImages, ...images];
-    const reorderedImages = [
-      allImagesRaw[mainImageIndex],
-      ...allImagesRaw.filter((_, idx) => idx !== mainImageIndex),
-    ];
-    const allImages = reorderedImages.map((img, idx) => ({
-      imageId:
-        "imageId" in img && typeof img.imageId === "number"
-          ? img.imageId
-          : null,
-      imageSeq: idx,
+    let uploadedImages: ServerImage[] = [];
+    try {
+      const res = await axios.post("/api/uploads", formData);
+      uploadedImages = res.data.images;
+    } catch (err) {
+      console.error("이미지 업로드 실패", err);
+      return alert("이미지 업로드 중 오류가 발생했습니다.");
+    }
+
+    const allImages = [...serverImages, ...uploadedImages].map((img, idx) => ({
+      originalName: img.originalName,
+      storeName: img.storeName,
+      url: img.url,
+      imageSeq: idx + 1,
     }));
 
-    const requestPayload = {
+    const payload = {
       title,
       description: detail,
-      itemCondition,
+      itemCondition: productConditions[productStatus!],
       basePrice: price,
       startDelay: startTime.hour * 60 + startTime.minute,
       durationTime: durationTime.hour * 60 + durationTime.minute,
-      mainImageIndex: 0, // 항상 대표 이미지가 첫 번째
+      mainImageIndex: 0,
       category: {
         id: category.id,
         mainCategory: category.mainCategory,
@@ -105,39 +107,13 @@ export default function EditRegistration() {
       },
       images: allImages,
     };
-    console.log("🧩 이미지 시퀀스 확인:");
-    console.log(
-      reorderedImages.map((img, idx) => ({
-        imageId: "imageId" in img ? img.imageId : "(신규)",
-        imageSeq: idx,
-      }))
-    );
-
-    console.log("📦 전체 requestPayload:");
-    console.log(JSON.stringify(requestPayload, null, 2));
-    const formData = new FormData();
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
-    formData.append(
-      "request",
-      new Blob([JSON.stringify(requestPayload)], { type: "application/json" })
-    );
 
     try {
-      await axios.patch(
-        `http://localhost:8080/api/auctions/${auctionId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await axios.patch(`/api/auctions/${auctionId}`, payload);
       alert("경매 수정이 완료되었습니다!");
       setIsModalOpen(false);
     } catch (err) {
-      console.error("❌ PATCH 실패", err);
+      console.error("수정 실패", err);
       alert("수정 중 오류가 발생했습니다.");
     }
   };
@@ -145,33 +121,21 @@ export default function EditRegistration() {
   useEffect(() => {
     const fetchAuctionData = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/api/auctions/${auctionId}/update`
-        );
-        const data = res.data.data; // ✅ 여기 수정 중요
-
-        // 🔒 null-safe 처리
-        const correctedImages = (data.images ?? []).map((img: ServerImage) => ({
-          ...img,
-          url: img.url.startsWith("http")
-            ? img.url
-            : `http://localhost:8080${img.url}`,
-        }));
+        const res = await fetch(`/api/auctions/${auctionId}`);
+        const data = await res.json();
 
         setTitle(data.title);
         setPrice(data.basePrice);
         setDetail(data.description);
-        setServerImages(correctedImages); // ✅ 보정된 이미지 사용
+        setServerImages(data.images);
         setCategory({
           id: data.category.id,
           mainCategory: data.category.mainCategory,
           subCategory: data.category.subCategory,
           detailCategory: data.category.detailCategory,
         });
-
-        const statusLabel = convertServerValueToLabel(data.itemCondition);
         const statusIndex = productConditions.findIndex(
-          (label) => label === statusLabel
+          (label) => label === convertServerValueToLabel(data.itemCondition)
         );
         setProductStatus(statusIndex);
       } catch (err) {
@@ -191,15 +155,11 @@ export default function EditRegistration() {
             onChange={setImages}
             serverImages={serverImages}
             onDeleteServerImage={(index) => {
-              setServerImages((prev) => {
-                const updated = prev.filter((_, i) => i !== index);
-
-                return [...updated]; // ✅ 새로운 참조 배열로 상태 변경
-              });
+              const newList = [...serverImages];
+              newList.splice(index, 1);
+              setServerImages(newList);
             }}
             onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
-            mainImageIndex={mainImageIndex}
-            onChangeMainImageIndex={setMainImageIndex}
           />
         </div>
 
@@ -233,13 +193,13 @@ export default function EditRegistration() {
         </div>
 
         <div className="flex justify-center">
-          <SellButton
+          {/* <SellButton
             label="수정하기"
             isModalOpen={isModalOpen}
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleValidationAndOpenModal} // ✅ 유효성 검사 & 모달 열기
             onModalClose={() => setIsModalOpen(false)}
-            onConfirm={handleSubmit}
-          />
+            onConfirm={handleSubmit} // ✅ 실제 등록 수행
+          /> */}
         </div>
       </form>
     </div>

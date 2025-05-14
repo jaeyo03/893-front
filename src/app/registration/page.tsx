@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
@@ -23,9 +22,7 @@ import {
 } from "@/components/registration/constants/productConditions";
 
 export default function Registration() {
-  const router = useRouter();
   const [images, setImages] = useState<File[]>([]);
-  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
@@ -41,31 +38,59 @@ export default function Registration() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleAgreementChange = (checked: boolean) => {
+    setAgreed(checked);
+  };
+
   const handleValidationAndOpenModal = () => {
-    if (images.length === 0) return alert("최소 1장의 이미지를 등록해주세요.");
-    if (!title.trim()) return alert("경매 제목을 입력해주세요.");
-    if (!category.id) return alert("카테고리를 선택해주세요.");
-    if (!price || price <= 0) return alert("시작 가격을 입력해주세요.");
-    if (!detail.trim()) return alert("상세 설명을 입력해주세요.");
-    if (productStatus === null) return alert("상품 상태를 선택해주세요.");
-    if (startTime.hour === 0 && startTime.minute === 0)
-      return alert("경매 시작 시간을 설정해주세요.");
-    if (durationTime.hour === 0 && durationTime.minute === 0)
-      return alert("경매 시간을 설정해주세요.");
-    if (!agreed) return alert("판매 동의에 체크해주세요.");
-    if (images.length > 10)
-      return alert("이미지는 최대 10장까지 등록 가능합니다.");
+    if (images.length === 0) {
+      alert("최소 1장의 이미지를 등록해주세요.");
+      return;
+    }
+    if (!title.trim()) {
+      alert("경매 제목을 입력해주세요.");
+      return;
+    }
+    if (!category.id) {
+      alert("카테고리를 선택해주세요.");
+      return;
+    }
+    if (!price || price <= 0) {
+      alert("시작 가격을 입력해주세요.");
+      return;
+    }
+    if (!detail.trim()) {
+      alert("상세 설명을 입력해주세요.");
+      return;
+    }
+    if (productStatus === null) {
+      alert("상품 상태를 선택해주세요.");
+      return;
+    }
+    if (startTime.hour === 0 && startTime.minute === 0) {
+      alert("경매 시작 시간을 설정해주세요.");
+      return;
+    }
+    if (durationTime.hour === 0 && durationTime.minute === 0) {
+      alert("경매 시간을 설정해주세요.");
+      return;
+    }
+    if (!agreed) {
+      alert("판매 동의에 체크해주세요.");
+      return;
+    }
+    if (images.length > 10) {
+      alert("이미지는 최대 10장까지 등록 가능합니다.");
+      return;
+    }
+
+    // 유효성 통과 → 모달 열기
     setIsModalOpen(true);
   };
 
   const handleSubmit = async () => {
     const startDelay = startTime.hour * 60 + startTime.minute;
     const duration = durationTime.hour * 60 + durationTime.minute;
-
-    const reorderedImages = [
-      images[mainImageIndex],
-      ...images.filter((_, i) => i !== mainImageIndex),
-    ];
 
     const payload = {
       title,
@@ -76,7 +101,6 @@ export default function Registration() {
       ),
       startDelay,
       durationTime: duration,
-      mainImageIndex: 0,
       category: {
         id: category.id,
         mainCategory: category.mainCategory,
@@ -86,7 +110,7 @@ export default function Registration() {
     };
 
     const formData = new FormData();
-    reorderedImages.forEach((image) => formData.append("images", image));
+    images.forEach((image) => formData.append("images", image));
     const jsonBlob = new Blob([JSON.stringify(payload)], {
       type: "application/json",
     });
@@ -98,12 +122,11 @@ export default function Registration() {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
         }
       );
       alert("경매 물품 등록이 완료되었습니다!");
+      console.log("등록 성공:", res.data);
       setIsModalOpen(false);
-      router.push("/");
     } catch (error: any) {
       console.error("등록 실패", error);
       if (error.response) {
@@ -117,15 +140,15 @@ export default function Registration() {
     <div className="max-w-[1280px] p-8 mx-auto">
       <form
         className="flex flex-col gap-4"
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
       >
         <div className="flex flex-col pb-[79px]">
           <ImageUploader
             value={images}
             onChange={setImages}
             onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
-            mainImageIndex={mainImageIndex}
-            onChangeMainImageIndex={setMainImageIndex}
           />
         </div>
 
@@ -155,16 +178,16 @@ export default function Registration() {
         </div>
 
         <div className="flex justify-center pb-[20px]">
-          <SellerAgreementCheckbox onChange={setAgreed} />
+          <SellerAgreementCheckbox onChange={handleAgreementChange} />
         </div>
 
         <div className="flex justify-center">
           <SellButton
             label="등록하기"
             isModalOpen={isModalOpen}
-            onClick={handleValidationAndOpenModal}
+            onClick={handleValidationAndOpenModal} // ✅ 유효성 검사 & 모달 열기
             onModalClose={() => setIsModalOpen(false)}
-            onConfirm={handleSubmit}
+            onConfirm={handleSubmit} // ✅ 실제 등록 수행
           />
         </div>
       </form>

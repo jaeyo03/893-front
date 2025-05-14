@@ -8,7 +8,7 @@ import BidHistory from "@/components/detail/Bid/BidHistory";
 import { AuctionBidData, Product } from "@/types/productData";
 import { useEffect, useState } from "react";
 
-import { fetchBidData,fetchProductData } from "@/lib/api/auction";
+import { getBidData,getProductData } from "@/lib/api/auction";
 import {dummyProduct} from "@/data/dummyProductData"
 import dummyBidData from "@/data/dummyBidData.json"
 
@@ -19,8 +19,8 @@ export default function SellerDetailView({ itemId }: { itemId: number }) {
   useEffect(() => {
     const fetchData = async () => {
       const [bid, product] = await Promise.all([
-        fetchBidData(itemId),
-        fetchProductData(itemId),
+        getBidData(itemId),
+        getProductData(itemId),
       ]);
 
       if (bid) setBidData(bid);

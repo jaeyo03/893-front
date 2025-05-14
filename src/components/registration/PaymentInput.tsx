@@ -44,8 +44,9 @@ export default function PaymentInput({
   value,
   onChange,
 }: AuctionPriceInputProps) {
-  const [inputValue, setInputValue] = useState(value.toLocaleString());
-
+  const [inputValue, setInputValue] = useState(
+    typeof value === "number" ? value.toLocaleString() : ""
+  );
   useEffect(() => {
     // 부모에서 받은 value가 변경되었을 때 inputValue도 업데이트
     setInputValue(value ? value.toLocaleString() : "");

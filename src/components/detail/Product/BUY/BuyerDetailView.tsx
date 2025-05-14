@@ -4,7 +4,7 @@
 import ImageSlider from "@/components/detail/ImageSlider";
 import ProductInfo from "@/components/detail/Product/BUY/ProductInfo";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
-import ProductCard from "@/components/detail/Product/ProductCard";
+import AuctionCard from "@/components/detail/Product/AuctionCard";
 import BidHistory from "@/components/detail/Bid/BidHistory";
 import { Product, AuctionBidData, Bid } from "@/types/productData";
 import { useEffect, useState } from "react";
@@ -91,7 +91,7 @@ export default function BuyerDetailView({ itemId }: { itemId: number }) {
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
         <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
           <div className="min-w-[231px]">
-            <ProductCard product={productData} />
+            <AuctionCard product={productData} />
           </div>
         </div>
       </div>

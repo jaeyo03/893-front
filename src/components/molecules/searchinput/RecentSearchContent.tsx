@@ -12,7 +12,7 @@ interface RecentSearchContentProps {
 }
 export default function RecentSearchContent({ handleDeleteAllSearches, handleClickRecentWord, recentSearches, handleDeleteSearch, recommendedSearches, handleCloseSearchContent } : RecentSearchContentProps) {
   return (
-    <div className="absolute rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
+    <div className="absolute z-10 rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
       <div className="border-t border-t-[#E5E9EC]">
         <div className="pr-4 pl-4 pt-4 pb-2 text-[#373737] flex text-sm items-center justify-between">
           <div>최근 검색어</div>

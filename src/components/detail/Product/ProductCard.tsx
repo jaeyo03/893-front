@@ -15,11 +15,13 @@ const statusMap: Record<Product['status'], { label: string; color: string }> = {
 };
 
 export default function AuctionCard({ product }: AuctionCardProps) {
-  if(!product) return null;
+  
 
   const [isScraped, setIsScraped] = useState<boolean>(product.isScrap);
   const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
-
+  
+  if(!product) return null;
+  
   const statusInfo = statusMap[product.status] ?? { label: "알 수 없음", color: "bg-red-500" };
 
   const handleScrapToggle = () => {

@@ -5,6 +5,7 @@ import { Product,AuctionBidData } from '@/types/productData';
 import { AuctionState } from '../../AuctionState';
 import BidInteraction from '../../Bid/BidInteraction';
 import ProductHeader from './ProductHeader';
+import { postBid } from '@/lib/api/auction';
 
 interface ProductInfoProps {
   product: Product;
@@ -12,13 +13,20 @@ interface ProductInfoProps {
 }
 
 export default function ProductInfo({ product,auctionBidData }: ProductInfoProps) {
-  const [currentPrice, setCurrentPrice] = useState<number>(product.basePrice);
+  const [currentPrice, setCurrentPrice] = useState<number>(() => {
+    if (auctionBidData.bids.length > 0) {
+      const maxBid = Math.max(...auctionBidData.bids.map((bid) => bid.bidPrice));
+      return maxBid;
+    }
+    return product.basePrice;
+  });
   const [lastBidPrice,setLastBidPrice] = useState<number>(product.basePrice)
   const [, setBidCount] = useState<number>(auctionBidData.totalBid);
   const [isHighestBidder, setIsHighestBidder] = useState<boolean>(false);
   const [cancelTimer, setCancelTimer] = useState<number>(0);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
   const [bookmarkCount, setBookmarkCount] = useState<number>(1);
+
 
   // 타이머 감소
   useEffect(() => {
@@ -38,14 +46,21 @@ export default function ProductInfo({ product,auctionBidData }: ProductInfoProps
   }, [cancelTimer]);
 
   // ✅ 입찰하기 눌렀을 때 호출
-  const handleBid = (amount: number) => {
+  const handleBid = async (amount: number) => {
     if (amount <= currentPrice) return;
 
-    setLastBidPrice(currentPrice);
-    setCurrentPrice(amount);             // 현재가 업데이트
-    setBidCount((prev) => prev + 1);     // 입찰 수 증가
-    setIsHighestBidder(true);
-    setCancelTimer(300);                 // 5분 타이머 시작
+    try {
+      await postBid({ auctionId: product.auctionId, bidPrice: amount });
+
+      setLastBidPrice(currentPrice);
+      setCurrentPrice(amount);
+      setBidCount((prev) => prev + 1);
+      setIsHighestBidder(true);
+      setCancelTimer(300);
+    } catch (error) {
+      console.error('입찰 실패:', error);
+      alert('입찰에 실패했습니다.');
+    }
   };
 
   const handleCancelBid = () => {

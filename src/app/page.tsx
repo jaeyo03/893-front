@@ -5,7 +5,6 @@ import SearchInput from "@/components/templates/SearchInput";
 
 import ProductCard from "@/components/detail/Product/ProductCard";
 
-import ProductCard from "@/components/detail/ProductCard";
 import { Metadata } from "next";
 // async function getProducts() {
 //   const res = await fetch('http://localhost:3000/mocks/products.json'); // TODO 추후 백엔드 URI로 변경
@@ -20,7 +19,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
   description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
-}
+};
 
 export default async function Home() {
   // const products = await getProducts(); // TODO 추후 상품 섹션과 연결
@@ -29,26 +28,18 @@ export default async function Home() {
     <>
       <div className="grid justify-center items-center gap-4 w-full">
         <HomeTitle>
-          <SpinningWord/>
+          <SpinningWord />
           <span>&nbsp;경매에 참여해보세요</span>
         </HomeTitle>
         <div className="flex justify-center w-full">
-          <SearchInput/>
+          <SearchInput />
         </div>
-        <CategorySearchSection/>
+        <CategorySearchSection />
       </div>
       <div className="grid grid-cols-5 gap-4 mt-8">
-        <ProductCard
-          imageUrl="https://via.placeholder.com/150"
-          title="상품 1"
-          status="진행중"
-          startTime="2024-01-01"
-          endTime="2024-01-10"
-          currentPrice={10000}
-          bidderCount={10}
-          scrapCount={10}
-          isScrapped={false}
-        />
+        {/* <ProductCard
+          product={ProductCard}
+        /> */}
       </div>
     </>
   );

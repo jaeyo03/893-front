@@ -6,16 +6,18 @@ import ProductStatusFilter from "@/components/templates/searchpage/ProductStatus
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
-import ProductCard from "@/components/detail/ProductCard";
+// import ProductCard from "@/components/detail/ProductCard";
 
-async function getSearchProducts(searchParams: Record<string, string | string[] | undefined>) {
+async function getSearchProducts(
+  searchParams: Record<string, string | string[] | undefined>
+) {
   const urlSearchParams = new URLSearchParams();
-  
+
   // searchParams을 순회하며 URLSearchParams에 추가
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       // 배열인 경우 각 항목을 같은 키로 추가
-      value.forEach(item => {
+      value.forEach((item) => {
         if (item) urlSearchParams.append(key, item);
       });
     } else if (value !== undefined) {
@@ -23,7 +25,7 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
       urlSearchParams.append(key, value);
     }
   });
-  
+
   let queryString = urlSearchParams.toString();
 
   if (queryString.length > 0) {
@@ -31,14 +33,14 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
   }
 
   console.log(`API 호출 URL: /api/auctions/search${queryString}`);
-  
+
   // TODO - 백엔드 ui로 변경
   // const response = await fetch(`/api/auctions/search?${queryString}`);
   // if (!response.ok) {
   //   throw new Error("Failed to fetch products");
   // }
   // return response.json();
-  
+
   return [
     {
       id: 1,
@@ -50,7 +52,7 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
       currentPrice: 10000,
       bidderCount: 5,
       scrapCount: 3,
-      isScrapped: false
+      isScrapped: false,
     },
     {
       id: 2,
@@ -62,7 +64,7 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
       currentPrice: 15000,
       bidderCount: 8,
       scrapCount: 12,
-      isScrapped: true
+      isScrapped: true,
     },
     {
       id: 3,
@@ -74,38 +76,42 @@ async function getSearchProducts(searchParams: Record<string, string | string[] 
       currentPrice: 25000,
       bidderCount: 15,
       scrapCount: 7,
-      isScrapped: false
-    }
+      isScrapped: false,
+    },
   ];
 }
 
-export default async function SearchPage({ searchParams } : { searchParams : { [key: string]: string | string[] | undefined } }) {
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const products = await getSearchProducts(searchParams);
-  
+
   return (
     <div className="grid mt-4 gap-4">
       <div className="flex justify-center gap-10 items-center">
-        <div className="font-bold text-xl">경매에 참여하고 싶은 물건을 검색해보세요</div>
-        <SearchInput/>
+        <div className="font-bold text-xl">
+          경매에 참여하고 싶은 물건을 검색해보세요
+        </div>
+        <SearchInput />
       </div>
-      <ProductRelated relatedWords={["카메라", "아이폰", "에어팟"]}/>
+      <ProductRelated relatedWords={["카메라", "아이폰", "에어팟"]} />
       <div className="bg-graybg h-auto p-4 flex gap-4">
         <div className="bg-white rounded-[12px] py-2 w-1/5">
           <div className="flex justify-between items-center px-4 py-2">
-            <div className="font-bold text-xl">
-              검색 필터
-            </div>
-            <FilterRefreshButton/>
+            <div className="font-bold text-xl">검색 필터</div>
+            <FilterRefreshButton />
           </div>
-          <CategoryFilter/>
-          <PriceFilter/>
-          <AuctionStatusFilter/>
-          <ProductStatusFilter/>
+          <CategoryFilter />
+          <PriceFilter />
+          <AuctionStatusFilter />
+          <ProductStatusFilter />
         </div>
         <div className="w-4/5">
-          <ProductSort/>
+          <ProductSort />
           <div className="grid grid-cols-4 gap-4 mt-4">
-            {products.map((product) => (
+            {/* {products.map((product) => (
               <ProductCard
                 key={product.id}
                 imageUrl={product.imageUrl}
@@ -118,10 +124,10 @@ export default async function SearchPage({ searchParams } : { searchParams : { [
                 scrapCount={product.scrapCount}
                 isScrapped={product.isScrapped}
               />
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
@@ -22,6 +23,7 @@ import {
 } from "@/components/registration/constants/productConditions";
 
 export default function Registration() {
+  const router = useRouter();
   const [images, setImages] = useState<File[]>([]);
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
@@ -122,11 +124,13 @@ export default function Registration() {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
         }
       );
       alert("경매 물품 등록이 완료되었습니다!");
       console.log("등록 성공:", res.data);
       setIsModalOpen(false);
+      router.push("/"); // ✅ 홈으로 이동
     } catch (error: any) {
       console.error("등록 실패", error);
       if (error.response) {

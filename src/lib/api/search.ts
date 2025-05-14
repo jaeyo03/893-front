@@ -1,8 +1,8 @@
 import { BaseResponse, SearchListResponse } from "@/types/response.types";
 
-export async function getSearchProducts(searchParams: Record<string, string | string[] | undefined>) : Promise<BaseResponse<SearchListResponse>> {
+function makeSearchParams(searchParams: Record<string, string | string[] | undefined>) : string {
   const urlSearchParams = new URLSearchParams();
-  console.log(searchParams);
+
   // searchParams을 순회하며 URLSearchParams에 추가
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
@@ -15,18 +15,34 @@ export async function getSearchProducts(searchParams: Record<string, string | st
       urlSearchParams.append(key, value);
     }
   });
-  
-  let queryString = urlSearchParams.toString();
+  console.log(urlSearchParams.toString());
+  return urlSearchParams.toString();
+}
+
+export async function getSearchProducts(searchParams: Record<string, string | string[] | undefined>) : Promise<BaseResponse<SearchListResponse>> {
+  let queryString = makeSearchParams(searchParams);
 
   if (queryString.length > 0) {
     queryString = `?${queryString}`;
   }
   
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error("Failed to fetch products");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return {
+      data: {
+        totalAuctionsCount: 0,
+        auctionList: [],
+      },
+      message: "Failed to fetch products",
+      code: 500,
+    }
   }
-  return response.json();
 }
 
 export async function getRelatedWords(searchParams: Record<string, string | string[] | undefined>) : Promise<BaseResponse<string[]>> {
@@ -42,10 +58,19 @@ export async function getRelatedWords(searchParams: Record<string, string | stri
     }
   }
   
-  const encodedKeyword = encodeURIComponent(keyword);
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`, { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error("Failed to fetch related words");
+  try {
+    const encodedKeyword = encodeURIComponent(keyword);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error("Failed to fetch related words");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching related words:", error);
+    return {
+      data: [],
+      message: "Failed to fetch related words",
+      code: 500,
+    }
   }
-  return response.json();
 }

@@ -1,3 +1,4 @@
+import { Status } from "@/types/userData";
 
 // 상태 라벨 및 클래스 정의용 인터페이스
 export interface AuctionStatus {
@@ -6,37 +7,17 @@ export interface AuctionStatus {
 }
 
 // 상태 조건에 따른 반환 함수
-export const getAuctionStatus = (isWinning: boolean): AuctionStatus => {
-  return isWinning
-    ? { label: "입찰 중", className: "bg-main" }
-    : { label: "경매 중", className: "bg-warningkeword" };
-};
-
-export interface PurchaseStatus {
-  label: string;
-  className: string;
-}
-export const getPurchaseStatus = (isPurchased:boolean) : PurchaseStatus=>{
-  return isPurchased
-  ?{label:"구매완료",className:"bg-main"}
-  :{label:"구매 전",className:"bg-warningkeword"}
-}
-
-// 입찰 카드에서 사용할 더미 데이터 (개발용)
-export const bidInfo = {
-  productName: "삼성 갤럭시 S23 Ultra",
-  myBid: "₩750,000",
-  currentBid: "₩750,000",
-  remainingTime: "1일 23시간 59분",
-  isWinning: false,
-  status: "pending",
-  isBookmarked: true,
-};
-
-export const bidEndInfo = {
-  productName: "삼성 갤럭시 S23 Ultra",
-  myBid: "₩750,000",
-  currentBid: "₩750,000",
-  orderNum:123123123123,
-  ispurchased:false,
+export const getAuctionStatus = (status: Status): AuctionStatus => {
+  switch (status) {
+    case 'pending':
+      return { label: '대기 중', className: 'bg-gray-400' };
+    case 'active':
+      return { label: '진행 중', className: 'bg-main' };
+    case 'completed':
+      return { label: '완료됨', className: 'bg-green-500' };
+    case 'cancelled':
+      return { label: '취소됨', className: 'bg-red-500' };
+    default:
+      return { label: '알 수 없음', className: 'bg-gray-200' }; // fallback (optional)
+  }
 };

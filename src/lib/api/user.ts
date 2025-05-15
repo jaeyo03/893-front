@@ -33,7 +33,9 @@ export const addAddress = async (newAddress: any) => {
 // 배송지 삭제 함수
 export const deleteAddress = async (id: number) => {
   try { 
-    await axios.delete(`${API_URL}/addresses/${id}`);
+    await axios.delete(`${API_URL}/addresses/${id}`,
+      {withCredentials:true}
+    );
   } catch (error) {
     console.error("배송지 삭제 실패:", error);
     throw error;
@@ -41,12 +43,75 @@ export const deleteAddress = async (id: number) => {
 };
 
 // 배송지 수정 함수
-export const updateAddress = async (id: string, updatedAddress: any) => {
+export const updateAddress = async (id: number) => {
   try {
-    const response = await axios.put(`${API_URL}/addresses/${id}/default`, updatedAddress);
+    const response = await axios.patch(`${API_URL}/addresses/${id}/default`,
+      {},
+      {withCredentials:true}
+    );
     return response.data;
   } catch (error) {
     console.error("배송지 수정 실패:", error);
+    throw error;
+  }
+};
+
+export const getUserInfo = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/user-info`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyBidsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/bids`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyAuctionsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/auctions`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyScrapsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/scraps`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyPaymentsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/payments`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
     throw error;
   }
 };

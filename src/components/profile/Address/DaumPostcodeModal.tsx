@@ -9,7 +9,7 @@ export default function DaumPostcodeModal({
   onComplete,
 }: {
   onClose: () => void;
-  onComplete: (data: { address: string }) => void;
+  onComplete: (data: { address: string, zipCode: string }) => void;
 }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -17,7 +17,10 @@ export default function DaumPostcodeModal({
         <h2 className="text-lg font-bold mb-2">주소 검색</h2>
         <DaumPostcodeEmbed
           onComplete={(data) => {
-            onComplete(data); // 상위로 주소 전달
+            onComplete({
+              address: data.address,
+              zipCode: data.zonecode,
+            }); // 상위로 주소 전달
             onClose(); // 모달 닫기
           }}
         />

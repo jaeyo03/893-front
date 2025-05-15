@@ -7,6 +7,7 @@ export interface User {
 }
 
 export interface DeliveryAddress {
+  id: number,
   name: string,
   phoneNumber: string,
   addressLine1: string,

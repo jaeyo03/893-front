@@ -1,41 +1,40 @@
 'use client';
 
-import { Bookmark } from 'lucide-react';
-import { useState } from 'react';
-import { Auction } from '@/types/response.types';
-import Image from 'next/image';
+import {Bookmark} from 'lucide-react';
+import {useState} from 'react';
+import {Auction} from '@/types/response.types';
 
 interface AuctionCardProps {
   product: Auction;
 }
 
 const statusMap: Record<Auction['status'], { label: string; color: string }> = {
-  pending: { label: "경매 전", color: "bg-rightgray" },
-  active: { label: "경매 중", color: "bg-main" },
-  completed: { label: "종료", color: "bg-red" },
-  cancelled: { label: "취소", color: "bg-red" },
+  pending: {label: "경매 전", color: "bg-rightgray"},
+  active: {label: "경매 중", color: "bg-main"},
+  completed: {label: "종료", color: "bg-red"},
+  cancelled: {label: "취소", color: "bg-red"},
 };
 
-export default function AuctionCard({ product }: AuctionCardProps) {
+export default function AuctionCard({product}: AuctionCardProps) {
   
-
+  
   const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped ?? false);
   const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
   
-  if(!product) return null;
+  if (!product) return null;
   
-  const statusInfo = statusMap[product.status] ?? { label: "알 수 없음", color: "bg-red-500" };
-
+  const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};
+  
   const handleScrapToggle = () => {
     setIsScraped((prev) => !prev);
     setBookmarkCount((prev) => (isScraped ? prev - 1 : prev + 1));
   };
-
+  
   return (
     <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
       <div className="grid grid-cols-1 grid-rows-1">
-        <Image
-          src={product.thumbnailUrl || '/placeholder.jpg'}
+        <img
+          src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}
           alt={product.title}
           width={231}
           height={231}
@@ -63,7 +62,7 @@ export default function AuctionCard({ product }: AuctionCardProps) {
           />
         </button>
       </div>
-
+      
       <div className="pt-3 space-y-1">
         <p className="text-sm font-medium truncate">{product.title}</p>
         <div className="flex items-center gap-1 text-xs text-gray-600">

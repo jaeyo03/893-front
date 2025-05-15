@@ -49,6 +49,37 @@ export default function BuyerDetailView({ itemId }: { itemId: number }) {
     fetchRelated();
   }, [itemId]);
   
+  useEffect(() => {
+    if (!itemId) return;
+  
+    const eventSource = new EventSource(`http://localhost:8080/api/auctions/${itemId}/stream`,
+      {withCredentials:true}
+    );
+
+    eventSource.addEventListener('connect', (event) => {
+      console.log('SSE connected:', event.data);
+    });
+    
+    eventSource.addEventListener('bid-update', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'NEW_BID') {
+          updateBidData(data.bid);
+        } else if (data.type === 'CANCEL_BID') {
+          removeBidData(data.bidId);
+        }
+      } catch (error) {
+        console.error('SSE message parse error:', error);
+      }
+    });
+    
+    eventSource.onerror = (err) => {
+      console.error('SSE error:', err);
+      eventSource.close();
+    };
+    
+  }, [itemId]);
+  
 
   if (!productData || !bidData) return <div>로딩 중...</div>;
 

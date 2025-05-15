@@ -5,7 +5,7 @@ import SellerProductInfo from "@/components/detail/Product/Sell/SellerProductInf
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import RelatedItemCard from "../RelatedItemCard";
 import BidHistory from "@/components/detail/Bid/BidHistory";
-import { AuctionBidData, Product, RelatedItem } from "@/types/productData";
+import { AuctionBidData, Product, RelatedItem, Bid } from "@/types/productData";
 import { useEffect, useState } from "react";
 
 import { getBidData,getProductData, getRelatedItem } from "@/lib/api/auction";
@@ -50,6 +50,62 @@ export default function SellerDetailView({ itemId }: { itemId: number }) {
       fetchRelated();
     }, [itemId]);
 
+    useEffect(() => {
+      if (!itemId) return;
+    
+      const eventSource = new EventSource(`http://localhost:8080/api/auctions/${itemId}/stream`,
+        {withCredentials:true}
+      );
+  
+      eventSource.addEventListener('connect', (event) => {
+        console.log('SSE connected:', event.data);
+      });
+      
+      eventSource.addEventListener('bid-update', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'NEW_BID') {
+            updateBidData(data.bid);
+          } else if (data.type === 'CANCEL_BID') {
+            removeBidData(data.bidId);
+          }
+        } catch (error) {
+          console.error('SSE message parse error:', error);
+        }
+      });
+      
+      eventSource.onerror = (err) => {
+        console.error('SSE error:', err);
+        eventSource.close();
+      };
+      
+    }, [itemId]);
+    
+  
+    const updateBidData = (newBid: Bid) => {
+      setBidData(prev => {
+        const updatedBids = [newBid, ...prev.bids];
+        return { ...prev, bids: updatedBids, totalBid: updatedBids.length };
+      });
+    };
+  
+    const removeBidData = (bidId: number) => {
+      setBidData(prev => {
+        const bidToCancel = prev.bids.find(bid => bid.bidId === bidId);
+        if (!bidToCancel) return prev;
+    
+        const updatedBids = prev.bids.filter(bid => bid.bidId !== bidId);
+        const updatedCancelledBids = [bidToCancel, ...(prev.cancelledBids || [])];
+    
+        return {
+          ...prev,
+          bids: updatedBids,
+          cancelledBids: updatedCancelledBids,
+          totalBid: updatedBids.length,
+        };
+      });
+    };
+    
   if (!productData || !bidData) return <div>로딩 중...</div>;
 
   return (

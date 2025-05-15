@@ -63,6 +63,7 @@ export default function UserProfile() {
             // 대표 주소가 없어도 userData는 반영
             setUserInfo((prev) => ({
               ...prev,
+              imageUrl: userData.profileUrl,
               name: userData.name,
               email: userData.email,
             }));

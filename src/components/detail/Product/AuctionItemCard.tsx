@@ -9,7 +9,7 @@ export default function AuctionItemCard({imageUrl, label = '경매중'}: Auction
       <div className="relative border rounded-lg overflow-hidden w-[600px] h-[600px] bg-white">
         {/* 이미지 */}
         <img
-          src={imageUrl}
+          src={`http://localhost:8080${imageUrl}` || '/placeholder.jpg'}
           alt="Auction item"
           width={600}
           height={600}

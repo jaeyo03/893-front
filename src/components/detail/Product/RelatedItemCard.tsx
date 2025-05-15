@@ -30,7 +30,7 @@ export default function RelatedItemCard({product}: RelatedItemCardProps) {
         <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
             <div className="grid grid-cols-1 grid-rows-1">
                 <img
-                    src={product.thumbnailUrl || '/placeholder.jpg'}
+                    src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}
                     alt={product.title}
                     width={231}
                     height={231}

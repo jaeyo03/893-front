@@ -178,10 +178,10 @@ input[type="text"]:focus {
   height: 100%;
 }
 
-a {
-  text-decoration: none;
-  text-align: center;
-}
+/*a {*/
+/*  text-decoration: none;*/
+/*  text-align: center;*/
+/*}*/
 
 .wrapper {
   display: flex;

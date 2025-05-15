@@ -49,7 +49,7 @@ export default function CategoryDetail() {
             )}
             {currentCategorySub === "7" && (
               <>
-                <SelectItem value="8">아우터</SelectItem>
+                <SelectItem value="23">아우터</SelectItem>
               </>
             )}
           </SelectGroup>

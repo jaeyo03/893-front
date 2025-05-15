@@ -23,7 +23,7 @@ export default function MyPaymentsProductCard({ key,payments }: Props){
         onClick={handleClick}
         className="p-4 mb-4 w-full h-[166px] border-2 border-checkbox">
         <div className="flex items-center h-full">
-              <img src={payments.mainImageUrl} alt={payments.title} className="w-24 h-24 object-cover mr-4" />
+              <img src={`http://localhost:8080${payments.mainImageUrl}` || '/placeholder.jpg'} alt={payments.title} className="w-24 h-24 object-cover mr-4" />
               <div className="flex-1">
               <p className="font-bold text-[16px]">{payments.title}</p>
               <div className="flex justify-between text-[14px] mt-2">

@@ -36,7 +36,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
       >
         <div className="flex items-center h-full">
           <img
-            src={auctions.mainImageUrl}
+            src={`http://localhost:8080${auctions.mainImageUrl}` || '/placeholder.jpg'}
             alt={auctions.title}
             className="w-24 h-24 object-cover rounded mr-4 bg-gray-100"
           />

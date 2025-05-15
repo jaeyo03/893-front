@@ -16,6 +16,7 @@ import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeBu
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
 import {
   productConditions,
+  convertLabelToServerValue,
   convertServerValueToLabel,
 } from "@/components/registration/constants/productConditions";
 
@@ -24,8 +25,11 @@ type ServerImage = {
   originalName: string;
   storeName: string;
 };
+interface AuctionIdProps {
+  params: { idx: number };
+}
 
-export default function EditRegistration() {
+export default function EditRegistration({params}: AuctionIdProps) {
   const [images, setImages] = useState<File[]>([]);
   const [serverImages, setServerImages] = useState<ServerImage[]>([]);
   const [category, setCategory] = useState<CategoryValue>({
@@ -43,9 +47,11 @@ export default function EditRegistration() {
   const [durationTime, setDurationTime] = useState({ hour: 0, minute: 0 });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const auctionId = 123; // 실제로는 props나 router에서 받아야 함
+  const auctionId = params.idx; // 실제로는 props나 router에서 받아야 함 <-- 라우팅 설정 필요
+  
 
   const validateForm = () => {
+    console.log(auctionId);
     const totalImageCount = images.length + serverImages.length;
     if (totalImageCount === 0)
       return alert("이미지를 최소 1장 업로드해주세요."), false;
@@ -67,38 +73,35 @@ export default function EditRegistration() {
     return true;
   };
 
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0); // 대표 이미지 인덱스 추가
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    const formData = new FormData();
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
+    const label = productConditions[productStatus!];
+    const itemCondition = convertLabelToServerValue(label);
 
-    let uploadedImages: ServerImage[] = [];
-    try {
-      const res = await axios.post("/api/uploads", formData);
-      uploadedImages = res.data.images;
-    } catch (err) {
-      console.error("이미지 업로드 실패", err);
-      return alert("이미지 업로드 중 오류가 발생했습니다.");
-    }
-
-    const allImages = [...serverImages, ...uploadedImages].map((img, idx) => ({
-      originalName: img.originalName,
-      storeName: img.storeName,
-      url: img.url,
-      imageSeq: idx + 1,
+    const allImagesRaw = [...serverImages, ...images];
+    const reorderedImages = [
+      allImagesRaw[mainImageIndex],
+      ...allImagesRaw.filter((_, idx) => idx !== mainImageIndex),
+    ];
+    const allImages = reorderedImages.map((img, idx) => ({
+      imageId:
+        "imageId" in img && typeof img.imageId === "number"
+          ? img.imageId
+          : null,
+      imageSeq: idx,
     }));
 
-    const payload = {
+    const requestPayload = {
       title,
       description: detail,
-      itemCondition: productConditions[productStatus!],
+      itemCondition,
       basePrice: price,
       startDelay: startTime.hour * 60 + startTime.minute,
       durationTime: durationTime.hour * 60 + durationTime.minute,
-      mainImageIndex: 0,
+      mainImageIndex: 0, // 항상 대표 이미지가 첫 번째
       category: {
         id: category.id,
         mainCategory: category.mainCategory,
@@ -107,13 +110,39 @@ export default function EditRegistration() {
       },
       images: allImages,
     };
+    console.log("🧩 이미지 시퀀스 확인:");
+    console.log(
+      reorderedImages.map((img, idx) => ({
+        imageId: "imageId" in img ? img.imageId : "(신규)",
+        imageSeq: idx,
+      }))
+    );
+
+    console.log("📦 전체 requestPayload:");
+    console.log(JSON.stringify(requestPayload, null, 2));
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+    formData.append(
+      "request",
+      new Blob([JSON.stringify(requestPayload)], { type: "application/json" })
+    );
 
     try {
-      await axios.patch(`/api/auctions/${auctionId}`, payload);
+      await axios.patch(
+        `http://localhost:8080/api/auctions/${auctionId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },withCredentials: true,
+        },
+      );
       alert("경매 수정이 완료되었습니다!");
       setIsModalOpen(false);
     } catch (err) {
-      console.error("수정 실패", err);
+      console.error("❌ PATCH 실패", err);
       alert("수정 중 오류가 발생했습니다.");
     }
   };
@@ -121,21 +150,36 @@ export default function EditRegistration() {
   useEffect(() => {
     const fetchAuctionData = async () => {
       try {
-        const res = await fetch(`/api/auctions/${auctionId}`);
-        const data = await res.json();
+        const res = await axios.get(
+          `http://localhost:8080/api/auctions/${auctionId}/update`,
+          {
+            withCredentials: true,
+          }
+        );
+        const data = res.data.data; // ✅ 여기 수정 중요
+
+        // 🔒 null-safe 처리
+        const correctedImages = (data.images ?? []).map((img: ServerImage) => ({
+          ...img,
+          url: img.url.startsWith("http")
+            ? img.url
+            : `http://localhost:8080${img.url}`,
+        }));
 
         setTitle(data.title);
         setPrice(data.basePrice);
         setDetail(data.description);
-        setServerImages(data.images);
+        setServerImages(correctedImages); // ✅ 보정된 이미지 사용
         setCategory({
           id: data.category.id,
           mainCategory: data.category.mainCategory,
           subCategory: data.category.subCategory,
           detailCategory: data.category.detailCategory,
         });
+
+        const statusLabel = convertServerValueToLabel(data.itemCondition);
         const statusIndex = productConditions.findIndex(
-          (label) => label === convertServerValueToLabel(data.itemCondition)
+          (label) => label === statusLabel
         );
         setProductStatus(statusIndex);
       } catch (err) {
@@ -155,11 +199,15 @@ export default function EditRegistration() {
             onChange={setImages}
             serverImages={serverImages}
             onDeleteServerImage={(index) => {
-              const newList = [...serverImages];
-              newList.splice(index, 1);
-              setServerImages(newList);
+              setServerImages((prev) => {
+                const updated = prev.filter((_, i) => i !== index);
+
+                return [...updated]; // ✅ 새로운 참조 배열로 상태 변경
+              });
             }}
             onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
+            mainImageIndex={mainImageIndex}
+            onChangeMainImageIndex={setMainImageIndex}
           />
         </div>
 
@@ -193,13 +241,13 @@ export default function EditRegistration() {
         </div>
 
         <div className="flex justify-center">
-          {/* <SellButton
+          <SellButton
             label="수정하기"
             isModalOpen={isModalOpen}
-            onClick={handleValidationAndOpenModal} // ✅ 유효성 검사 & 모달 열기
+            onClick={() => setIsModalOpen(true)}
             onModalClose={() => setIsModalOpen(false)}
-            onConfirm={handleSubmit} // ✅ 실제 등록 수행
-          /> */}
+            onConfirm={handleSubmit}
+          />
         </div>
       </form>
     </div>

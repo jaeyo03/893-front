@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,15 +16,8 @@ import {
 
 import DeliveryAddressCard from "@/components/profile/Address/DeliveryAddressCard";
 import AddressModal from "./Address/AddressModal";
-
-type AddressInfo = {
-  label: string;
-  name: string;
-  phone: string;
-  address: string;
-  detail: string;
-  isMain: boolean;
-};
+import { DeliveryAddress } from "@/types/userData";
+import { getAddresses, getUserInfo,updateAddress, deleteAddress } from "@/lib/api/user";
 
 export default function UserProfile() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -33,90 +26,149 @@ export default function UserProfile() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   const [userInfo, setUserInfo] = useState({
-    name: "홍길동",
-    email: "user@example.com",
-    address: "대표 배송지",
-    phone: "010-1234-5678",
-    imageUrl: "/images/신짱구.png",
+    name: '',
+    email: '',
+    address: '',
+    phone: '',
+    imageUrl: '',
   });
 
-  const [addresses, setAddresses] = useState<AddressInfo[]>([
-    {
-      label: "배송지",
-      name: "user",
-      phone: "010 - xxxx - xxxx",
-      address: "",
-      detail: "",
-      isMain: true,
-    },
-    {
-      label: "집",
-      name: "user",
-      phone: "010 - xxxx - xxxx",
-      address: "",
-      detail: "",
-      isMain: false,
-    },
-  ]);
+  // 초기값을 빈 배열로 설정하여 undefined 방어
+  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 두 API를 병렬로 호출
+        const [addressData, userData] = await Promise.all([
+          getAddresses(),
+          getUserInfo()
+        ]);
+  
+        // 주소 데이터 처리
+        if (Array.isArray(addressData)) {
+          setAddresses(addressData);
+  
+          // 대표 주소가 있다면 userInfo에 반영
+          const mainAddress = addressData.find((addr) => addr.isDefault);
+          if (mainAddress) {
+            setUserInfo((prev) => ({
+              ...prev,
+              address: `${mainAddress.addressLine1} ${mainAddress.addressLine2}`,
+              phone: mainAddress.phoneNumber,
+              name: userData.name,          // ✅ 유저 기본정보도 업데이트
+              email: userData.email,        // 예: 유저 이메일이 있다면
+            }));
+          } else if (userData) {
+            // 대표 주소가 없어도 userData는 반영
+            setUserInfo((prev) => ({
+              ...prev,
+              name: userData.name,
+              email: userData.email,
+            }));
+          }
+        } else {
+          console.error("API에서 배열이 아닌 주소값 반환:", addressData);
+        }
+      } catch (error) {
+        console.error("유저 정보 또는 배송지 불러오기 실패:", error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  
+  // 기본 배송지 업데이트
   const updateUserInfoFromMainAddress = () => {
-    const main = addresses.find((addr) => addr.isMain);
+    if (!addresses) return; // addresses가 null 또는 undefined일 때 처리
+    const main = addresses.find((addr) => addr.isDefault);
     if (main) {
       setUserInfo((prev) => ({
         ...prev,
-        address: main.label,
-        phone: main.phone,
+        address: `${main.addressLine1} ${main.addressLine2}`,
+        phone: main.phoneNumber,
       }));
     }
   };
 
-  const handleSetMain = (index: number) => {
-    setAddresses((prev) =>
-      prev.map((addr, i) => ({
+  const handleSetMain = async (index: number) => {
+    const selectedAddress = addresses?.[index];
+    if (!selectedAddress) return;
+  
+    try {
+      // ✅ 서버에 대표 배송지 요청
+      await updateAddress(selectedAddress.id);
+  
+      // ✅ 성공 시 상태 업데이트
+      const updatedAddresses = addresses.map((addr, i) => ({
         ...addr,
-        isMain: i === index,
-      }))
-    );
-  };
-
-  const handleDelete = (index: number) => {
-    const isMain = addresses[index].isMain;
-    const updated = addresses.filter((_, i) => i !== index);
-
-    if (isMain && updated.length > 0) updated[0].isMain = true;
-
-    setAddresses([...updated]);
-    if (updated.length === 0) {
-      setUserInfo((prev) => ({
-        ...prev,
-        address: "",
-        phone: "",
+        isDefault: i === index,
       }));
+  
+      setAddresses(updatedAddresses);
+      updateUserInfoFromMainAddress();
+    } catch (error) {
+      console.error("대표 배송지 설정 실패:", error);
+      // 알림이나 토스트 메시지를 띄워도 좋습니다
     }
   };
 
-  const handleSave = () => {
-    updateUserInfoFromMainAddress();
-    setDialogOpen(false);
+  const handleDelete = async (index: number) => {
+    if (!addresses || addresses[index] === undefined) return;
+
+    const addressToDelete = addresses[index];
+    const isMain = addressToDelete.isDefault;
+
+    try {
+      // 🔥 서버에 삭제 요청
+      await deleteAddress(addressToDelete.id);
+
+      // 🔁 클라이언트 상태 업데이트
+      const updated = addresses.filter((_, i) => i !== index);
+      if (isMain && updated.length > 0) {
+        updated[0].isDefault = true; // 클라이언트상에서 첫 번째를 대표로
+      }
+
+      setAddresses([...updated]);
+
+      if (updated.length === 0) {
+        setUserInfo((prev) => ({
+          ...prev,
+          address: "",
+          phone: "",
+        }));
+      }
+    } catch (error) {
+      console.error("배송지 삭제 처리 중 오류:", error);
+      // 필요 시 사용자에게 알림 처리 가능
+    }
   };
 
   const handleDeleteClick = (index: number) => {
+    if (!addresses || addresses[index] === undefined) return;
     if (addresses.length === 1) {
       setDeleteIndex(index);
       setDeleteConfirmOpen(true);
     } else {
-      handleDelete(index);
+      handleDelete(index); // 👉 await는 필요 없음, handleDelete 자체에서 처리
     }
   };
 
-  const handleAddAddress = (newAddress: AddressInfo) => {
+
+  const handleAddAddress = (newAddress: DeliveryAddress) => {
     setAddresses((prev) => {
-      const updated = newAddress.isMain
-        ? prev.map((a) => ({ ...a, isMain: false }))
+      const updated = newAddress.isDefault
+        ? prev.map((a) => ({ ...a, isDefault: false }))
         : prev;
       return [...updated, newAddress];
     });
     setAddressModalOpen(false);
+  };
+
+  const handleSave = () => {
+    updateUserInfoFromMainAddress(); // Update user profile from the selected main address
+    setDialogOpen(false); // Close the dialog after saving the changes
   };
 
   return (
@@ -171,14 +223,18 @@ export default function UserProfile() {
             </DialogHeader>
 
             <div className="mt-4 max-h-[400px] overflow-y-auto space-y-2">
-              {addresses.map((addr, index) => (
-                <DeliveryAddressCard
-                  key={index}
-                  data={addr}
-                  onDelete={() => handleDeleteClick(index)}
-                  onSetMain={() => handleSetMain(index)}
-                />
-              ))}
+              {addresses && addresses.length > 0 ? (
+                addresses.map((addr, index) => (
+                  <DeliveryAddressCard
+                    key={index}
+                    data={addr}
+                    onDelete={() => handleDeleteClick(index)}
+                    onSetMain={() => handleSetMain(index)}
+                  />
+                ))
+              ) : (
+                <p>배송지가 없습니다.</p>
+              )}
 
               <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
                 <DialogContent>
@@ -221,22 +277,7 @@ export default function UserProfile() {
               isOpen={addressModalOpen}
               onClose={() => setAddressModalOpen(false)}
               onSave={(newAddress) => {
-                setAddresses((prev) => {
-                  const isFirst = prev.length === 0;
-            
-                  const updated = newAddress.isMain || isFirst
-                    ? prev.map((a) => ({ ...a, isMain: false }))
-                    : prev;
-            
-                  return [
-                    ...updated,
-                    {
-                      ...newAddress,
-                      isMain: newAddress.isMain || isFirst, // 첫 주소면 자동으로 isMain: true
-                    },
-                  ];
-                });
-                setAddressModalOpen(false);
+                handleAddAddress(newAddress);
               }}
             />
 

@@ -1,32 +1,25 @@
-"use client";
+'use client';
 
-import DaumPostcodeModal from "./DaumPostcodeModal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-type AddressForm = {
-  label: string;
-  name: string;
-  phone: string;
-  address: string;
-  detail: string;
-  isMain: boolean;
-};
+import { DeliveryAddress } from "@/types/userData";
+import { addAddress } from "@/lib/api/user";  // API 호출 함수
+import DaumPostcodeModal from "./DaumPostcodeModal";
 
 type AddressModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: AddressForm) => void;
+  onSave: (data: DeliveryAddress) => void;
 };
 
 export default function AddressModal({ isOpen, onClose, onSave }: AddressModalProps) {
-  const [form, setForm] = useState<AddressForm>({
-    label: "",
+  const [form, setForm] = useState<DeliveryAddress>({
     name: "",
-    phone: "",
-    address: "",
-    detail: "",
-    isMain: false,
+    phoneNumber: "",
+    addressLine1: "",
+    addressLine2: "",
+    zipCode: "",
+    isDefault: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -51,7 +44,7 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    (["label", "name", "phone", "address", "detail"] as const).forEach((key) => {
+    (["name", "phoneNumber", "addressLine1", "addressLine2", "zipCode"] as const).forEach((key) => {
       if (form[key].trim() === "") {
         newErrors[key] = "이 필드는 필수입니다.";
       }
@@ -60,21 +53,34 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm()) return;
-    onSave(form);
-    onClose();
-    setForm({
-      label: "",
-      name: "",
-      phone: "",
-      address: "",
-      detail: "",
-      isMain: false,
-    });
-    setErrors({});
-  };
 
+    // form의 데이터가 유효한지 방어 코드
+    if (!form.name || !form.phoneNumber || !form.addressLine1 || !form.addressLine2 || !form.zipCode) {
+      console.error("필수 입력값이 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await addAddress(form);  // API 호출
+      if (response) {
+        onSave(form);  // 성공하면 부모에게 데이터 전달
+        onClose();  // 모달 닫기
+        setForm({
+          name: "",
+          phoneNumber: "",
+          addressLine1: "",
+          addressLine2: "",
+          zipCode: "",
+          isDefault: false,
+        });
+        setErrors({});
+      }
+    } catch (error) {
+      console.error("배송지 추가 오류:", error);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -84,19 +90,6 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
         <h2 className="text-xl font-bold mb-4">배송지 입력</h2>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
-          {/** 배송지 라벨 */}
-          <div className="col-span-2">
-            <input
-              type="text"
-              name="label"
-              placeholder="배송지 라벨 (예: 집, 회사)"
-              value={form.label}
-              onChange={handleChange}
-              className={`w-full p-2 border rounded ${errors.label ? "border-red" : "border-gray-300"}`}
-            />
-            {errors.label && <p className="text-red text-xs mt-1">{errors.label}</p>}
-          </div>
-
           <div>
             <input
               type="text"
@@ -112,55 +105,66 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
           <div>
             <input
               type="text"
-              name="phone"
+              name="phoneNumber"
               placeholder="전화번호"
-              value={form.phone}
+              value={form.phoneNumber}
               onChange={handleChange}
-              className={`w-full p-2 border rounded ${errors.phone ? "border-red" : "border-gray-300"}`}
+              className={`w-full p-2 border rounded ${errors.phoneNumber ? "border-red" : "border-gray-300"}`}
             />
-            {errors.phone && <p className="text-red text-xs mt-1">{errors.phone}</p>}
+            {errors.phoneNumber && <p className="text-red text-xs mt-1">{errors.phoneNumber}</p>}
           </div>
 
           {/* 주소 검색 + readOnly 필드 */}
           <div className="col-span-2">
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <input
                 type="text"
-                name="address"
-                value={form.address}
+                name="addressLine1"
+                value={form.addressLine1}
                 placeholder="도로명 주소"
                 readOnly
-                className={`w-full p-2 border rounded ${errors.address ? "border-red" : "border-gray-300"}`}
+                className={`w-full p-2 border rounded ${errors.addressLine1 ? "border-red" : "border-gray-300"}`}
               />
               <Button
                 type="button"
                 onClick={() => setIsPostcodeOpen(true)}
-                className="mt-2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
-              >
+                className="bg-blue-500 text-white px-2 py-1 rounded text-sm">
                 주소 검색
               </Button>
             </div>
-            
-            {errors.address && <p className="text-red text-xs mt-1">{errors.address}</p>}
+
+            {errors.addressLine1 && <p className="text-red text-xs mt-1">{errors.addressLine1}</p>}
           </div>
 
           <div className="col-span-2">
             <input
               type="text"
-              name="detail"
+              name="addressLine2"
               placeholder="상세 주소"
-              value={form.detail}
+              value={form.addressLine2}
               onChange={handleChange}
-              className={`w-full p-2 border rounded ${errors.detail ? "border-red" : "border-gray-300"}`}
+              className={`w-full p-2 border rounded ${errors.addressLine2 ? "border-red" : "border-gray-300"}`}
             />
-            {errors.detail && <p className="text-red text-xs mt-1">{errors.detail}</p>}
+            {errors.addressLine2 && <p className="text-red text-xs mt-1">{errors.addressLine2}</p>}
+          </div>
+
+          <div className="col-span-2">
+            <input
+              type="text"
+              name="zipCode"
+              placeholder="우편번호"
+              value={form.zipCode}
+              readOnly
+              className={`w-full p-2 border rounded ${errors.zipCode ? "border-red" : "border-gray-300"}`}
+            />
+            {errors.zipCode && <p className="text-red text-xs mt-1">{errors.zipCode}</p>}
           </div>
 
           <label className="col-span-2 flex items-center space-x-2 mt-2">
             <input
               type="checkbox"
-              name="isMain"
-              checked={form.isMain}
+              name="isDefault"
+              checked={form.isDefault}
               onChange={handleChange}
               className="w-4 h-4"
             />
@@ -181,7 +185,8 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
             onComplete={(data) => {
               setForm((prev) => ({
                 ...prev,
-                address: data.address,
+                addressLine1: data.address, // Address from postcode
+                zipCode: data.zipCode,
               }));
             }}
           />

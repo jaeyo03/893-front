@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { X, Trash2 } from "lucide-react";
 import NotificationContents from "./NotificationContents";
@@ -5,82 +7,104 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
 import { onMessageListener } from "@/lib/firebase-messaging";
+import axios from "@/lib/axios";
 
-// ✅ dayjs 플러그인 초기화
+// dayjs 설정
 dayjs.extend(relativeTime);
 dayjs.locale("ko");
 
-// ✅ 날짜를 '방금 전' 또는 'MM월 DD일' 형식으로 변환
 function convertTimeToDisplay(dateString: string) {
   const date = dayjs(dateString);
   const todayStart = dayjs().startOf("day");
   return date.isAfter(todayStart) ? date.fromNow() : date.format("MM월 DD일");
 }
 
-// ✅ 외부로부터 전달받는 props 타입
 type Props = {
   onClose: () => void;
 };
 
-// ✅ 알림 객체 타입 정의
 type Notification = {
   id: number;
-  notificationType: "Buyer" | "Seller";
+  image: string;
   title: string;
-  content: string;
+  date: string;
   createdAt: string;
+  category: "구매" | "판매" | "기타";
+  content: string;
   auctionId: number;
   isRead: boolean;
-  thumbnailUrl: string;
 };
 
 export default function NotificationDropdown({ onClose }: Props) {
-  // ✅ 탭 선택 상태 (전체 / 구매 / 판매)
   const [selectedTab, setSelectedTab] = useState<"전체" | "구매" | "판매">(
     "전체"
   );
-
-  // ✅ 알림 리스트 상태
-  const [notifications, setNotifications] = useState<any[]>([]);
-
-  // ✅ 알림 내 옵션 버튼 열림 여부 → 배경 dim 처리용
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isDimmed, setIsDimmed] = useState(false);
-
-  // ✅ 현재 옵션이 열린 알림의 ID
   const [optionTargetId, setOptionTargetId] = useState<number | null>(null);
-
-  // ✅ 바깥 클릭 감지를 위한 참조
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ✅ 최초 진입 시 기존 알림 목록 불러오기 (백엔드 API 호출)
   useEffect(() => {
     async function fetchNotifications() {
-      const res = await fetch("/api/notification");
-      const data = await res.json();
-      const list = data.data.notificationList;
-      const formatted = list.map((n: Notification) => ({
-        id: n.id,
-        image: n.thumbnailUrl,
-        title: n.title,
-        date: convertTimeToDisplay(n.createdAt),
-        createdAt: n.createdAt,
-        category: n.notificationType === "Buyer" ? "구매" : "판매",
-        content: n.content,
-        auctionId: n.auctionId,
-        isRead: n.isRead,
-      }));
-      setNotifications(formatted);
+      try {
+        const res = await axios.get("/notifications");
+
+        console.log("✅ 응답 성공:", res.data);
+
+        const list = res.data.data || []; // ✅ 바로 배열로 처리
+        console.log("📦 알림 목록:", list);
+
+        const formatted = list.map((n: any): Notification => {
+          const typeList = n.subscriptionTypeList || []; // ✅ 여기만 수정!
+
+          // 디버깅용 로그
+          console.log(`🔔 ID ${n.id} 의 타입 목록:`, typeList);
+
+          let category: "구매" | "판매" | "기타" = "기타";
+          if (typeList.includes("SELLER")) {
+            category = "판매";
+          } else if (
+            typeList.includes("BIDDER") ||
+            typeList.includes("SCRAPPER")
+          ) {
+            category = "구매";
+          }
+
+          console.log(`📌 분류된 category for ID ${n.id}:`, category);
+
+          return {
+            id: n.id,
+            image: n.imageUrl,
+            title: n.title,
+            date: convertTimeToDisplay(n.createdAt),
+            createdAt: n.createdAt,
+            category,
+            content: n.message || n.content || "",
+            auctionId: n.auctionId,
+            isRead: n.isRead,
+          };
+        });
+
+        console.log("🟢 변환된 알림 목록:", formatted);
+
+        setNotifications(formatted);
+      } catch (err: any) {
+        console.error(
+          "💥 알림 불러오기 실패:",
+          err.response?.data || err.message
+        );
+      }
     }
+
     fetchNotifications();
   }, []);
 
-  // ✅ FCM 실시간 알림 수신 처리
   useEffect(() => {
     onMessageListener()
       .then((payload: any) => {
         const { title, body } = payload.notification;
         const { category, image, auctionId } = payload.data || {};
-        const newNotification = {
+        const newNotification: Notification = {
           id: Date.now(),
           image: image || "/images/default.png",
           title: title || "알림",
@@ -98,25 +122,23 @@ export default function NotificationDropdown({ onClose }: Props) {
       });
   }, []);
 
-  // ✅ 알림 삭제
   const handleDelete = async (id: number) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     try {
-      await fetch(`/api/notification/${id}`, { method: "DELETE" });
+      await axios.delete(`/notifications/${id}`); // ✅ 경로 수정됨
+      console.log(`🗑️ 알림 ${id} 삭제 완료`);
     } catch (err) {
-      console.error("삭제 실패", err);
+      console.error("❌ 알림 삭제 실패", err);
     }
     setOptionTargetId(null);
   };
 
-  // ✅ 알림 읽음 처리
   const markAsRead = (id: number) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
   };
 
-  // ✅ 오늘 기준으로 알림 분류
   const todayStart = dayjs().startOf("day");
 
   const todayNotifications = notifications.filter(
@@ -133,13 +155,11 @@ export default function NotificationDropdown({ onClose }: Props) {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="absolute right-0 mt-2 w-[390px] h-[740px] bg-[#F5F6F8] border rounded-lg shadow-lg z-50 overflow-y-auto">
-        {/* ✅ 삭제 버튼이 열렸을 때 배경 블라인드 처리 */}
+      <div className="absolute right-0 mt-2 w-[390px] h-[740px] bg-[#F5F6F8] border rounded-lg shadow-lg z-50 overflow-y-scroll no-scrollbar">
         {optionTargetId && (
           <div className="absolute inset-0 bg-black bg-opacity-30 z-40 pointer-events-none rounded-lg" />
         )}
 
-        {/* ✅ 상단 헤더 */}
         <header className="flex bg-white border-b z-50 p-4 justify-between items-center">
           <h2 className="text-[22px] font-bold text-[#1E1E23]">알림</h2>
           <button type="button" className="p-2" onClick={onClose}>
@@ -147,13 +167,12 @@ export default function NotificationDropdown({ onClose }: Props) {
           </button>
         </header>
 
-        {/* ✅ 오늘 받은 알림 섹션 */}
         {todayNotifications.length > 0 && (
           <div className="flex flex-col items-start w-full p-4">
             <div className="text-[#1E1E23] font-bold text-[19px] pt-[9px]">
               오늘 받은 알림
             </div>
-            <div className="flex flex-col gap-5 w-full">
+            <div className="flex flex-col gap-5 items-center">
               {todayNotifications.map((n) => (
                 <NotificationContents
                   key={n.id}
@@ -167,13 +186,11 @@ export default function NotificationDropdown({ onClose }: Props) {
           </div>
         )}
 
-        {/* ✅ 이전 알림 섹션 */}
         <div className="w-full px-4 pt-4">
           <div className="text-[#1E1E23] font-bold text-[19px] pt-[9px] pb-[10px]">
             이전 알림
           </div>
 
-          {/* 탭 버튼 (전체 / 구매 / 판매) */}
           <div className="flex space-x-4 mb-4">
             {["전체", "구매", "판매"].map((tab) => (
               <button
@@ -190,8 +207,7 @@ export default function NotificationDropdown({ onClose }: Props) {
             ))}
           </div>
 
-          {/* 이전 알림 리스트 */}
-          <div className="flex flex-col gap-5 w-full">
+          <div className="flex flex-col gap-5 items-center">
             {pastNotifications.map((n) => (
               <NotificationContents
                 key={n.id}
@@ -204,7 +220,6 @@ export default function NotificationDropdown({ onClose }: Props) {
           </div>
         </div>
 
-        {/* ✅ 하단 고정 삭제/닫기 버튼 */}
         {optionTargetId && (
           <div className="absolute bottom-4 w-full px-4 space-y-2 z-50">
             <div className="w-full h-[60px] bg-white border shadow-sm rounded-[12px]">
@@ -226,7 +241,6 @@ export default function NotificationDropdown({ onClose }: Props) {
           </div>
         )}
 
-        {/* ✅ 하단 안내 문구 */}
         <footer className="flex justify-center items-center pt-6 text-main text-[13px] font-normal">
           최근 7일 동안 받은 알림을 모두 확인했습니다.
         </footer>

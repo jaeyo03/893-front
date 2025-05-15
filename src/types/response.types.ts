@@ -28,3 +28,35 @@ export interface SearchListResponse {
   totalAuctionsCount: number;
   auctionList: Auction[];
 }
+
+export interface PaymentResponse {
+  orderId: string;
+  orderName: string;
+  successUrl: string;
+  failUrl: string;
+  customerEmail: string;
+  customerName: string;
+  customerMobilePhone: string;
+  finalPrice: number;
+}
+
+interface DeliveryAddress{
+  id: number;
+  name: string;
+  phoneNumber: string;
+  addressLine1: string;
+  addressLine2: string;
+  zipCode: string;
+  isDefault: boolean;
+}
+
+export interface OrderResponse {
+  orderId: string;
+  auctionId: number;
+  auctionTitle: string;
+  auctionThumbnail: string;
+  finalPrice: number;
+  deliveryAddress: DeliveryAddress;
+  paymentMethod: string;
+  paymentStatus: string;
+}

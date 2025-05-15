@@ -1,4 +1,3 @@
-
 export default function ShippingInfo() {
   return (
     <div className="border rounded-lg shadow-sm">

@@ -67,3 +67,51 @@ export const getUserInfo = async () => {
     throw error;
   }
 };
+
+export const getMyBidsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/bids`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyAuctionsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/auctions`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyScrapsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/scraps`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};
+
+export const getMyPaymentsProduct = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/payments`,
+      {withCredentials: true}
+    )
+    return response.data.data;
+  }catch (error) {
+    console.error("유저정보 불러오기 실패",error);
+    throw error;
+  }
+};

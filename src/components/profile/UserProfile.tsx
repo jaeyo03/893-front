@@ -17,7 +17,7 @@ import {
 import DeliveryAddressCard from "@/components/profile/Address/DeliveryAddressCard";
 import AddressModal from "./Address/AddressModal";
 import { DeliveryAddress } from "@/types/userData";
-import { getAddresses } from "@/lib/api/user";
+import { getAddresses, getUserInfo,updateAddress, deleteAddress } from "@/lib/api/user";
 
 export default function UserProfile() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -26,39 +26,58 @@ export default function UserProfile() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   const [userInfo, setUserInfo] = useState({
-    name: "짱구",
-    email: "user@example.com",
-    address: "",
-    phone: "",
-    imageUrl: "/images/신짱구.png",
+    name: '',
+    email: '',
+    address: '',
+    phone: '',
+    imageUrl: '',
   });
 
   // 초기값을 빈 배열로 설정하여 undefined 방어
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
 
   useEffect(() => {
-    getAddresses()
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setAddresses(data);
-          
-          // 첫 번째 대표 배송지를 userInfo에 반영
-          const mainAddress = data.find((addr) => addr.isDefault);
+    const fetchData = async () => {
+      try {
+        // 두 API를 병렬로 호출
+        const [addressData, userData] = await Promise.all([
+          getAddresses(),
+          getUserInfo()
+        ]);
+  
+        // 주소 데이터 처리
+        if (Array.isArray(addressData)) {
+          setAddresses(addressData);
+  
+          // 대표 주소가 있다면 userInfo에 반영
+          const mainAddress = addressData.find((addr) => addr.isDefault);
           if (mainAddress) {
             setUserInfo((prev) => ({
               ...prev,
               address: `${mainAddress.addressLine1} ${mainAddress.addressLine2}`,
               phone: mainAddress.phoneNumber,
+              name: userData.name,          // ✅ 유저 기본정보도 업데이트
+              email: userData.email,        // 예: 유저 이메일이 있다면
+            }));
+          } else if (userData) {
+            // 대표 주소가 없어도 userData는 반영
+            setUserInfo((prev) => ({
+              ...prev,
+              name: userData.name,
+              email: userData.email,
             }));
           }
         } else {
-          console.error("API에서 배열이 아닌 값을 반환함:", data);
+          console.error("API에서 배열이 아닌 주소값 반환:", addressData);
         }
-      })
-      .catch((error) => {
-        console.error("배송지 목록 가져오기 오류:", error);
-      });
+      } catch (error) {
+        console.error("유저 정보 또는 배송지 불러오기 실패:", error);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
   
   // 기본 배송지 업데이트
   const updateUserInfoFromMainAddress = () => {
@@ -73,43 +92,69 @@ export default function UserProfile() {
     }
   };
 
-  const handleSetMain = (index: number) => {
-    if (!addresses || addresses[index] === undefined) return; // addresses가 null 또는 index가 없을 때 처리
-    setAddresses((prev) =>
-      prev.map((addr, i) => ({
+  const handleSetMain = async (index: number) => {
+    const selectedAddress = addresses?.[index];
+    if (!selectedAddress) return;
+  
+    try {
+      // ✅ 서버에 대표 배송지 요청
+      await updateAddress(selectedAddress.id);
+  
+      // ✅ 성공 시 상태 업데이트
+      const updatedAddresses = addresses.map((addr, i) => ({
         ...addr,
         isDefault: i === index,
-      }))
-    );
-    updateUserInfoFromMainAddress();
+      }));
+  
+      setAddresses(updatedAddresses);
+      updateUserInfoFromMainAddress();
+    } catch (error) {
+      console.error("대표 배송지 설정 실패:", error);
+      // 알림이나 토스트 메시지를 띄워도 좋습니다
+    }
   };
 
-  const handleDelete = (index: number) => {
-    if (!addresses || addresses[index] === undefined) return; // addresses가 null 또는 index가 없을 때 처리
-    const isMain = addresses[index].isDefault;
-    const updated = addresses.filter((_, i) => i !== index);
+  const handleDelete = async (index: number) => {
+    if (!addresses || addresses[index] === undefined) return;
 
-    if (isMain && updated.length > 0) updated[0].isDefault = true;
+    const addressToDelete = addresses[index];
+    const isMain = addressToDelete.isDefault;
 
-    setAddresses([...updated]);
-    if (updated.length === 0) {
-      setUserInfo((prev) => ({
-        ...prev,
-        address: "",
-        phone: "",
-      }));
+    try {
+      // 🔥 서버에 삭제 요청
+      await deleteAddress(addressToDelete.id);
+
+      // 🔁 클라이언트 상태 업데이트
+      const updated = addresses.filter((_, i) => i !== index);
+      if (isMain && updated.length > 0) {
+        updated[0].isDefault = true; // 클라이언트상에서 첫 번째를 대표로
+      }
+
+      setAddresses([...updated]);
+
+      if (updated.length === 0) {
+        setUserInfo((prev) => ({
+          ...prev,
+          address: "",
+          phone: "",
+        }));
+      }
+    } catch (error) {
+      console.error("배송지 삭제 처리 중 오류:", error);
+      // 필요 시 사용자에게 알림 처리 가능
     }
   };
 
   const handleDeleteClick = (index: number) => {
-    if (!addresses || addresses[index] === undefined) return; // addresses가 null 또는 index가 없을 때 처리
+    if (!addresses || addresses[index] === undefined) return;
     if (addresses.length === 1) {
       setDeleteIndex(index);
       setDeleteConfirmOpen(true);
     } else {
-      handleDelete(index);
+      handleDelete(index); // 👉 await는 필요 없음, handleDelete 자체에서 처리
     }
   };
+
 
   const handleAddAddress = (newAddress: DeliveryAddress) => {
     setAddresses((prev) => {

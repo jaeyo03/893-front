@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard grid justify-center`}
       >
-        <GlobalFCMSetup /> {/* FCM 설정 -> 로그인될때 불러오게 수정예정 */}
+        {isLoggedIn && <GlobalFCMSetup />}
         <header className="sticky top-0 z-50 w-full border-b bg-background">
           <div className="container flex h-16 items-center">
             <Header isLoggedIn={isLoggedIn} />

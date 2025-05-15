@@ -11,6 +11,7 @@ export async function sendFcmTokenToServer(fcmToken: string) {
         headers: {
           "Content-Type": "application/json", // ✅ 헤더 명시 (axios는 자동 설정되지만 명시해도 안전)
         },
+        withCredentials: true,
       }
     );
     console.log("✅ 전송 성공:", res.data);

@@ -20,7 +20,7 @@ export const getProductData = async (itemId: number): Promise<Product | null> =>
     const response = await axios.get(`http://localhost:8080/api/auctions/${itemId}`,
       {withCredentials: true }
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('❌ 상품 데이터를 불러오는 중 오류 발생:', error);
     return null;

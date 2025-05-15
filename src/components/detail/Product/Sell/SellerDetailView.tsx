@@ -112,7 +112,7 @@ export default function SellerDetailView({ itemId }: { itemId: number }) {
     <>
       <div className="flex justify-between p-5">
         <div className="flex-1 mr-5">
-          <ImageSlider images={productData.images} />
+          <ImageSlider images={productData.images} product={productData}/>
           <GoodsInfo
             description={productData.description}
             itemCondition={productData.itemCondition}

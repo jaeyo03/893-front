@@ -5,6 +5,7 @@ const axiosSearchboxInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 export async function getUserSearchHistory() : Promise<BaseResponse<SearchHistory[]>> {

@@ -1,13 +1,15 @@
 import { BaseResponse, SearchListResponse } from "@/types/response.types";
 
-function makeSearchParams(searchParams: Record<string, string | string[] | undefined>) : string {
+function makeSearchParams(
+  searchParams: Record<string, string | string[] | undefined>
+): string {
   const urlSearchParams = new URLSearchParams();
 
   // searchParams을 순회하며 URLSearchParams에 추가
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       // 배열인 경우 각 항목을 같은 키로 추가
-      value.forEach(item => {
+      value.forEach((item) => {
         if (item) urlSearchParams.append(key, item);
       });
     } else if (value !== undefined) {
@@ -19,15 +21,20 @@ function makeSearchParams(searchParams: Record<string, string | string[] | undef
   return urlSearchParams.toString();
 }
 
-export async function getSearchProducts(searchParams: Record<string, string | string[] | undefined>) : Promise<BaseResponse<SearchListResponse>> {
+export async function getSearchProducts(
+  searchParams: Record<string, string | string[] | undefined>
+): Promise<BaseResponse<SearchListResponse>> {
   let queryString = makeSearchParams(searchParams);
 
   if (queryString.length > 0) {
     queryString = `?${queryString}`;
   }
-  
+
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`, { cache: 'no-store' });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`,
+      { cache: "no-store" }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }
@@ -41,11 +48,13 @@ export async function getSearchProducts(searchParams: Record<string, string | st
       },
       message: "Failed to fetch products",
       code: 500,
-    }
+    };
   }
 }
 
-export async function getRelatedWords(searchParams: Record<string, string | string[] | undefined>) : Promise<BaseResponse<string[]>> {
+export async function getRelatedWords(
+  searchParams: Record<string, string | string[] | undefined>
+): Promise<BaseResponse<string[]>> {
   let keyword = "";
 
   if (searchParams.keyword) {
@@ -55,12 +64,15 @@ export async function getRelatedWords(searchParams: Record<string, string | stri
       data: [],
       message: "검색어가 없습니다.",
       code: 400,
-    }
+    };
   }
-  
+
   try {
     const encodedKeyword = encodeURIComponent(keyword);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`, { cache: 'no-store' });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
+      { cache: "no-store" }
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch related words");
     }
@@ -71,6 +83,6 @@ export async function getRelatedWords(searchParams: Record<string, string | stri
       data: [],
       message: "Failed to fetch related words",
       code: 500,
-    }
+    };
   }
 }

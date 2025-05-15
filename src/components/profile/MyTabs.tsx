@@ -1,13 +1,64 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import ProductBidCard from "./ProductBidCard";
-import ProductPurchasedCard from "./ProductParchaseCard";
-import SellerProductBidCard from "./SellProductBidCard";
+import MyBidsProductCard from "./MyBidsProductCard";
+import MyPaymentsProductCard from "./MyPaymentsProductCard";
+import MyScrapsProductCard from "./MyScrapsProductCard";
+import MyAuctionsProductCard from "./MyAuctionsProductCard";
+import { getMyAuctionsProduct,getMyBidsProduct,getMyScrapsProduct,getMyPaymentsProduct } from '@/lib/api/user';
+import { MyAuctionsProduct,MyBidProduct,MyPaymentsProduct,MyScrapsProduct } from '@/types/userData';
 
 export default function MyTabs() {
   const [selectedTab, setSelectedTab] = useState("bids");
+  const [auctions, setAuctions] = useState<MyAuctionsProduct[]>([]);
+  const [bids, setBids] = useState<MyBidProduct[]>([]);
+  const [scraps, setScraps] = useState<MyScrapsProduct[]>([]);
+  const [payments,setPayments] = useState<MyPaymentsProduct[]>([]);
+  
+  useEffect(() => {
+    if (selectedTab === 'bids' && bids.length === 0) {
+      getMyBidsProduct()
+        .then((data) => {
+          // 콘솔로 반환값 확인
+          console.log('bids data:', data);
+          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
+          setBids(Array.isArray(data) ? data : []);
+        })
+        .catch(console.error);
+    }
+    if (selectedTab === 'auctions' && auctions.length === 0) {
+      getMyAuctionsProduct()
+        .then((data) => {
+          // 콘솔로 반환값 확인
+          console.log('auctions data:', data);
+          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
+          setAuctions(Array.isArray(data) ? data : []);
+        })
+        .catch(console.error);
+    }
+    if (selectedTab === 'scraps' && scraps.length === 0) {
+      getMyScrapsProduct()
+        .then((data) => {
+          // 콘솔로 반환값 확인
+          console.log('scraps data:', data);
+          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
+          setScraps(Array.isArray(data) ? data : []);
+        })
+        .catch(console.error);
+    }
+    if (selectedTab === 'payments' && payments.length === 0) {
+      getMyPaymentsProduct()
+        .then((data) => {
+          // 콘솔로 반환값 확인
+          console.log('payments data:', data);
+          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
+          setPayments(Array.isArray(data) ? data : []);
+        })
+        .catch(console.error);
+    }
+  }, [selectedTab]);
+
 
   return (
     <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
@@ -27,7 +78,7 @@ export default function MyTabs() {
             내 경매
           </TabsTrigger>
           <TabsTrigger
-            value="favorites"
+            value="scraps"
             className={`text-sm font-medium transition-all duration-200 ease-in-out ${selectedTab === "favorites" ? "text-main border-b-2 border-main" : "hover:border-b-2 hover:border-main hover:text-main"}`}
           >
             찜한 상품
@@ -42,16 +93,24 @@ export default function MyTabs() {
 
         {/* TabsContent - 탭의 내용 정의 */}
         <TabsContent value="bids" className="p-2">
-          <ProductBidCard productId={1} />
+          {bids.map((bid) => (
+            <MyBidsProductCard key={bid.auctionId} myBidProduct={bid} />
+          ))}
         </TabsContent>
         <TabsContent value="auctions" className="p-2">
-          <SellerProductBidCard productId={2}/>
+          {auctions.map((auctions) => (
+            <MyAuctionsProductCard key={auctions.auctionId} auctions={auctions} />
+          ))}
         </TabsContent>
-        <TabsContent value="favorites" className="p-2">
-          <ProductBidCard productId={1}/>
+        <TabsContent value="scraps" className="p-2">
+          {scraps.map((scrap) => (
+            <MyScrapsProductCard key={scrap.auctionId} scrap={scrap} />
+          ))}
         </TabsContent>
         <TabsContent value="payments" className="p-2">
-          <ProductPurchasedCard />
+          {payments.map((payments) => (
+            <MyPaymentsProductCard key={payments.auctionId} payments={payments}/>
+          ))}
         </TabsContent>
       </div>
     </Tabs>

@@ -32,7 +32,7 @@ export interface Category{
 
 export type ItemCondition = 'brand_new' | 'like_new' | 'gently_used' | 'heavily_used' | 'damaged';
 
-export type Status = 'pending' | 'completed' | 'yet';
+export type Status = 'pending' | 'active' | 'completed' | 'cancelled';
 
 export interface Bid {
   bidId: number;
@@ -64,4 +64,16 @@ export interface BidInteractionProps {
   onCancelBid: () => void;
   isHighestBidder: boolean;
   cancelTimer: number;
+}
+
+export interface RelatedItem {
+  auctionId: number;
+  title: string;
+  status: Status;
+  thumbnailUrl: string;
+  endTime: string;
+  price?: number;
+  bidCount: number;
+  scrapCount: number;
+  isScrapped: boolean;
 }

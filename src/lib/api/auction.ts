@@ -1,6 +1,6 @@
 // api/auction.ts 또는 컴포넌트 파일 상단에 작성
 import axios from "axios";
-import { AuctionBidData, Product } from "@/types/productData";
+import { AuctionBidData, Product,RelatedItem } from "@/types/productData";
 
 export async function getBidData(itemId: number): Promise<AuctionBidData | null> {
   try {
@@ -71,5 +71,18 @@ export const cancelBid = async ({
       console.error('Unexpected Error:', error);
     }
     throw new Error('입찰 취소 실패');
+  }
+};
+
+
+export const getRelatedItem = async (auctionId:number) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/auctions/${auctionId}/related`,{
+      withCredentials:true
+    });
+    return response.data.data; // 필요한 데이터 리턴
+  } catch (error) {
+    console.error('Failed to fetch related item:', error);
+    throw error;
   }
 };

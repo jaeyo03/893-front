@@ -20,7 +20,7 @@ export default function GoodsInfo({ description,itemCondition } : GoodsInfoProps
       <h2 className="mb-2 text-lg font-medium text-gray-700">상품 상세 정보</h2>
       <div className="p-4 text-sm text-gray-800 whitespace-pre-line rounded-lg space-y-2">
         <p>
-          {description || '해당 상품은 아디다스 신발입니다.\n 사주세요.. '}
+          {description}
         </p>
         <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${badgeColor}`}>
           {conditionLabel}

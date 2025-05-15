@@ -2,8 +2,6 @@
 
 import UserProfile from "@/components/profile/UserProfile"
 import MyTabs from "@/components/profile/MyTabs"
-import ProductBidCard from "@/components/profile/ProductBidCard"
-import ProductPurchasedCard from "@/components/profile/ProductParchaseCard"
 export default function MyPage(){
   return (
     <div className="max-w-4xl p-8 mx-auto">

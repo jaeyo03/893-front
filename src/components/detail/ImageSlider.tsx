@@ -2,14 +2,15 @@
 
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Image } from "@/types/productData";
 
-import AuctionItemCard from "./AuctionItemCard"
+import AuctionItemCard from "./Product/AuctionItemCard"
 
-export default function ImageSlider(){
-  const images =['/images/adidas_shoe.jpg',
-    '/images/converse.avif',
-    '/images/nike_shoe.jpg',
-  ];
+interface ImageSliderProps{
+  images: Image[];
+}
+
+export default function ImageSlider({images} : ImageSliderProps){
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const goToNext = () => {
@@ -22,7 +23,7 @@ export default function ImageSlider(){
   return (
     <div className="relative flex flex-col">
       <div className="relative w-[600px] h-[600px] group">
-        <AuctionItemCard imageUrl={images[currentIndex]} label="진행중"/>
+        <AuctionItemCard imageUrl={images[currentIndex].url} label="진행중"/>
         <div
           className="absolute top-0 left-0 h-full w-[150px] z-20 cursor-pointer flex items-center justify-start bg-transparent">
         <ChevronLeft

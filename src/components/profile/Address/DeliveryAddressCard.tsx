@@ -6,7 +6,6 @@ type DeliveryAddressCardProps = {
     label: string;
     name: string;
     phone: string;
-    city: string;
     address: string;
     detail: string;
     isMain: boolean;
@@ -16,7 +15,7 @@ type DeliveryAddressCardProps = {
   onSetMain?: () => void;
 };
 
-export default function DeliveryAddressCard({ data, onChange, onDelete, onSetMain }: DeliveryAddressCardProps) {
+export default function DeliveryAddressCard({ data, onDelete, onSetMain }: DeliveryAddressCardProps) {
   return (
     <div className="border rounded-md p-4 bg-gray-50 mb-3">
       <div className="flex justify-between items-center mb-2">
@@ -40,7 +39,6 @@ export default function DeliveryAddressCard({ data, onChange, onDelete, onSetMai
         )}
       </div>
       <div className="text-sm space-y-1 mt-2">
-        <div>주소 : {data.city}</div>
         <div>휴대폰 : {data.phone}</div>
         <div>배송지 : {data.address}</div>
         <div>상세 주소 : {data.detail}</div>

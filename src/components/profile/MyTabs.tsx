@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import ProductBidCard from "./ProductBidCard";
 import ProductPurchasedCard from "./ProductParchaseCard";
+import SellerProductBidCard from "./SellProductBidCard";
 
 export default function MyTabs() {
   const [selectedTab, setSelectedTab] = useState("bids");
@@ -41,13 +42,13 @@ export default function MyTabs() {
 
         {/* TabsContent - 탭의 내용 정의 */}
         <TabsContent value="bids" className="p-2">
-          <ProductBidCard />
+          <ProductBidCard productId={1} />
         </TabsContent>
         <TabsContent value="auctions" className="p-2">
-          <ProductBidCard />
+          <SellerProductBidCard productId={2}/>
         </TabsContent>
         <TabsContent value="favorites" className="p-2">
-          <ProductBidCard />
+          <ProductBidCard productId={1}/>
         </TabsContent>
         <TabsContent value="payments" className="p-2">
           <ProductPurchasedCard />

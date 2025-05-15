@@ -1,24 +1,14 @@
-import { useState } from "react";
+import {
+  productConditions,
+  productConditionDescriptions,
+} from "./constants/productConditions";
 
-const productConditions = [
-  "새 상품 (미사용)",
-  "사용감 없음",
-  "사용감 적음",
-  "사용감 많음",
-  "고장/파손 상품",
-];
+type ProductStatusProps = {
+  value: number | null;
+  onChange: (index: number) => void;
+};
 
-const productConditionDescriptions = [
-  "사용하지 않은 새 상품",
-  "사용은 했지만 눈에 띄는 흔적이나 얼룩이 없음",
-  "눈에 띄는 흔적이나 얼룩이 약간 있음",
-  "눈에 띄는 흔적이나 얼룩이 많이 있음",
-  "기능 이나 외관 손상 등으로 수리/수선 필요",
-];
-
-export default function ProductStatus() {
-  const [selected, setSelected] = useState<number | null>(null);
-
+export default function ProductStatus({ value, onChange }: ProductStatusProps) {
   return (
     <div className="flex flex-col w-full max-w-md gap-6">
       <label className="text-resgisterchecktext font-thin font-[15px]">
@@ -32,23 +22,21 @@ export default function ProductStatus() {
               id={`condition-${index}`}
               name="productCondition"
               className="sr-only"
-              checked={selected === index}
-              onChange={() => setSelected(index)}
+              checked={value === index}
+              onChange={() => onChange(index)}
             />
-            {/* 사용자 정의 체크박스 */}
             <label
               htmlFor={`condition-${index}`}
               className={`w-5 h-5 flex items-center justify-center border-2 rounded-md cursor-pointer
                 ${
-                  selected === index
+                  value === index
                     ? "bg-white border-main text-main"
-                    : "border-resgistersubtext rounded-[6px] border-solid border text-transparent"
+                    : "border-resgistersubtext text-transparent"
                 }
               `}
             >
               ✓
             </label>
-            {/* 텍스트 */}
             <label
               htmlFor={`condition-${index}`}
               className="text-resgistertext font-normal text-[16px] cursor-pointer"

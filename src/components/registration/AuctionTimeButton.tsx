@@ -1,48 +1,72 @@
+"use client";
+
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogFooter,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-export default function AuctionTimeButton() {
-  const [hour, setHour] = useState(0);
-  const [minute, setMinute] = useState(0);
+interface AuctionTimeButtonProps {
+  value: { hour: number; minute: number };
+  onChange: (value: { hour: number; minute: number }) => void;
+}
+
+export default function AuctionTimeButton({
+                                            value,
+                                            onChange,
+                                          }: AuctionTimeButtonProps) {
   const [open, setOpen] = useState(false);
+  const [tempHour, setTempHour] = useState(value.hour);
+  const [tempMinute, setTempMinute] = useState(value.minute);
 
   const formattedTime =
-    hour === 0 && minute === 0
+    value.hour === 0 && value.minute === 0
       ? "경매 소요 시간 선택 (10분 ~ 24시간)"
-      : `${hour.toString().padStart(2, "0")} 시간 ${minute
-          .toString()
-          .padStart(2, "0")} 분 동안 경매가 진행됩니다.`;
+      : `${value.hour.toString().padStart(2, "0")} 시간 ${value.minute
+        .toString()
+        .padStart(2, "0")} 분 동안 경매가 진행됩니다.`;
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
+  useEffect(() => {
+    if (open) {
+      setTempHour(value.hour);
+      setTempMinute(value.minute);
+    }
+  }, [open, value.hour, value.minute]);
+
   const handleConfirm = () => {
-    const totalMinutes = hour * 60 + minute;
+    const totalMinutes = tempHour * 60 + tempMinute;
     if (totalMinutes < 10) {
       alert("경매 시간은 최소 10분 이상이어야 합니다.");
       return;
     }
 
-    alert(
-      `${hour.toString().padStart(2, "0")} 시간간 ${minute
-        .toString()
-        .padStart(2, "0")} 분 동안 경매가 진행됩니다.`
-    );
+    onChange({ hour: tempHour, minute: tempMinute });
     setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTitle>
+        <VisuallyHidden>경매 진행 시간 설정</VisuallyHidden>
+      </DialogTitle>
+      <DialogDescription>
+        <VisuallyHidden>
+          경매 진행 시간 을 시, 분 단위로 설정할 수 있습니다.
+        </VisuallyHidden>
+      </DialogDescription>
       <DialogTrigger asChild>
         <Button
           onClick={() => setOpen(true)}
@@ -54,10 +78,8 @@ export default function AuctionTimeButton() {
 
       <DialogContent className="w-[200px] h-[400px] p-4 flex flex-col justify-between items-center">
         <div className="relative flex items-center justify-center gap-2 pt-6">
-          {/* 중앙 강조 영역 */}
           <div className="absolute top-[calc(50%-20px)] w-full h-[40px] bg-main/10 z-10 rounded-lg" />
 
-          {/* 시 Swiper */}
           <Swiper
             direction="vertical"
             slidesPerView={5}
@@ -67,7 +89,7 @@ export default function AuctionTimeButton() {
             freeMode
             onSlideChange={(swiper) => {
               const realIndex = swiper.realIndex % 24;
-              setHour(realIndex);
+              setTempHour(realIndex);
             }}
             className="h-[280px] w-[80px]"
           >
@@ -81,7 +103,6 @@ export default function AuctionTimeButton() {
             ))}
           </Swiper>
 
-          {/* 분 Swiper */}
           <Swiper
             direction="vertical"
             slidesPerView={5}
@@ -91,7 +112,7 @@ export default function AuctionTimeButton() {
             freeMode
             onSlideChange={(swiper) => {
               const realIndex = swiper.realIndex % 60;
-              setMinute(realIndex);
+              setTempMinute(realIndex);
             }}
             className="h-[280px] w-[80px]"
           >

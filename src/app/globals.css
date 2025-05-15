@@ -143,7 +143,7 @@ input[type="text"]:focus {
 }
 
 .thumb::-webkit-slider-thumb {
-  background-color: #0064FF;
+  background-color: #0064ff;
   border-radius: 50%;
   cursor: pointer;
   height: 22px;
@@ -168,4 +168,11 @@ input[type="text"]:focus {
   margin-top: 4.5px;
   pointer-events: all;
   position: relative;
+}
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

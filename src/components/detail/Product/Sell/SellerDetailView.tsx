@@ -3,18 +3,23 @@
 import ImageSlider from "@/components/detail/ImageSlider";
 import SellerProductInfo from "@/components/detail/Product/Sell/SellerProductInfo";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
-import AuctionCard from "@/components/detail/Product/AuctionCard";
+import RelatedItemCard from "../RelatedItemCard";
 import BidHistory from "@/components/detail/Bid/BidHistory";
-import { AuctionBidData, Product } from "@/types/productData";
+import { AuctionBidData, Product, RelatedItem } from "@/types/productData";
 import { useEffect, useState } from "react";
 
-import { getBidData,getProductData } from "@/lib/api/auction";
-import {dummyProduct} from "@/data/dummyProductData"
-import dummyBidData from "@/data/dummyBidData.json"
+import { getBidData,getProductData, getRelatedItem } from "@/lib/api/auction";
 
 export default function SellerDetailView({ itemId }: { itemId: number }) {
-  const [bidData, setBidData] = useState<AuctionBidData>(dummyBidData);
-  const [productData, setProductData] = useState<Product>(dummyProduct);
+  const [bidData, setBidData] = useState<AuctionBidData>({
+    bids: [],
+    cancelledBids: [],
+    totalBid: 0,
+    auctionId: 1,
+    totalBidder: 0,
+  });
+  const [productData, setProductData] = useState<Product>();
+  const [relatedItem,setRelatedItem] = useState<RelatedItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +34,21 @@ export default function SellerDetailView({ itemId }: { itemId: number }) {
 
     fetchData();
   }, [itemId]);
+  
+  useEffect(() => {
+      if(!itemId) return;
+      const fetchRelated = async () => {
+        try {
+          const data = await getRelatedItem(itemId);
+          setRelatedItem(data);
+        } catch (error) {
+          console.error('Failed to fetch related auctions:', error as Error);
+          throw error;
+        }
+      };
+  
+      fetchRelated();
+    }, [itemId]);
 
   if (!productData || !bidData) return <div>로딩 중...</div>;
 
@@ -61,13 +81,19 @@ export default function SellerDetailView({ itemId }: { itemId: number }) {
 
       <hr />
 
-      <div className="p-5">
+      <div style={{ padding: '20px' }}>
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
-        <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
-          <div className="min-w-[231px]">
-            <AuctionCard product={productData} />
+          <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
+            {relatedItem.length > 0 ? (
+              relatedItem.map(item => (
+                <div key={item.auctionId} className="min-w-[231px]">
+                  <RelatedItemCard product={item} />
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-400 pl-4">관련 상품이 없습니다.</p>
+                )}
           </div>
-        </div>
       </div>
     </>
   );

@@ -25,8 +25,11 @@ type ServerImage = {
   originalName: string;
   storeName: string;
 };
+interface AuctionIdProps {
+  params: { idx: number };
+}
 
-export default function EditRegistration() {
+export default function EditRegistration({params}: AuctionIdProps) {
   const [images, setImages] = useState<File[]>([]);
   const [serverImages, setServerImages] = useState<ServerImage[]>([]);
   const [category, setCategory] = useState<CategoryValue>({
@@ -44,9 +47,11 @@ export default function EditRegistration() {
   const [durationTime, setDurationTime] = useState({ hour: 0, minute: 0 });
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const auctionId = 13; // 실제로는 props나 router에서 받아야 함 <-- 라우팅 설정 필요
+  const auctionId = params.idx; // 실제로는 props나 router에서 받아야 함 <-- 라우팅 설정 필요
+  
 
   const validateForm = () => {
+    console.log(auctionId);
     const totalImageCount = images.length + serverImages.length;
     if (totalImageCount === 0)
       return alert("이미지를 최소 1장 업로드해주세요."), false;
@@ -131,8 +136,8 @@ export default function EditRegistration() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-          },
-        }
+          },withCredentials: true,
+        },
       );
       alert("경매 수정이 완료되었습니다!");
       setIsModalOpen(false);
@@ -146,7 +151,10 @@ export default function EditRegistration() {
     const fetchAuctionData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/auctions/${auctionId}/update`
+          `http://localhost:8080/api/auctions/${auctionId}/update`,
+          {
+            withCredentials: true,
+          }
         );
         const data = res.data.data; // ✅ 여기 수정 중요
 

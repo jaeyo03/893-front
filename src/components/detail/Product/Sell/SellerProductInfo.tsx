@@ -34,6 +34,7 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
           mainCategory={product.category.mainCategory}
           subCategory={product.category.subCategory}
           lastCategory={product.category.detailCategory}
+          auctionId={product.auctionId}
         />
       </div>
       <div className="mx-auto max-w-[620px] border border-blue-400 rounded-lg p-4">

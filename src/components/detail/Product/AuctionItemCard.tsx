@@ -1,18 +1,14 @@
-
-
-import Image from 'next/image';
-
 interface AuctionItemCardProps {
   imageUrl: string;
-  label: string; // "경매중,경매전,경매 완료" 
+  label: string; // "경매중,경매전,경매 완료"
 };
 
-export default function AuctionItemCard({ imageUrl, label = '경매중' }: AuctionItemCardProps) {
+export default function AuctionItemCard({imageUrl, label = '경매중'}: AuctionItemCardProps) {
   return (
     <div className="p-5">
       <div className="relative border rounded-lg overflow-hidden w-[600px] h-[600px] bg-white">
         {/* 이미지 */}
-        <Image
+        <img
           src={imageUrl}
           alt="Auction item"
           width={600}

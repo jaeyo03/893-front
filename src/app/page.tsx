@@ -2,10 +2,11 @@ import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
 import CategorySearchSection from "@/components/molecules/CategorySearchSection";
 import SearchInput from "@/components/templates/SearchInput";
-import { Metadata } from "next";
+import {Metadata} from "next";
 import QueryProvider from "@/components/QueryProvider";
 import AuctionCard from "@/components/detail/Product/AuctionCard";
 import {getSearchProducts} from "@/lib/api/search";
+import {cookies} from "next/headers";
 
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
@@ -13,8 +14,12 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-  const products = await getSearchProducts({});
-
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const cookieHeader = accessToken ? `accessToken=${accessToken}` : '';
+  
+  const products = await getSearchProducts({}, cookieHeader);
+  
   return (
     <>
       <div className="grid justify-center items-center gap-4 w-full">

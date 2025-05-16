@@ -114,7 +114,7 @@ export default function BuyerDetailView({ itemId }: { itemId: number }) {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
         <div style={{ flex: 1, marginRight: '20px' }}>
-          <ImageSlider images={productData.images} />
+          <ImageSlider images={productData.images} product={productData}/>
           <GoodsInfo
             description={productData.description}
             itemCondition={productData.itemCondition}

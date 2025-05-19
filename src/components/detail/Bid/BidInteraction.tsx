@@ -9,8 +9,6 @@ function numberToKorean(num: number): string {
   if (num === 0) return "0원";
 
   const units = [
-    { value: 10 ** 16, label: "경" },
-    { value: 10 ** 12, label: "조" },
     { value: 10 ** 8, label: "억" },
     { value: 10 ** 4, label: "만" },
     { value: 1, label: "" },

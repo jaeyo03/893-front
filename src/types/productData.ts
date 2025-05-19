@@ -60,10 +60,12 @@ export interface AuctionStatsProps {
 
 export interface BidInteractionProps {
   currentPrice: number;
-  onBid: (amount: number) => void;
+  onBid: (amount: number) => Promise<void>;
   onCancelBid: () => void;
   isHighestBidder: boolean;
   cancelTimer: number;
+  endTime: string; // ✅ 경매 종료까지 남은 시간 (초 단위)
+  itemId: number;
 }
 
 export interface RelatedItem {

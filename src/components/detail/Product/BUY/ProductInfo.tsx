@@ -66,19 +66,20 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
 
       // 입찰 성공 시 상태 업데이트
       if (response) {
+        const bidRespose = response.data
         const newBid: Bid = {
-          bidId: response.data.bidId, // 서버 응답에 따라 조정
-          bidderEmail: response.data.bidderEmail, // 응답 값 기반
-          bidPrice: response.data.bidPrice,
-          createdAt: response.data.createdAt,
-          updatedAt: response.data.updatedAt,
+          bidId: bidRespose.bidId, // 서버 응답에 따라 조정
+          bidderEmail: bidRespose.bidderEmail, // 응답 값 기반
+          bidPrice: bidRespose.bidPrice,
+          createdAt: bidRespose.createdAt,
+          updatedAt: bidRespose.updatedAt,
         };
-        setMyBidId(response.data.bidId);
-        setMyBidEmail(response.data.bidderEmail);
+        setMyBidId(bidRespose.bidId);
+        setMyBidEmail(bidRespose.bidderEmail);
         setLastBidPrice(currentPrice);  // 이전 입찰 가격을 저장
         setCurrentPrice(amount);  // 현재가 업데이트
         setIsHighestBidder(true);  // 최고 입찰자 상태 설정
-        setCancelTimer(300);  // 타이머 5분 설정
+        setCancelTimer(60);  // 타이머 1분 설정
         updateBidData(newBid); // 입찰 내역 업데이트
       }
     } catch (error) {
@@ -140,6 +141,8 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
             onCancelBid={handleCancelBid}
             isHighestBidder={isHighestBidder}
             cancelTimer={cancelTimer}
+            endTime={product.endTime} 
+            itemId={product.auctionId}
           />
         </div>
       </div>

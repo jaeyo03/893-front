@@ -5,6 +5,29 @@ import { TriangleAlert } from 'lucide-react';
 import { BidInteractionProps } from '@/types/productData';
 import WarningModal from '../WarningModal';
 
+function numberToKorean(num: number): string {
+  if (num === 0) return "0원";
+
+  const units = [
+    { value: 10 ** 16, label: "경" },
+    { value: 10 ** 12, label: "조" },
+    { value: 10 ** 8, label: "억" },
+    { value: 10 ** 4, label: "만" },
+    { value: 1, label: "" },
+  ];
+
+  let result = "";
+
+  for (const unit of units) {
+    const unitValue = Math.floor(num / unit.value);
+    if (unitValue > 0) {
+      result += `${unitValue}${unit.label} `;
+      num %= unit.value;
+    }
+  }
+
+  return result.trim() + "원";
+}
 
 export default function BidInteraction({
   currentPrice,
@@ -29,17 +52,6 @@ export default function BidInteraction({
     return `${hours}:${min}:${sec}`;
   };
 
-  const convertToKoreanCurrency = (amount: number) => {
-    const man = Math.floor(amount / 10000);
-    const chun = Math.floor((amount % 10000) / 1000);
-    const baek = Math.floor(amount % 1000);
-    let result = '';
-    if (man > 0) result += `${man}만`;
-    if (chun > 0) result += ` ${chun}천`;
-    if (baek > 0) result += `${baek}`;
-    return result.trim() ? `${result.trim()}원` : '';
-  };
-
   const handleBid = () => {
     if (isHighestBidder && cancelTimer > 0) return;
     if (bidAmount % 100 !== 0) return;
@@ -47,6 +59,18 @@ export default function BidInteraction({
       onBid(bidAmount);
     }
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
+    if (value === '') {
+      setBidAmount(0);
+      return;
+    }
+
+    const numericValue = Math.min(Number(value), 1000000000); // 10억 제한
+    setBidAmount(numericValue);
+  };
+  
 
   return (
     <div>
@@ -59,18 +83,11 @@ export default function BidInteraction({
       <div className="flex items-center gap-2 mt-4">
         <span className="text-gray-500">₩</span>
         <input
-          type="number"
-          step={100}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={bidAmount !== 0 ? bidAmount : ''}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value === '') {
-              setBidAmount(0);
-              return;
-            }
-            const numericValue = Number(value.replace(/^0+/, ''));
-            setBidAmount(numericValue);
-          }}
+          onChange={handleInputChange}
           className="w-full px-2 py-1 text-right border rounded"
         />
         <button
@@ -93,7 +110,7 @@ export default function BidInteraction({
       </div>
 
       <p className="mt-1 text-xs font-thin text-right text-red mr-[100px]">
-        {bidAmount > 0 ? convertToKoreanCurrency(bidAmount) : ''}
+        {bidAmount > 0 ? numberToKorean(bidAmount) : ''}
       </p>
 
       {isHighestBidder && (

@@ -8,11 +8,10 @@ import { getAuctionStatus } from "./constants/MyPageProduct";
 import { MyBidProduct } from "@/types/userData";
 
 interface Props {
-  key:number,
   myBidProduct: MyBidProduct;
 }
 
-export default function MyBidsProductCard({ key,myBidProduct }: Props) {
+export default function MyBidsProductCard({ myBidProduct }: Props) {
   const router = useRouter();
 
   const status = getAuctionStatus(myBidProduct.status);
@@ -27,7 +26,14 @@ export default function MyBidsProductCard({ key,myBidProduct }: Props) {
     router.push(`/seller/detail/${myBidProduct.auctionId}`);
   };
 
-  
+  const formattedEndTime = myBidProduct.endTime
+    ? new Date(myBidProduct.endTime).toLocaleTimeString('ko-KR', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+    : '';
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -35,7 +41,11 @@ export default function MyBidsProductCard({ key,myBidProduct }: Props) {
             onClick={handleClick}
             className="p-4 mb-4 w-full !h-[166px] border-2 border-checkbox">
             <div className="flex items-center h-full">
-              <img src={myBidProduct.mainImageUrl} alt={myBidProduct.title} className="w-24 h-24 object-cover mr-4" />
+              <img 
+                src={`http://localhost:8080${myBidProduct.mainImageUrl}`} 
+                alt={myBidProduct.title} 
+                className="w-24 h-24 object-cover mr-4" 
+              />
               <div className="flex-1">
                 <p className="font-bold text-[16px]">{myBidProduct.title}</p>
 
@@ -54,7 +64,7 @@ export default function MyBidsProductCard({ key,myBidProduct }: Props) {
                     className={`w-5 h-5 ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
                   />
                 </button>
-                <p className="text-xs mt-1">남은 시간: {myBidProduct.endTime}</p>
+                <p className="text-xs mt-1">남은 시간: {formattedEndTime}</p>
               </div>
 
               <div className="flex flex-col justify-between items-center ml-4 h-full py-2">

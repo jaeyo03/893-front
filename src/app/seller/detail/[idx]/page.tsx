@@ -27,13 +27,12 @@ export default function SellerDetailPage({ params }: DetailPageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [bid, product] = await Promise.all([
+      const [bidResponse, productResponse] = await Promise.all([
         getBidData(itemId),
         getProductData(itemId),
       ]);
-
-      if (bid) setBidData(bid);
-      if (product) setProductData(product);
+      if (bidResponse?.data) setBidData(bidResponse.data);
+      if (productResponse?.data) setProductData(productResponse.data);
     };
 
     fetchData();
@@ -44,7 +43,7 @@ export default function SellerDetailPage({ params }: DetailPageProps) {
       const fetchRelated = async () => {
         try {
           const data = await getRelatedItem(itemId);
-          setRelatedItem(data);
+          setRelatedItem(data.data);
         } catch (error) {
           console.error('Failed to fetch related auctions:', error as Error);
           throw error;

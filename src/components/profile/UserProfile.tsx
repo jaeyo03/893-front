@@ -51,13 +51,14 @@ export default function UserProfile() {
   
           // 대표 주소가 있다면 userInfo에 반영
           const mainAddress = addressData.find((addr) => addr.isDefault);
+          console.log("유저 정보",userData);
           if (mainAddress) {
-            setUserInfo((prev) => ({
-              ...prev,
+            setUserInfo(() => ({
               address: `${mainAddress.addressLine1} ${mainAddress.addressLine2}`,
               phone: mainAddress.phoneNumber,
               name: userData.name,          // ✅ 유저 기본정보도 업데이트
               email: userData.email,        // 예: 유저 이메일이 있다면
+              imageUrl: userData.profileUrl,
             }));
           } else if (userData) {
             // 대표 주소가 없어도 userData는 반영
@@ -75,6 +76,7 @@ export default function UserProfile() {
         console.error("유저 정보 또는 배송지 불러오기 실패:", error);
       }
     };
+
   
     fetchData();
   }, []);
@@ -181,7 +183,7 @@ export default function UserProfile() {
             {userInfo.imageUrl ? (
               <img
                 src={userInfo.imageUrl}
-                alt="사용자 이미지"
+                alt= {userInfo.name}
                 className="w-full h-full object-cover"
               />
             ) : (

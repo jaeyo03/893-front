@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import GlobalFCMSetup from "@/components/GlobalFCMSetup";
 import { cookies } from "next/headers";
+import { Toaster } from "react-hot-toast";
 
 const pretendard = localFont({
   src: "../fonts/PretendardVariable.woff2",
@@ -37,6 +38,16 @@ export default function RootLayout({
           </div>
         </header>
         <div className="w-[1280px]">{children}</div>
+
+        {/* Toaster 컴포넌트 추가 */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              zIndex: 9999,
+            },
+          }}
+        />
       </body>
     </html>
   );

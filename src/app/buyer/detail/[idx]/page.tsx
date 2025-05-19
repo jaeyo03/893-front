@@ -1,7 +1,4 @@
 'use client';
-interface DetailPageProps {
-  params: { idx: number };
-}
 
 import ImageSlider from "@/components/detail/ImageSlider";
 import ProductInfo from "@/components/detail/Product/BUY/ProductInfo";
@@ -11,6 +8,12 @@ import BidHistory from "@/components/detail/Bid/BidHistory";
 import { Product, AuctionBidData, Bid,RelatedItem } from "@/types/productData";
 import { useEffect, useState } from "react";
 import { getBidData, getProductData,getRelatedItem } from "@/lib/api/auction";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+
+
+interface DetailPageProps {
+  params: { idx: number };
+}
 
 export default function BuyerDetailPage({ params }: DetailPageProps) {
   const itemId = params.idx;
@@ -84,7 +87,7 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
   }, [itemId]);
   
 
-  if (!productData || !bidData) return <div>로딩 중...</div>;
+  if (!productData || !bidData) return <LoadingSpinner/>;
 
   // 입찰 내역을 업데이트하는 함수
   const updateBidData = (newBid: Bid) => {

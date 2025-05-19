@@ -8,6 +8,7 @@ import BidHistory from "@/components/detail/Bid/BidHistory";
 import { AuctionBidData, Product, RelatedItem, Bid } from "@/types/productData";
 import { useEffect, useState } from "react";
 import { getBidData,getProductData, getRelatedItem } from "@/lib/api/auction";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface DetailPageProps {
   params: { idx: number };
@@ -109,7 +110,7 @@ export default function SellerDetailPage({ params }: DetailPageProps) {
       });
     };
     
-  if (!productData || !bidData) return <div>로딩 중...</div>;
+  if (!productData || !bidData) return <LoadingSpinner/>;
 
   return (
     <>

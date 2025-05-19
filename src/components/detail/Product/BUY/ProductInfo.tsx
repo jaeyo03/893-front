@@ -4,7 +4,7 @@ import { Product, AuctionBidData, Bid } from '@/types/productData';
 import { AuctionState } from '../../AuctionState';
 import BidInteraction from '../../Bid/BidInteraction';
 import ProductHeader from './ProductHeader';
-import { cancelBid, postBid } from '@/lib/api/auction';
+import { addScrap, cancelBid, getProductData, postBid, removeScrap } from '@/lib/api/auction';
 
 interface ProductInfoProps {
   product: Product;
@@ -21,7 +21,7 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
   const [,setMyBidEmail] = useState<string>();
   const [cancelTimer, setCancelTimer] = useState<number>(0);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
-  const [bookmarkCount, setBookmarkCount] = useState<number>(1);
+  const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
 
   useEffect(() => {
     if (auctionBidData.bids.length > 0) {
@@ -126,10 +126,21 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
             product={product}
             auctionBidData={auctionBidData}
             isBookmarked={isBookmarked}
-            bookmarkCount={bookmarkCount}
-            onBookmarkToggle={() => {
-              setIsBookmarked((prev) => !prev);
-              setBookmarkCount((prev) => (isBookmarked ? prev - 1 : prev + 1));
+            bookmarkCount={scrapCount}
+            onBookmarkToggle={async () => {
+              try {
+                if (isBookmarked) {
+                  await removeScrap(product.auctionId); // ✅ 스크랩 취소 요청
+                  setIsBookmarked(false);
+                } else {
+                  await addScrap(product.auctionId); // ✅ 스크랩 추가 요청
+                  setIsBookmarked(true);
+                }
+                const updatedProduct = await getProductData(product.auctionId);
+                setScrapCount(updatedProduct?.data.scrapCount);
+              } catch (error) {
+                alert('스크랩 처리 중 오류가 발생했습니다.');
+              }
             }}
           />
         </div>

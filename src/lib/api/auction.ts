@@ -2,10 +2,12 @@
 import axios from "axios";
 import { AuctionBidData, Product,RelatedItem } from "@/types/productData";
 
+const API_URL = "http://localhost:8080/api/auctions";
+
 export async function getBidData(itemId: number): Promise<AuctionBidData | null> {
   try {
     const response = await axios.get(
-      `http://localhost:8080/api/auctions/${itemId}/bids`,
+      `${API_URL}/${itemId}/bids`,
       { withCredentials: true }
     );
     return response.data;
@@ -17,7 +19,7 @@ export async function getBidData(itemId: number): Promise<AuctionBidData | null>
 
 export const getProductData = async (itemId: number): Promise<Product | null> => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/auctions/${itemId}`,
+    const response = await axios.get(`${API_URL}/${itemId}`,
       {withCredentials: true }
     );
     return response.data;
@@ -35,7 +37,7 @@ export const postBid = async ({
   bidPrice: number;
 }) => {
   try {
-    const response = await axios.post(`http://localhost:8080/api/auctions/${itemId}/bids`,{
+    const response = await axios.post(`${API_URL}/${itemId}/bids`,{
       price: bidPrice,
     },{withCredentials:true,});
 
@@ -59,7 +61,7 @@ export const cancelBid = async ({
 }) => {
   try {
     const response = await axios.patch(
-      `http://localhost:8080/api/auctions/${auctionId}/bids/${bidId}`,
+      `${API_URL}/${auctionId}/bids/${bidId}`,
       {},
       { withCredentials: true, }
     );
@@ -77,12 +79,37 @@ export const cancelBid = async ({
 
 export const getRelatedItem = async (auctionId:number) => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/auctions/${auctionId}/related`,{
+    const response = await axios.get(`${API_URL}/${auctionId}/related`,{
       withCredentials:true
     });
     return response.data; // 필요한 데이터 리턴
   } catch (error) {
     console.error('Failed to fetch related item:', error);
+    throw error;
+  }
+};
+
+export const addScrap = async (id:number) => {
+  try {
+    const response = await axios.post(`${API_URL}/${id}/scrap`,
+      {},
+      {withCredentials:true}
+    );
+    return response.data;
+  } catch (error) {
+    console.error("스크랩 성공 실패: ", error);
+    throw error;
+  }
+};
+
+export const removeScrap = async (id:number) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${id}/scrap`,
+      {withCredentials:true}
+    );
+    return response.data;
+  } catch (error) {
+    console.error("스크랩 취소 실패: ", error);
     throw error;
   }
 };

@@ -9,6 +9,7 @@ import { Product, AuctionBidData, Bid,RelatedItem } from "@/types/productData";
 import { useEffect, useState } from "react";
 import { getBidData, getProductData,getRelatedItem } from "@/lib/api/auction";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { notFound } from "next/navigation";
 
 
 interface DetailPageProps {
@@ -26,15 +27,28 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
   });
   const [productData, setProductData] = useState<Product>();
   const [relatedItem,setRelatedItem] = useState<RelatedItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [bidResponse, productResponse] = await Promise.all([
-        getBidData(itemId),
-        getProductData(itemId),
-      ]);
-      if (bidResponse?.data) setBidData(bidResponse.data);
-      if (productResponse?.data) setProductData(productResponse.data);
+      try {
+        const [bidResponse, productResponse] = await Promise.all([
+          getBidData(itemId),
+          getProductData(itemId),
+        ]);
+        
+        if (!productResponse?.data) {
+          notFound(); // ✅ 존재하지 않는 상품이면 404 페이지로
+        }
+
+        setProductData(productResponse.data);
+        if (bidResponse?.data) setBidData(bidResponse.data);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        notFound();
+      } finally {
+        setIsLoading(false); // ✅ 로딩 끝
+      }
     };
 
     fetchData();
@@ -87,7 +101,10 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
   }, [itemId]);
   
 
-  if (!productData || !bidData) return <LoadingSpinner/>;
+  if (isLoading) return <LoadingSpinner/>;
+  if (!productData || !bidData) {
+    notFound(); // ✅ 서버에서 비정상 상태일 경우 예외 처리
+  }
 
   // 입찰 내역을 업데이트하는 함수
   const updateBidData = (newBid: Bid) => {
@@ -157,4 +174,8 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
       </div>
     </>
   );
+}
+
+function setIsLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
 }

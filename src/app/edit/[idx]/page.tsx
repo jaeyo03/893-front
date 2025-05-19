@@ -19,6 +19,7 @@ import {
   convertLabelToServerValue,
   convertServerValueToLabel,
 } from "@/components/registration/constants/productConditions";
+import { useRouter } from "next/navigation";
 
 type ServerImage = {
   url: string;
@@ -29,7 +30,8 @@ interface AuctionIdProps {
   params: { idx: number };
 }
 
-export default function EditRegistration({params}: AuctionIdProps) {
+export default function EditRegistration({ params }: AuctionIdProps) {
+  const router = useRouter();
   const [images, setImages] = useState<File[]>([]);
   const [serverImages, setServerImages] = useState<ServerImage[]>([]);
   const [category, setCategory] = useState<CategoryValue>({
@@ -48,7 +50,6 @@ export default function EditRegistration({params}: AuctionIdProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const auctionId = params.idx; // 실제로는 props나 router에서 받아야 함 <-- 라우팅 설정 필요
-  
 
   const validateForm = () => {
     console.log(auctionId);
@@ -136,10 +137,12 @@ export default function EditRegistration({params}: AuctionIdProps) {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-          },withCredentials: true,
-        },
+          },
+          withCredentials: true,
+        }
       );
       alert("경매 수정이 완료되었습니다!");
+      router.push(`/buyer/detail/${auctionId}`);
       setIsModalOpen(false);
     } catch (err) {
       console.error("❌ PATCH 실패", err);
@@ -192,7 +195,10 @@ export default function EditRegistration({params}: AuctionIdProps) {
 
   return (
     <div className="max-w-[1280px] p-8 mx-auto">
-      <form className="flex flex-col gap-4">
+      <form
+        className="flex flex-col gap-4 "
+        onSubmit={(e) => e.preventDefault()}
+      >
         <div className="flex flex-col pb-[79px]">
           <ImageUploader
             value={images}

@@ -30,11 +30,13 @@ function numberToKorean(num: number): string {
 }
 
 function getRemainTime(endAt: string): number {
+  if (!endAt || isNaN(new Date(endAt).getTime())) return 0;
   const now = new Date();
   const end = new Date(endAt);
   const diff = Math.floor((end.getTime() - now.getTime()) / 1000);
-  return Math.max(diff, 0); // 0보다 작아지지 않도록
+  return Math.max(diff, 0);
 }
+
 
 export default function BidInteraction({
   product,
@@ -46,13 +48,14 @@ export default function BidInteraction({
   endTime,
   itemId,
 }: BidInteractionProps) {
-  const [bidAmount, setBidAmount] = useState<number>(currentPrice + 100);
+  const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : 0);
   const [show, setShow] = useState(false);
   const [remainTime, setRemainTime] = useState<number>(getRemainTime(endTime));
+  const [isLoading, setIsLoading] = useState(false);
 
   const isAuctionEnded = remainTime <= 0;
 
-  const router = useRouter(); // ✅ 추가
+  const router = useRouter(); // 결제하기 버튼
 
   const handlePayment = () => {
     router.push(`/payment?auctionId=${itemId}`);
@@ -82,7 +85,7 @@ export default function BidInteraction({
 
   const handleBid = async () => {
     if (isHighestBidder && cancelTimer > 0) return;
-  
+    if (isLoading) return;
     const isInitialBid = currentPrice === product.basePrice;
   
     if (bidAmount % 100 !== 0) {
@@ -99,7 +102,7 @@ export default function BidInteraction({
       toast.error(`입찰 금액은 현재가보다 높아야 합니다.`);
       return;
     }
-  
+    setIsLoading(true);
     try {
       await onBid(bidAmount);
     } catch (error: any) {
@@ -110,22 +113,36 @@ export default function BidInteraction({
   
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 허용
-    if (value === '') {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    if (!raw) {
       setBidAmount(0);
       return;
     }
-
-    const numericValue = Math.min(Number(value), 1000000000); // 10억 제한
-    setBidAmount(numericValue);
+  
+    const num = Number(raw);
+    if (!Number.isFinite(num)) return;
+  
+    setBidAmount(Math.min(num, 1_000_000_000));
   };
 
-  const handleCancelBid = () => {
-    onCancelBid();
-    toast('입찰이 취소되었습니다.', {
-      icon: '❌',
-    });
+  const handleCancelBid = async () => {
+    if (isLoading) return; // 중복 클릭 방지
+    setIsLoading(true);
+  
+    try {
+      await onCancelBid();
+      toast.success('입찰이 취소되었습니다.');
+    } catch (error: any) {
+      console.error('입찰 취소 에러:', error);
+      toast.error(error?.message || '입찰 취소에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (!itemId || !product || typeof currentPrice !== 'number') {
+    return <div className="text-red-500">잘못된 경매 정보입니다.</div>;
+  }
   
 
   return (

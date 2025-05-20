@@ -21,14 +21,14 @@ type Props = {
 };
 
 export default function ImageUploader({
-                                        value,
-                                        onChange,
-                                        serverImages = [],
-                                        onDeleteServerImage,
-                                        onEmptyImage,
-                                        mainImageIndex,
-                                        onChangeMainImageIndex,
-                                      }: Props) {
+  value,
+  onChange,
+  serverImages = [],
+  onDeleteServerImage,
+  onEmptyImage,
+  mainImageIndex,
+  onChangeMainImageIndex,
+}: Props) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleRepresentClick = (index: number) => {
@@ -57,8 +57,6 @@ export default function ImageUploader({
   };
 
   const handleDeleteImage = (index: number) => {
-    console.log("🗑️ 삭제 시도된 인덱스:", index);
-
     const serverCount = serverImages.length;
 
     if (index < serverCount) {

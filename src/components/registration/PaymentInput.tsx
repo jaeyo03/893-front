@@ -3,60 +3,56 @@
 import { useState, useEffect } from "react";
 
 export interface AuctionPriceInputProps {
-  value: number;
-  onChange: (value: number) => void;
+  value: number | null;
+  onChange: (value: number | null) => void;
 }
 
 // 숫자를 한글 금액으로 변환
-function numberToKorean(num: number): string {
-  if (num === 0) return "0원";
+function numberToKorean(num: number | null): string {
+  if (!num || num === 0) return "0원";
 
-  const unitDigit = ["", "십", "백", "천"];
-  const unitLevel = ["", "만", "억", "조", "경"];
+  const units = [
+    { value: 10 ** 8, label: "억" },
+    { value: 10 ** 4, label: "만" },
+    { value: 1, label: "" },
+  ];
 
   let result = "";
-  let level = 0;
 
-  while (num > 0) {
-    const part = num % 10000;
-    if (part !== 0) {
-      let section = "";
-      const digits = String(part).padStart(4, "0").split("").map(Number);
-
-      digits.forEach((digit, i) => {
-        const pos = 3 - i; // 천백십일 순서
-        if (digit !== 0) {
-          section += `${digit}${unitDigit[pos]}`;
-        }
-      });
-
-      result = section + unitLevel[level] + result;
+  for (const unit of units) {
+    const unitValue = Math.floor(num / unit.value);
+    if (unitValue > 0) {
+      result += `${unitValue}${unit.label} `;
+      num %= unit.value;
     }
-
-    level++;
-    num = Math.floor(num / 10000);
   }
 
-  return result + "원";
+  return result.trim() + "원";
 }
 
 export default function PaymentInput({
-                                       value,
-                                       onChange,
-                                     }: AuctionPriceInputProps) {
-  const [inputValue, setInputValue] = useState(typeof value === "number" ? value.toLocaleString() : "");
+  value,
+  onChange,
+}: AuctionPriceInputProps) {
+  const [inputValue, setInputValue] = useState("");
+
   useEffect(() => {
-    // 부모에서 받은 value가 변경되었을 때 inputValue도 업데이트
-    setInputValue(value ? value.toLocaleString() : "");
-    console.log("value", value);
+    setInputValue(value != null && value !== 0 ? value.toLocaleString() : "");
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 추출
-    const num = Number(raw);
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    if (raw === "") {
+      setInputValue("");
+      onChange(null); // 빈 입력 시 null 전달
+      return;
+    }
 
-    setInputValue(raw ? num.toLocaleString() : "");
-    onChange(num); // 부모에게 전달
+    let num = Number(raw);
+    num = Math.min(Math.max(0, num), 100000000);
+
+    setInputValue(num.toLocaleString());
+    onChange(num);
   };
 
   return (

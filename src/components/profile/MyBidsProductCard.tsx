@@ -23,7 +23,7 @@ export default function MyBidsProductCard({ myBidProduct }: Props) {
   };
 
   const handleClick = () => {
-    router.push(`/seller/detail/${myBidProduct.auctionId}`);
+    router.push(`/detail/${myBidProduct.auctionId}`);
   };
 
   const formattedEndTime = myBidProduct.endTime

@@ -23,7 +23,7 @@ export default function MyScrapsProductCard({ scrap }: Props) {
   };
 
   const handleClick = () => {
-    router.push(`/seller/detail/${scrap.auctionId}`);
+    router.push(`/detail/${scrap.auctionId}`);
   };
 
   const formattedEndTime = scrap.endTime

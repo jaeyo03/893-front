@@ -15,7 +15,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
 
   const status = getAuctionStatus(auctions.status);
   const handleClick = () => {
-    router.push(`/seller/detail/${auctions.auctionId}`);
+    router.push(`/detail/${auctions.auctionId}`);
   };
 
   const formattedEndTime = auctions.endTime

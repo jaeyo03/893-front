@@ -13,7 +13,7 @@ export default function MyPaymentsProductCard({ payments }: Props){
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/seller/detail/${payments.auctionId}`);
+    router.push(`/detail/${payments.auctionId}`);
   };
 
 

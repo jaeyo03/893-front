@@ -11,7 +11,7 @@ export default function CategoryFilter() {
   const currentCategorySub = searchParams.get('subCategoryId')
 
   return (
-    <div className="border-b-[1px] border-divider">
+    <div>
       <div className="flex justify-between items-center px-4 py-2">
         <label htmlFor="category" className="font-bold text-md">
           카테고리

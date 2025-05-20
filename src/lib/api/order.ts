@@ -1,5 +1,5 @@
 import { OrderResponse, BaseResponse } from "@/types/response.types";
-import { TossPaymentRequest, TossPaymentResponse } from "@/types/payment.types";
+import { TossPaymentConfirmRequest, TossPaymentRequest, TossPaymentResponse } from "@/types/payment.types";
 import axios from "axios";
 
 // 서버 컴포넌트 버전
@@ -43,13 +43,27 @@ export async function getUserOrderInfoForClient(auctionId : string) : Promise<Ba
 
 export async function postPaymentInfo(auctionId : string, paymentRequest : TossPaymentRequest) : Promise<BaseResponse<TossPaymentResponse | null>>{
   try {
-    const response = await axiosInstance.post(`/api/auctions/${auctionId}/orders`, paymentRequest);
+    const response = await axiosInstance.post(`/api/auctions/${auctionId}/payments`, paymentRequest);
     return response.data;
   } catch (error) {
     console.error("Error posting payment info:", error);
     return {
       data: null,
       message: "Failed to post payment info",
+      code: 500,
+    }
+  }
+}
+
+export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<unknown>>{ // TODO 타입 추가
+  try {
+    const response = await axiosInstance.post(`/api/payments/confirm`, paymentConfirmRequest);
+    return response.data;
+  } catch (error) {
+    console.error("Error posting payment confirm:", error);
+    return {
+      data: null,
+      message: "Failed to post payment confirm",
       code: 500,
     }
   }

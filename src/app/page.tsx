@@ -1,6 +1,5 @@
 import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
-import CategorySearchSection from "@/components/molecules/CategorySearchSection";
 import SearchInput from "@/components/templates/SearchInput";
 import {Metadata} from "next";
 import QueryProvider from "@/components/QueryProvider";
@@ -22,7 +21,7 @@ export default async function Home() {
   
   return (
     <>
-      <div className="grid justify-center items-center gap-4 w-full">
+      <div className="grid justify-center items-center gap-6 w-full mt-6">
         <HomeTitle>
           <SpinningWord/>
           <span>&nbsp;경매에 참여해보세요</span>
@@ -32,7 +31,6 @@ export default async function Home() {
             <SearchInput/>
           </QueryProvider>
         </div>
-        <CategorySearchSection/>
       </div>
       <div className="grid grid-cols-5 gap-4 mt-8 mb-8">
         {products.data.auctionList.map((product) => (

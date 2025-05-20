@@ -1,4 +1,4 @@
-export type PaymentMethod = 'CREDIT_CARD' | 'NAVER_PAY' | 'KAKAO_PAY' | 'PHONE' | 'BANK_TRANSFER' | 'NORMAL';
+export type PaymentType = 'CREDIT_CARD' | 'NAVER_PAY' | 'KAKAO_PAY' | 'PHONE' | 'BANK_TRANSFER' | 'NORMAL';
 
 export interface TossPaymentRequest {
   recipientName: string;
@@ -6,9 +6,6 @@ export interface TossPaymentRequest {
   addressLine1: string;
   addressLine2?: string;
   zipCode: string;
-  paymentMethod: PaymentMethod;
-  orderId: string;
-  paymentKey: string;
   finalPrice: number;
   successUrl: string;
   failUrl: string;
@@ -23,4 +20,11 @@ export interface TossPaymentResponse {
   customerName: string;
   customerMobilePhone: string;
   finalPrice: number;
+}
+
+export interface TossPaymentConfirmRequest {
+  paymentKey: string;
+  orderId: string;
+  amount: number;
+  paymentType: PaymentType;
 }

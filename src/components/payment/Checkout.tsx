@@ -2,22 +2,36 @@
 
 import { useEffect, useRef, useState } from "react";
 import {loadTossPayments, ANONYMOUS, TossPaymentsWidgets} from "@tosspayments/tosspayments-sdk";
+import { OrderResponse } from "@/types/response.types";
+import {postPaymentInfo} from "@/lib/api/order";
+import {TossPaymentRequest} from "@/types/payment.types";
 
 interface CheckoutPageProps {
-  finalPrice : number;
   auctionId : string;
+  userOrderInfo : OrderResponse | null;
 }
 
 const generateRandomString = () => window.btoa(String(Math.random())).slice(0, 20);
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
-export function Checkout({ finalPrice, auctionId } : CheckoutPageProps) {
+export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
   const [amount, setAmount] = useState({
     currency: "KRW",
-    value: finalPrice,
+    value: userOrderInfo?.finalPrice ?? 0, // TODO 추후 예외처리 필요
   });
+
+  const finalPaymentInfo : TossPaymentRequest = {
+    recipientName: userOrderInfo?.deliveryAddress?.name ?? "",
+    phoneNumber: userOrderInfo?.deliveryAddress?.phoneNumber ?? "",
+    addressLine1: userOrderInfo?.deliveryAddress?.addressLine1 ?? "",
+    addressLine2: userOrderInfo?.deliveryAddress?.addressLine2 ?? "",
+    zipCode: userOrderInfo?.deliveryAddress?.zipCode ?? "",
+    finalPrice: userOrderInfo?.finalPrice ?? 0,
+    successUrl: "http://localhost:3000/payment/success",
+    failUrl: "http://localhost:3000/payment/fail"  
+  }
 
 
   useEffect(() => {
@@ -87,11 +101,23 @@ export function Checkout({ finalPrice, auctionId } : CheckoutPageProps) {
                  * 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
                  * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
                  */
+                const response = await postPaymentInfo(auctionId, finalPaymentInfo);
+                
+                const orderId = response?.data?.orderId;
+                const orderName = response?.data?.orderName;
+                const customerName = response?.data?.customerName;
+                const customerEmail = response?.data?.customerEmail;
+
+                if (!orderId || !orderName || !customerName || !customerEmail) {
+                  alert("결제 정보를 가져오는데 실패했습니다.");
+                  return;
+                }
+
                 await widgets?.requestPayment({
-                  orderId: generateRandomString(),
-                  orderName: "토스 티셔츠 외 2건",
-                  customerName: "김토스",
-                  customerEmail: "customer123@gmail.com",
+                  orderId: orderId,
+                  orderName: orderName,
+                  customerName: customerName,
+                  customerEmail: customerEmail,
                   successUrl: `http://localhost:3000/payment/success?auctionId=${auctionId}`,
                   failUrl: "http://localhost:3000/payment/fail"
                 });

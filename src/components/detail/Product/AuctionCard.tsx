@@ -31,7 +31,7 @@ export default function AuctionCard({product}: AuctionCardProps) {
   };
   
   return (
-    <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
+    <div className="p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white">
       <div className="grid grid-cols-1 grid-rows-1">
         <img
           src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}

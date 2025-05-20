@@ -22,6 +22,7 @@ export default function CategorySub() {
     if (value) {
       params.set('subCategoryId', value)
       params.delete('detailCategoryId')
+      params.delete('page')
     }
     
     router.replace(`/search?${params.toString()}`, { scroll: false })

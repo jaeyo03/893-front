@@ -25,6 +25,7 @@ export default function PriceFilter() {
     const params = new URLSearchParams(searchParams.toString())
     params.set('minPrice', currentMinPrice.toString())
     params.set('maxPrice', currentMaxPrice.toString())
+    params.delete('page')
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [currentMinPrice, currentMaxPrice, router, searchParams])
   
@@ -35,7 +36,7 @@ export default function PriceFilter() {
   }, [searchParams])
 
   return (
-    <div className="border-b-[1px] border-divider">
+    <div>
       <div className="flex justify-between items-center px-4 py-2">
         <label htmlFor="price" className="font-bold text-md">
           경매 시작가

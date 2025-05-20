@@ -57,6 +57,6 @@ export interface OrderResponse {
   auctionThumbnail: string;
   finalPrice: number;
   deliveryAddress: DeliveryAddress;
-  paymentMethod: string;
+  paymentType: string;
   paymentStatus: string;
 }

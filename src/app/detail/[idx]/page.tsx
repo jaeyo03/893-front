@@ -1,23 +1,26 @@
 'use client';
 
 import ImageSlider from "@/components/detail/ImageSlider";
-import ProductInfo from "@/components/detail/Product/BUY/ProductInfo";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import RelatedItemCard from "@/components/detail/Product/RelatedItemCard";
 import BidHistory from "@/components/detail/Bid/BidHistory";
-import { Product, AuctionBidData, Bid,RelatedItem } from "@/types/productData";
+import ProductInfo from "@/components/detail/Product/BUY/ProductInfo";
+import SellerProductInfo from "@/components/detail/Product/Sell/SellerProductInfo";
+
+import { Product, AuctionBidData, Bid, RelatedItem } from "@/types/productData";
 import { useEffect, useState } from "react";
-import { getBidData, getProductData,getRelatedItem } from "@/lib/api/auction";
+import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { notFound } from "next/navigation";
-
 
 interface DetailPageProps {
   params: { idx: number };
 }
 
-export default function BuyerDetailPage({ params }: DetailPageProps) {
+export default function AuctionDetailPage({ params }: DetailPageProps) {
   const itemId = params.idx;
+
+  const [productData, setProductData] = useState<Product>();
   const [bidData, setBidData] = useState<AuctionBidData>({
     bids: [],
     cancelledBids: [],
@@ -25,8 +28,7 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
     auctionId: 1,
     totalBidder: 0,
   });
-  const [productData, setProductData] = useState<Product>();
-  const [relatedItem,setRelatedItem] = useState<RelatedItem[]>([]);
+  const [relatedItem, setRelatedItem] = useState<RelatedItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,9 +38,9 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
           getBidData(itemId),
           getProductData(itemId),
         ]);
-        
+
         if (!productResponse?.data) {
-          notFound(); // ✅ 존재하지 않는 상품이면 404 페이지로
+          notFound();
         }
 
         setProductData(productResponse.data);
@@ -47,7 +49,7 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
         console.error('Fetch error:', err);
         notFound();
       } finally {
-        setIsLoading(false); // ✅ 로딩 끝
+        setIsLoading(false);
       }
     };
 
@@ -55,31 +57,32 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
   }, [itemId]);
 
   useEffect(() => {
-    if(!itemId) return;
+    if (!itemId) return;
+
     const fetchRelated = async () => {
       try {
         const data = await getRelatedItem(itemId);
         setRelatedItem(data.data);
       } catch (error) {
-        console.error('Failed to fetch related auctions:', error as Error);
-        throw error;
+        console.error('Failed to fetch related auctions:', error);
       }
     };
 
     fetchRelated();
   }, [itemId]);
-  
+
   useEffect(() => {
     if (!itemId) return;
-  
-    const eventSource = new EventSource(`http://localhost:8080/api/auctions/${itemId}/stream`,
-      {withCredentials:true}
+
+    const eventSource = new EventSource(
+      `http://localhost:8080/api/auctions/${itemId}/stream`,
+      { withCredentials: true }
     );
 
     eventSource.addEventListener('connect', (event) => {
       console.log('SSE connected:', event.data);
     });
-    
+
     eventSource.addEventListener('bid-update', (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -89,39 +92,31 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
           removeBidData(data.bidId);
         }
       } catch (error) {
-        console.error('SSE message parse error:', error);
+        console.error('SSE parse error:', error);
       }
     });
-    
+
     eventSource.onerror = (err) => {
       console.error('SSE error:', err);
       eventSource.close();
     };
-    
   }, [itemId]);
-  
 
-  if (isLoading) return <LoadingSpinner/>;
-  if (!productData || !bidData) {
-    notFound(); // ✅ 서버에서 비정상 상태일 경우 예외 처리
-  }
-
-  // 입찰 내역을 업데이트하는 함수
   const updateBidData = (newBid: Bid) => {
     setBidData(prev => {
       const updatedBids = [newBid, ...prev.bids];
       return { ...prev, bids: updatedBids, totalBid: updatedBids.length };
     });
   };
-  
+
   const removeBidData = (bidId: number) => {
     setBidData(prev => {
       const bidToCancel = prev.bids.find(bid => bid.bidId === bidId);
       if (!bidToCancel) return prev;
-  
+
       const updatedBids = prev.bids.filter(bid => bid.bidId !== bidId);
-      const updatedCancelledBids = [bidToCancel, ...(prev.cancelledBids || [])]; // ✅ 안전 처리
-  
+      const updatedCancelledBids = [bidToCancel, ...(prev.cancelledBids || [])];
+
       return {
         ...prev,
         bids: updatedBids,
@@ -131,33 +126,48 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
     });
   };
 
-  
+  if (isLoading) return <LoadingSpinner />;
+  if (!productData || !bidData) {
+    notFound();
+  }
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-        <div style={{ flex: 1, marginRight: '20px' }}>
-          <ImageSlider images={productData.images} product={productData}/>
+      <div className="flex justify-between p-5">
+        <div className="flex-1 mr-5">
+          <ImageSlider images={productData.images} product={productData} />
           <GoodsInfo
             description={productData.description}
             itemCondition={productData.itemCondition}
           />
         </div>
-        <div style={{ flex: 1, maxWidth: '620px' }}>
+        <div className="flex-1 max-w-[620px]">
           <div className="mb-4">
-            <ProductInfo
-              product={productData}
-              auctionBidData={bidData}
-              updateBidData={updateBidData} // 입찰 내역 업데이트 함수 전달
-              removeBidData={removeBidData}
-            />
+            {productData.isSeller ? (
+              <SellerProductInfo
+                product={productData}
+                auctionBidData={bidData}
+              />
+            ) : (
+              <ProductInfo
+                product={productData}
+                auctionBidData={bidData}
+                updateBidData={updateBidData}
+                removeBidData={removeBidData}
+              />
+            )}
           </div>
           <div className="mb-4">
-            <BidHistory bidData={bidData.bids} cancelData={bidData.cancelledBids} />
+            <BidHistory
+              bidData={bidData.bids}
+              cancelData={bidData.cancelledBids}
+            />
           </div>
         </div>
       </div>
+
       <hr />
+
       <div style={{ padding: '20px' }}>
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
         <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
@@ -174,8 +184,4 @@ export default function BuyerDetailPage({ params }: DetailPageProps) {
       </div>
     </>
   );
-}
-
-function setIsLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
 }

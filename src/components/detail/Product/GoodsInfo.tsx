@@ -36,15 +36,18 @@ export default function GoodsInfo({ description, itemCondition }: GoodsInfoProps
 
   return (
     <div className="pt-10 px-5">
-      <h2 className="mb-2 text-lg font-medium text-gray-700">상품 상세 정보</h2>
-      <div className="p-4 text-sm text-gray-800 whitespace-pre-line rounded-lg space-y-2">
-        <p>{description}</p>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-medium text-gray-700">상품 상세 정보</h2>
         <span
           className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${badgeColor}`}
         >
           {conditionLabel}
         </span>
       </div>
+      <div className="p-4 text-sm text-gray-800 whitespace-pre-line rounded-lg space-y-2">
+        <p>{description}</p>
+      </div>
     </div>
   );
+  
 }

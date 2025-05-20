@@ -29,7 +29,7 @@ export default function Registration() {
   const [images, setImages] = useState<File[]>([]);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number | null>(null);
   const [detail, setDetail] = useState<string>("");
   const [agreed, setAgreed] = useState<boolean>(false);
   const [productStatus, setProductStatus] = useState<number | null>(null);
@@ -64,7 +64,9 @@ export default function Registration() {
       newErrors.images = "최소 1장의 이미지를 등록해주세요.";
     if (!title.trim()) newErrors.title = "경매 제목을 입력해주세요.";
     if (!category.id) newErrors.category = "카테고리를 선택해주세요.";
-    if (!price || price <= 0) newErrors.price = "시작 가격을 입력해주세요.";
+    if (price == null || isNaN(price) || price < 0) {
+      newErrors.price = "시작 가격을 입력해주세요.";
+    }
     if (!detail.trim()) newErrors.detail = "상세 설명을 입력해주세요.";
     if (productStatus === null)
       newErrors.productStatus = "상품 상태를 선택해주세요.";

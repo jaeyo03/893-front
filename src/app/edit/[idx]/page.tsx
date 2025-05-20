@@ -47,7 +47,8 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     detailCategory: "",
   });
   const [title, setTitle] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
+  const [price, setPrice] = useState<number | null>(null);
+
   const [detail, setDetail] = useState<string>("");
   const [productStatus, setProductStatus] = useState<number | null>(null);
   const [startTime, setStartTime] = useState({ hour: 0, minute: 0 });
@@ -72,7 +73,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     agreed: useRef<HTMLDivElement>(null),
   };
 
-  // ✅ 기존 데이터 로드
   useEffect(() => {
     (async () => {
       try {
@@ -80,7 +80,11 @@ export default function EditRegistration({ params }: AuctionIdProps) {
           `http://localhost:8080/api/auctions/${auctionId}/update`,
           { withCredentials: true }
         );
-        const data = res.data.data;
+        const data = res?.data?.data;
+        if (!data) {
+          console.error("데이터 없음");
+          return;
+        }
 
         setServerImages(
           (data.images ?? []).map((img: ServerImage) => ({
@@ -103,14 +107,12 @@ export default function EditRegistration({ params }: AuctionIdProps) {
 
         const statusLabel = convertServerValueToLabel(data.itemCondition);
         setProductStatus(productConditions.findIndex((l) => l === statusLabel));
-        // startTime, durationTime 필드가 있다면 여기에서 setStartTime / setDurationTime
       } catch (err) {
         console.error("기존 경매 데이터 로딩 실패", err);
       }
     })();
   }, [auctionId]);
 
-  // ✅ 유효성 검사
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     const total = images.length + serverImages.length;
@@ -120,7 +122,9 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     if (!category.id) {
       newErrors.category = "카테고리를 선택해주세요.";
     }
-    if (!price || price <= 0) newErrors.price = "시작 가격을 입력해주세요.";
+    if (price == null || isNaN(price) || price < 0) {
+      newErrors.price = "시작 가격을 입력해주세요.";
+    }
     if (!detail.trim()) newErrors.detail = "상세 설명을 입력해주세요.";
     if (productStatus === null)
       newErrors.productStatus = "상품 상태를 선택해주세요.";

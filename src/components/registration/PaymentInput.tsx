@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 
 export interface AuctionPriceInputProps {
-  value: number;
-  onChange: (value: number) => void;
+  value: number | null;
+  onChange: (value: number | null) => void;
 }
 
 // 숫자를 한글 금액으로 변환
-function numberToKorean(num: number): string {
-  if (num === 0) return "0원";
+function numberToKorean(num: number | null): string {
+  if (!num || num === 0) return "0원";
 
   const units = [
     { value: 10 ** 8, label: "억" },
@@ -34,17 +34,17 @@ export default function PaymentInput({
   value,
   onChange,
 }: AuctionPriceInputProps) {
-  const [inputValue, setInputValue] = useState(value.toLocaleString());
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    setInputValue(value === 0 ? "" : value.toLocaleString());
+    setInputValue(value != null && value !== 0 ? value.toLocaleString() : "");
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 추출
+    const raw = e.target.value.replace(/[^0-9]/g, "");
     if (raw === "") {
-      setInputValue(""); // 빈 문자열 유지
-      onChange(0); // 내부 상태는 0
+      setInputValue("");
+      onChange(null); // 빈 입력 시 null 전달
       return;
     }
 

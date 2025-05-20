@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Bookmark } from 'lucide-react';
 import { MyScrapsProduct } from "@/types/userData";
 import { getAuctionStatus } from "./constants/MyPageProduct";
+import { getRemainingTime } from "./TimeCalculator";
 
 interface Props {
   scrap: MyScrapsProduct;
@@ -16,6 +17,20 @@ export default function MyScrapsProductCard({ scrap }: Props) {
   const [isScraped, setIsScraped] = useState(true); // 기본 찜 상태
   const status = getAuctionStatus(scrap.status);
 
+  
+  const [remainingTime, setRemainingTime] = useState<string>(() =>
+      getRemainingTime(scrap.endTime)
+    );
+    
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setRemainingTime(getRemainingTime(scrap.endTime));
+      }, 1000);
+  
+      return () => clearInterval(interval);
+    }, [scrap.endTime]);
+  
+
   const handleScrapToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsScraped((prev) => !prev);
@@ -25,16 +40,6 @@ export default function MyScrapsProductCard({ scrap }: Props) {
   const handleClick = () => {
     router.push(`/detail/${scrap.auctionId}`);
   };
-
-  const formattedEndTime = scrap.endTime
-    ? new Date(scrap.endTime).toLocaleTimeString('ko-KR', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      })
-    : '';
-
   
   return (
     <div className="flex justify-center w-full">
@@ -54,7 +59,7 @@ export default function MyScrapsProductCard({ scrap }: Props) {
                 className={`w-5 h-5 ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
               />
             </button>
-            <p className="text-xs mt-1">종료 시간: {formattedEndTime}</p>
+            <p className="text-xs mt-1">종료 시간: {remainingTime}</p>
           </div>
 
           <div className="flex flex-col justify-between items-center ml-4 h-full py-2">

@@ -81,13 +81,30 @@ export default function CategorySelector({ value, onChange }: Props) {
   }, [value.id, tree]);
 
   // ✅ 선택 완료 시 onChange
+  // ✅ mainCategory 또는 subCategory가 바뀔 때도 반응하게
   useEffect(() => {
-    if (step3) {
+    if (step1 && !step2 && !step3) {
+      onChange({
+        id: null,
+        mainCategory: step1.name,
+        subCategory: "",
+        detailCategory: "",
+      });
+    }
+    if (step1 && step2 && !step3) {
+      onChange({
+        id: null,
+        mainCategory: step1.name,
+        subCategory: step2.name,
+        detailCategory: "",
+      });
+    }
+    if (step1 && step2 && step3) {
       onChange({
         id: step3.id,
-        mainCategory: step1?.name ?? "",
-        subCategory: step2?.name ?? "",
-        detailCategory: step3?.name ?? "",
+        mainCategory: step1.name,
+        subCategory: step2.name,
+        detailCategory: step3.name,
       });
     }
   }, [step1, step2, step3]);

@@ -5,6 +5,7 @@ import { AuctionState } from '../../AuctionState';
 import BidInteraction from '../../Bid/BidInteraction';
 import ProductHeader from './ProductHeader';
 import { addScrap, cancelBid, getProductData, postBid, removeScrap } from '@/lib/api/auction';
+import toast from 'react-hot-toast';
 
 interface ProductInfoProps {
   product: Product;
@@ -55,37 +56,38 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
 
   // ✅ 입찰하기 눌렀을 때 호출
   const handleBid = async (amount: number) => {
-    if (amount <= currentPrice) return;
-
+    const isInitialBid = amount === product.basePrice;
+    // 최초 입찰이 아닌 경우에만 현재가보다 높은 금액 요구
+    if (!isInitialBid && amount <= currentPrice) return;
+  
     try {
-      // 서버에 입찰 요청 보내기
       const response = await postBid({
-        itemId: product.auctionId,  // 현재 상품의 ID를 itemId로 전달
-        bidPrice: amount,    // 입찰 금액
+        itemId: product.auctionId,
+        bidPrice: amount,
       });
-
-      // 입찰 성공 시 상태 업데이트
+  
       if (response) {
-        const bidRespose = response.data
+        const bidRespose = response.data;
         const newBid: Bid = {
-          bidId: bidRespose.bidId, // 서버 응답에 따라 조정
-          bidderEmail: bidRespose.bidderEmail, // 응답 값 기반
+          bidId: bidRespose.bidId,
+          bidderEmail: bidRespose.bidderEmail,
           bidPrice: bidRespose.bidPrice,
           createdAt: bidRespose.createdAt,
           updatedAt: bidRespose.updatedAt,
         };
         setMyBidId(bidRespose.bidId);
         setMyBidEmail(bidRespose.bidderEmail);
-        setLastBidPrice(currentPrice);  // 이전 입찰 가격을 저장
-        setCurrentPrice(amount);  // 현재가 업데이트
-        setIsHighestBidder(true);  // 최고 입찰자 상태 설정
-        setCancelTimer(60);  // 타이머 1분 설정
-        updateBidData(newBid); // 입찰 내역 업데이트
+        setLastBidPrice(currentPrice);
+        setCurrentPrice(amount);
+        setIsHighestBidder(true);
+        setCancelTimer(60);
+        updateBidData(newBid);
       }
     } catch (error) {
-      alert('입찰에 실패했습니다. 다시 시도해 주세요.');
+      toast.error('입찰에 실패했습니다. 다시 시도해 주세요.');
     }
   };
+  
 
   const handleCancelBid = async () => {
     
@@ -147,6 +149,7 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
         <hr className="border-gray-300 my-4" />
         <div className="mt-4">
           <BidInteraction
+            product={product}
             currentPrice={currentPrice}  // currentPrice 상태가 제대로 전달되었는지 확인
             onBid={handleBid}
             onCancelBid={handleCancelBid}

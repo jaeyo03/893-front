@@ -59,6 +59,7 @@ export interface AuctionStatsProps {
 }
 
 export interface BidInteractionProps {
+  product: Product;
   currentPrice: number;
   onBid: (amount: number) => Promise<void>;
   onCancelBid: () => void;

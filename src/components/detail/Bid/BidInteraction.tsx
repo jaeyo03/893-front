@@ -37,6 +37,7 @@ function getRemainTime(endAt: string): number {
 }
 
 export default function BidInteraction({
+  product,
   currentPrice,
   onBid,
   onCancelBid,
@@ -81,21 +82,31 @@ export default function BidInteraction({
 
   const handleBid = async () => {
     if (isHighestBidder && cancelTimer > 0) return;
+  
+    const isInitialBid = currentPrice === product.basePrice;
+  
     if (bidAmount % 100 !== 0) {
       toast.error('입찰 금액은 100원 단위여야 합니다.');
       return;
     }
-    if (bidAmount < currentPrice + 100) {
+  
+    if (!isInitialBid && bidAmount < currentPrice + 100) {
       toast.error(`입찰 금액은 현재가보다 최소 100원 이상이어야 합니다.`);
       return;
     }
   
+    if (isInitialBid && bidAmount <= currentPrice) {
+      toast.error(`입찰 금액은 현재가보다 높아야 합니다.`);
+      return;
+    }
+  
     try {
-      await onBid(bidAmount);  // onBid는 Promise 반환한다고 가정
+      await onBid(bidAmount);
     } catch (error: any) {
       toast.error(error?.message || '입찰에 실패했습니다.');
     }
   };
+  
   
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -11,14 +11,16 @@ import { Product, AuctionBidData, Bid, RelatedItem } from "@/types/productData";
 import { useEffect, useState } from "react";
 import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { notFound } from "next/navigation";
+import { notFound, usePathname } from "next/navigation";
 
 interface DetailPageProps {
-  params: { idx: number };
+  params: { idx: string };
 }
 
 export default function AuctionDetailPage({ params }: DetailPageProps) {
-  const itemId = params.idx;
+  console.log("✅ Received params:", params);
+  const pathname = usePathname();
+  const itemId = Number(params.idx);
 
   const [productData, setProductData] = useState<Product>();
   const [bidData, setBidData] = useState<AuctionBidData>({
@@ -54,7 +56,7 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
     };
 
     fetchData();
-  }, [itemId]);
+  },[pathname, itemId]);
 
   useEffect(() => {
     if (!itemId) return;
@@ -73,16 +75,16 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
 
   useEffect(() => {
     if (!itemId) return;
-
+  
     const eventSource = new EventSource(
       `http://localhost:8080/api/auctions/${itemId}/stream`,
       { withCredentials: true }
     );
-
+  
     eventSource.addEventListener('connect', (event) => {
       console.log('SSE connected:', event.data);
     });
-
+  
     eventSource.addEventListener('bid-update', (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -95,12 +97,17 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
         console.error('SSE parse error:', error);
       }
     });
-
+  
     eventSource.onerror = (err) => {
       console.error('SSE error:', err);
       eventSource.close();
     };
-  }, [itemId]);
+  
+    return () => {
+      eventSource.close();  // 컴포넌트 언마운트 시 연결 종료
+    };
+  }, [pathname, itemId]);
+  
 
   const updateBidData = (newBid: Bid) => {
     setBidData(prev => {
@@ -135,7 +142,7 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
     <>
       <div className="flex justify-between p-5">
         <div className="flex-1 mr-5">
-          <ImageSlider images={productData.images} product={productData} />
+          <ImageSlider key={productData.auctionId} images={productData.images} product={productData} />
           <GoodsInfo
             description={productData.description}
             itemCondition={productData.itemCondition}

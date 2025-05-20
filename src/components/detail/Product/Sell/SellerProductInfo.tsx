@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Product, AuctionBidData } from '@/types/productData';
 import { AuctionState } from '../../AuctionState';
 import SellerProductHeader from './SellerProductHeader';
+import { addScrap, getProductData, removeScrap } from '@/lib/api/auction';
 
 interface ProductInfoProps {
   product: Product;
@@ -14,7 +15,7 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
   const [, setCurrentPrice] = useState<number>(product.basePrice);
   const [, setBidCount] = useState<number>(auctionBidData.totalBid);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
-  const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
+  const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
 
   useEffect(() => {
     const hasBids = auctionBidData.bids?.length > 0;
@@ -30,6 +31,7 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
     <div className="pt-5">
       <div className="mx-auto max-w-[620px] mb-4">
         <SellerProductHeader
+          product={product}
           title={product.title}
           mainCategory={product.category.mainCategory}
           subCategory={product.category.subCategory}
@@ -42,10 +44,21 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
           product={product}
           auctionBidData={auctionBidData}
           isBookmarked={isBookmarked}
-          bookmarkCount={bookmarkCount}
-          onBookmarkToggle={() => {
-            setIsBookmarked((prev) => !prev);
-            setBookmarkCount((prev) => (isBookmarked ? prev - 1 : prev + 1));
+          bookmarkCount={scrapCount}
+          onBookmarkToggle={async () => {
+            try {
+              if (isBookmarked) {
+                await removeScrap(product.auctionId); // ✅ 스크랩 취소 요청
+                setIsBookmarked(false);
+              } else {
+                await addScrap(product.auctionId); // ✅ 스크랩 추가 요청
+                setIsBookmarked(true);
+              }
+              const updatedProduct = await getProductData(product.auctionId);
+              setScrapCount(updatedProduct?.data.scrapCount);
+            } catch (error) {
+              alert('스크랩 처리 중 오류가 발생했습니다.');
+            }
           }}
         />
       </div>

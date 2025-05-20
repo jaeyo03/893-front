@@ -5,28 +5,34 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MyAuctionsProduct } from '@/types/userData';
 import { getAuctionStatus } from './constants/MyPageProduct';
+import { useEffect, useState } from 'react';
+import { getRemainingTime } from './TimeCalculator';
 
 interface Props {
   auctions: MyAuctionsProduct;
 }
 
+
+
 export default function MyAuctionsProductCard({ auctions }: Props) {
   const router = useRouter();
-
   const status = getAuctionStatus(auctions.status);
-  const handleClick = () => {
-    router.push(`/seller/detail/${auctions.auctionId}`);
-  };
 
-  const formattedEndTime = auctions.endTime
-    ? new Date(auctions.endTime).toLocaleTimeString('ko-KR', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      })
-    : '';
-    
+  const [remainingTime, setRemainingTime] = useState<string>(() =>
+    getRemainingTime(auctions.endTime)
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemainingTime(getRemainingTime(auctions.endTime));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [auctions.endTime]);
+
+  const handleClick = () => {
+    router.push(`/detail/${auctions.auctionId}`);
+  };
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -44,7 +50,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
             <p className="font-bold text-[16px]">{auctions.title}</p>
             <div className="text-[14px] mt-2">현재 입찰가</div>
             <div className="text-[16px]">{auctions.bidHighestPrice.toLocaleString()}원</div>
-            <p className="text-xs mt-6">종료 시간: {formattedEndTime}</p>
+            <p className="text-xs mt-6">남은 시간: {remainingTime}</p>
           </div>
           <div className="flex flex-col justify-between items-center ml-4 h-full py-2">
             <span className={`text-xs text-white px-3 py-1 rounded-full ${status.className}`}>
@@ -65,3 +71,4 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
     </div>
   );
 }
+

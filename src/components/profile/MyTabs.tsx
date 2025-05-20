@@ -98,18 +98,18 @@ export default function MyTabs() {
           ))}
         </TabsContent>
         <TabsContent value="auctions" className="p-2">
-          {auctions.map((auctions) => (
-            <MyAuctionsProductCard key={auctions.auctionId} auctions={auctions} />
+          {auctions.map((auction) => (
+            <MyAuctionsProductCard key={auction.auctionId} auctions={auction} />
           ))}
         </TabsContent>
         <TabsContent value="scraps" className="p-2">
           {scraps.map((scrap) => (
-            <MyScrapsProductCard key={scrap.auctionId} scrap={scrap} />
+            <MyScrapsProductCard key = { scrap.auctionId} scrap={scrap} />
           ))}
         </TabsContent>
         <TabsContent value="payments" className="p-2">
-          {payments.map((payments) => (
-            <MyPaymentsProductCard key={payments.auctionId} payments={payments}/>
+          {payments.map((payment) => (
+            <MyPaymentsProductCard key={payment.auctionId} payments={payment}/>
           ))}
         </TabsContent>
       </div>

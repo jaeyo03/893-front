@@ -4,7 +4,8 @@ import { Product, AuctionBidData, Bid } from '@/types/productData';
 import { AuctionState } from '../../AuctionState';
 import BidInteraction from '../../Bid/BidInteraction';
 import ProductHeader from './ProductHeader';
-import { cancelBid, postBid } from '@/lib/api/auction';
+import { addScrap, cancelBid, getProductData, postBid, removeScrap } from '@/lib/api/auction';
+import toast from 'react-hot-toast';
 
 interface ProductInfoProps {
   product: Product;
@@ -21,7 +22,7 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
   const [,setMyBidEmail] = useState<string>();
   const [cancelTimer, setCancelTimer] = useState<number>(0);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
-  const [bookmarkCount, setBookmarkCount] = useState<number>(1);
+  const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
 
   useEffect(() => {
     if (auctionBidData.bids.length > 0) {
@@ -55,36 +56,38 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
 
   // ✅ 입찰하기 눌렀을 때 호출
   const handleBid = async (amount: number) => {
-    if (amount <= currentPrice) return;
-
+    const isInitialBid = amount === product.basePrice;
+    // 최초 입찰이 아닌 경우에만 현재가보다 높은 금액 요구
+    if (!isInitialBid && amount <= currentPrice) return;
+  
     try {
-      // 서버에 입찰 요청 보내기
       const response = await postBid({
-        itemId: product.auctionId,  // 현재 상품의 ID를 itemId로 전달
-        bidPrice: amount,    // 입찰 금액
+        itemId: product.auctionId,
+        bidPrice: amount,
       });
-
-      // 입찰 성공 시 상태 업데이트
+  
       if (response) {
+        const bidRespose = response.data;
         const newBid: Bid = {
-          bidId: response.data.bidId, // 서버 응답에 따라 조정
-          bidderEmail: response.data.bidderEmail, // 응답 값 기반
-          bidPrice: response.data.bidPrice,
-          createdAt: response.data.createdAt,
-          updatedAt: response.data.updatedAt,
+          bidId: bidRespose.bidId,
+          bidderEmail: bidRespose.bidderEmail,
+          bidPrice: bidRespose.bidPrice,
+          createdAt: bidRespose.createdAt,
+          updatedAt: bidRespose.updatedAt,
         };
-        setMyBidId(response.data.bidId);
-        setMyBidEmail(response.data.bidderEmail);
-        setLastBidPrice(currentPrice);  // 이전 입찰 가격을 저장
-        setCurrentPrice(amount);  // 현재가 업데이트
-        setIsHighestBidder(true);  // 최고 입찰자 상태 설정
-        setCancelTimer(300);  // 타이머 5분 설정
-        updateBidData(newBid); // 입찰 내역 업데이트
+        setMyBidId(bidRespose.bidId);
+        setMyBidEmail(bidRespose.bidderEmail);
+        setLastBidPrice(currentPrice);
+        setCurrentPrice(amount);
+        setIsHighestBidder(true);
+        setCancelTimer(60);
+        updateBidData(newBid);
       }
     } catch (error) {
-      alert('입찰에 실패했습니다. 다시 시도해 주세요.');
+      toast.error('입찰에 실패했습니다. 다시 시도해 주세요.');
     }
   };
+  
 
   const handleCancelBid = async () => {
     
@@ -125,21 +128,35 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
             product={product}
             auctionBidData={auctionBidData}
             isBookmarked={isBookmarked}
-            bookmarkCount={bookmarkCount}
-            onBookmarkToggle={() => {
-              setIsBookmarked((prev) => !prev);
-              setBookmarkCount((prev) => (isBookmarked ? prev - 1 : prev + 1));
+            bookmarkCount={scrapCount}
+            onBookmarkToggle={async () => {
+              try {
+                if (isBookmarked) {
+                  await removeScrap(product.auctionId); // ✅ 스크랩 취소 요청
+                  setIsBookmarked(false);
+                } else {
+                  await addScrap(product.auctionId); // ✅ 스크랩 추가 요청
+                  setIsBookmarked(true);
+                }
+                const updatedProduct = await getProductData(product.auctionId);
+                setScrapCount(updatedProduct?.data.scrapCount);
+              } catch (error) {
+                alert('스크랩 처리 중 오류가 발생했습니다.');
+              }
             }}
           />
         </div>
         <hr className="border-gray-300 my-4" />
         <div className="mt-4">
           <BidInteraction
+            product={product}
             currentPrice={currentPrice}  // currentPrice 상태가 제대로 전달되었는지 확인
             onBid={handleBid}
             onCancelBid={handleCancelBid}
             isHighestBidder={isHighestBidder}
             cancelTimer={cancelTimer}
+            endTime={product.endTime} 
+            itemId={product.auctionId}
           />
         </div>
       </div>

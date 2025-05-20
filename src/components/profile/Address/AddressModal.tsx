@@ -14,6 +14,7 @@ type AddressModalProps = {
 
 export default function AddressModal({ isOpen, onClose, onSave }: AddressModalProps) {
   const [form, setForm] = useState<DeliveryAddress>({
+    id: 0,
     name: "",
     phoneNumber: "",
     addressLine1: "",
@@ -68,6 +69,7 @@ export default function AddressModal({ isOpen, onClose, onSave }: AddressModalPr
         onSave(form);  // 성공하면 부모에게 데이터 전달
         onClose();  // 모달 닫기
         setForm({
+          id: 0,
           name: "",
           phoneNumber: "",
           addressLine1: "",

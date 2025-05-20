@@ -4,17 +4,71 @@ import { useState, useEffect } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import { BidInteractionProps } from '@/types/productData';
 import WarningModal from '../WarningModal';
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation';
+
+function numberToKorean(num: number): string {
+  if (num === 0) return "0원";
+
+  const units = [
+    { value: 10 ** 8, label: "억" },
+    { value: 10 ** 4, label: "만" },
+    { value: 1, label: "" },
+  ];
+
+  let result = "";
+
+  for (const unit of units) {
+    const unitValue = Math.floor(num / unit.value);
+    if (unitValue > 0) {
+      result += `${unitValue}${unit.label} `;
+      num %= unit.value;
+    }
+  }
+
+  return result.trim() + "원";
+}
+
+function getRemainTime(endAt: string): number {
+  if (!endAt || isNaN(new Date(endAt).getTime())) return 0;
+  const now = new Date();
+  const end = new Date(endAt);
+  const diff = Math.floor((end.getTime() - now.getTime()) / 1000);
+  return Math.max(diff, 0);
+}
 
 
 export default function BidInteraction({
+  product,
   currentPrice,
   onBid,
   onCancelBid,
   isHighestBidder,
   cancelTimer,
+  endTime,
+  itemId,
 }: BidInteractionProps) {
-  const [bidAmount, setBidAmount] = useState<number>(currentPrice + 100);
+  const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : 0);
   const [show, setShow] = useState(false);
+  const [remainTime, setRemainTime] = useState<number>(getRemainTime(endTime));
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isAuctionEnded = remainTime <= 0;
+
+  const router = useRouter(); // 결제하기 버튼
+
+  const handlePayment = () => {
+    router.push(`/payment?auctionId=${itemId}`);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const timeLeft = getRemainTime(endTime);
+      setRemainTime(timeLeft);
+    }, 1000); // 매초 갱신
+
+    return () => clearInterval(interval);
+  }, [endTime]);
 
   useEffect(() => {
     if (currentPrice > 0) {
@@ -29,24 +83,67 @@ export default function BidInteraction({
     return `${hours}:${min}:${sec}`;
   };
 
-  const convertToKoreanCurrency = (amount: number) => {
-    const man = Math.floor(amount / 10000);
-    const chun = Math.floor((amount % 10000) / 1000);
-    const baek = Math.floor(amount % 1000);
-    let result = '';
-    if (man > 0) result += `${man}만`;
-    if (chun > 0) result += ` ${chun}천`;
-    if (baek > 0) result += `${baek}`;
-    return result.trim() ? `${result.trim()}원` : '';
-  };
-
-  const handleBid = () => {
+  const handleBid = async () => {
     if (isHighestBidder && cancelTimer > 0) return;
-    if (bidAmount % 100 !== 0) return;
-    if (bidAmount >= currentPrice + 100) {
-      onBid(bidAmount);
+    if (isLoading) return;
+    const isInitialBid = currentPrice === product.basePrice;
+  
+    if (bidAmount % 100 !== 0) {
+      toast.error('입찰 금액은 100원 단위여야 합니다.');
+      return;
+    }
+  
+    if (!isInitialBid && bidAmount < currentPrice + 100) {
+      toast.error(`입찰 금액은 현재가보다 최소 100원 이상이어야 합니다.`);
+      return;
+    }
+  
+    if (isInitialBid && bidAmount <= currentPrice) {
+      toast.error(`입찰 금액은 현재가보다 높아야 합니다.`);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await onBid(bidAmount);
+    } catch (error: any) {
+      toast.error(error?.message || '입찰에 실패했습니다.');
     }
   };
+  
+  
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    if (!raw) {
+      setBidAmount(0);
+      return;
+    }
+  
+    const num = Number(raw);
+    if (!Number.isFinite(num)) return;
+  
+    setBidAmount(Math.min(num, 1_000_000_000));
+  };
+
+  const handleCancelBid = async () => {
+    if (isLoading) return; // 중복 클릭 방지
+    setIsLoading(true);
+  
+    try {
+      await onCancelBid();
+      toast.success('입찰이 취소되었습니다.');
+    } catch (error: any) {
+      console.error('입찰 취소 에러:', error);
+      toast.error(error?.message || '입찰 취소에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!itemId || !product || typeof currentPrice !== 'number') {
+    return <div className="text-red-500">잘못된 경매 정보입니다.</div>;
+  }
+  
 
   return (
     <div>
@@ -59,25 +156,24 @@ export default function BidInteraction({
       <div className="flex items-center gap-2 mt-4">
         <span className="text-gray-500">₩</span>
         <input
-          type="number"
-          step={100}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={bidAmount !== 0 ? bidAmount : ''}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value === '') {
-              setBidAmount(0);
-              return;
-            }
-            const numericValue = Number(value.replace(/^0+/, ''));
-            setBidAmount(numericValue);
-          }}
-          className="w-full px-2 py-1 text-right border rounded"
+          onChange={handleInputChange}
+          disabled={isAuctionEnded}
+          className="w-full px-2 py-1 text-right border rounded bg-gray-100"
         />
+
         <button
-          className="w-[72px] h-[32px] text-sm text-white bg-main rounded hover:bg-blue-700"
-          onClick={handleBid}
+          className={`w-[72px] h-[32px] text-sm text-white rounded ${
+            isAuctionEnded
+              ? 'bg-green-600 hover:bg-green-700'
+              : 'bg-main hover:bg-blue-700'
+          }`}
+          onClick={isAuctionEnded ? handlePayment : handleBid}
         >
-          입찰하기
+          {isAuctionEnded ? '결제하기' : '입찰하기'}
         </button>
         <div
           className="relative inline-block"
@@ -93,7 +189,7 @@ export default function BidInteraction({
       </div>
 
       <p className="mt-1 text-xs font-thin text-right text-red mr-[100px]">
-        {bidAmount > 0 ? convertToKoreanCurrency(bidAmount) : ''}
+        {bidAmount > 0 ? numberToKorean(bidAmount) : ''}
       </p>
 
       {isHighestBidder && (
@@ -104,7 +200,7 @@ export default function BidInteraction({
           </div>
           <button
             className="px-3 py-1 text-yellow-600 border border-yellow-600 rounded hover:bg-yellow-200"
-            onClick={onCancelBid}
+            onClick={handleCancelBid}
           >
             취소하기
           </button>

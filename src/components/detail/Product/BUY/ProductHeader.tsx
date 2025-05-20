@@ -22,14 +22,16 @@ export default function ProductHeader({
     <div className="mb-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{title}</h1>
-        <p className="flex items-center gap-1 text-gray-600">
+      </div>
+      <div className="flex items-center justify-between text-xs text-gray-600 mt-1">
+        <p className="font-thin">
+          {mainCategory} &gt; {subCategory} &gt; {lastCategory}
+        </p>
+        <p className="flex items-center gap-1">
           <User className="w-4 h-4" />
           {sellerEmail}
         </p>
       </div>
-      <p className="text-xs font-thin">
-        {mainCategory} &gt; {subCategory} &gt; {lastCategory}
-      </p>
     </div>
   );
 }

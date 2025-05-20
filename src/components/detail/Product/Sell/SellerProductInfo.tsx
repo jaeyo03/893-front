@@ -31,6 +31,7 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
     <div className="pt-5">
       <div className="mx-auto max-w-[620px] mb-4">
         <SellerProductHeader
+          product={product}
           title={product.title}
           mainCategory={product.category.mainCategory}
           subCategory={product.category.subCategory}

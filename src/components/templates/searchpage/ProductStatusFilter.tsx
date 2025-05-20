@@ -24,6 +24,8 @@ export default function ProductStatusFilter() {
     } else { // 체크박스가 해제되면 해당 키를 제거
       params.delete(key)
     }
+
+    params.delete('page')
     
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [router, searchParams])

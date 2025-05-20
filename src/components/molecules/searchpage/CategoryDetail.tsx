@@ -21,6 +21,7 @@ export default function CategoryDetail() {
     
     if (value) {
       params.set('detailCategoryId', value)
+      params.delete('page')
     } else {
       params.delete('detailCategoryId')
     }

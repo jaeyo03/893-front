@@ -41,8 +41,7 @@ export async function getSearchProducts(
         },
       }
     );
-    console.log("여기 되는중")
-    console.log(response)
+
     if (!response.ok) {
       throw new Error("Failed to fetch products");
     }

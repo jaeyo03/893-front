@@ -22,12 +22,14 @@ export default function AuctionStatusFilter() {
     } else { // 체크박스가 해제되면 해당 키를 제거
       params.delete(key)
     }
+
+    params.delete('page')
     
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [router, searchParams])
   
   return (
-    <div className="border-b-[1px] border-divider">
+    <div>
       <div className="flex justify-between items-center px-4 py-2">
         <div className="font-bold text-md">
           경매 진행 여부
@@ -35,8 +37,8 @@ export default function AuctionStatusFilter() {
       </div>
       <div className="px-4 py-2"> 
         <FilterFieldSet>
-          <FilterCheckBox id="isActive" name="isActive" label="시작 전" checked={auctionActive === "true"} onChange={handleAuctionStatusChange}  />
-          <FilterCheckBox id="isPending" name="isPending" label="진행중" checked={auctionPending === "true"} onChange={handleAuctionStatusChange}/>
+          <FilterCheckBox id="isPending" name="isPending" label="시작 전" checked={auctionPending === "true"} onChange={handleAuctionStatusChange}  />
+          <FilterCheckBox id="isActive" name="isActive" label="진행중" checked={auctionActive === "true"} onChange={handleAuctionStatusChange}/>
           <FilterCheckBox id="isCompleted" name="isCompleted" label="경매 완료" checked={auctionCompleted === "true"} onChange={handleAuctionStatusChange}/>
         </FilterFieldSet>
       </div>

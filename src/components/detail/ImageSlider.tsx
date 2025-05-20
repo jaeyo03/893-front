@@ -5,7 +5,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Image,Product } from "@/types/productData";
 
 import AuctionItemCard from "./Product/AuctionItemCard"
-import { Auction } from "@/types/response.types";
 
 
 interface ImageSliderProps{
@@ -17,8 +16,8 @@ interface ImageSliderProps{
 
 
 export default function ImageSlider({product, images} : ImageSliderProps){
-
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const initialIndex = images.findIndex(image => image.imageSeq === 0);
+  const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
   const goToNext = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };

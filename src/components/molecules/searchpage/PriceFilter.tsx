@@ -12,7 +12,7 @@ interface PriceFilterProps {
 }
 
 const formatPrice = (price: number) => {
-  if (!price) return '';
+  if (price === null || price === undefined) return '';
   return price.toLocaleString('ko-KR')
 }
 

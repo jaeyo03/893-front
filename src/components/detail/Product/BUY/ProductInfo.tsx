@@ -139,7 +139,9 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
                   setIsBookmarked(true);
                 }
                 const updatedProduct = await getProductData(product.auctionId);
-                setScrapCount(updatedProduct?.data.scrapCount);
+                if (updatedProduct) {
+                  setScrapCount(updatedProduct.scrapCount); // ✅ 수정된 부분
+                }
               } catch (error) {
                 alert('스크랩 처리 중 오류가 발생했습니다.');
               }

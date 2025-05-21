@@ -41,12 +41,12 @@ export default function DetailPage({ params }: DetailPageProps) {
           getProductData(itemId),
         ]);
 
-        if (!productResponse?.data) {
+        if (!productResponse) {
           notFound();
         }
 
-        setProductData(productResponse.data);
-        if (bidResponse?.data) setBidData(bidResponse.data);
+        setProductData(productResponse);
+        if (bidResponse) setBidData(bidResponse);
       } catch (err) {
         console.error('Fetch error:', err);
         notFound();
@@ -233,7 +233,7 @@ export default function DetailPage({ params }: DetailPageProps) {
       <div style={{ padding: '20px' }}>
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
         <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
-          {relatedItem.length > 0 ? (
+          {Array.isArray(relatedItem) && relatedItem.length > 0 ? (
             relatedItem.map(item => (
               <div key={item.auctionId} className="min-w-[231px]">
                 <RelatedItemCard product={item} />

@@ -84,7 +84,7 @@ export default function BidInteraction({
   };
 
   const handleBid = async () => {
-    if (isHighestBidder && cancelTimer > 0) return;
+    if (cancelTimer > 0) return;
     if (isLoading) return;
     const isInitialBid = currentPrice === product.basePrice;
   
@@ -105,8 +105,11 @@ export default function BidInteraction({
     setIsLoading(true);
     try {
       await onBid(bidAmount);
+      
     } catch (error: any) {
       toast.error(error?.message || '입찰에 실패했습니다.');
+    }finally{
+      setIsLoading(false);
     }
   };
   
@@ -192,10 +195,9 @@ export default function BidInteraction({
         {bidAmount > 0 ? numberToKorean(bidAmount) : ''}
       </p>
 
-      {isHighestBidder && (
+      {cancelTimer > 0 && (
         <div className="flex items-center justify-between p-3 text-yellow-800 bg-yellow-100 rounded-lg">
           <div>
-            <p className="font-medium">현재 최고 입찰자입니다.</p>
             <p className="text-sm">입찰 취소 가능 시간: {formatTime(cancelTimer)}</p>
           </div>
           <button

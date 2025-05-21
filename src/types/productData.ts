@@ -48,6 +48,13 @@ export interface AuctionBidData {
   totalBidder: number;
   bids: Bid[];
   cancelledBids: Bid[];
+  userBids: UserBids[];
+}
+
+export interface UserBids {
+  bidId: number;
+  pidPrice: number;
+  createdAt: string;
 }
 
 export interface AuctionStatsProps {

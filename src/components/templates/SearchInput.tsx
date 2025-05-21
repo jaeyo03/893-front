@@ -8,6 +8,7 @@ import RecentSearchContent from "../molecules/searchinput/RecentSearchContent";
 import RelatedSearchContent from "../molecules/searchinput/RelatedSearchContent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteSearchHistory, getRelatedWords, getUserSearchHistory, postSearchHistory } from "@/lib/api/searchbox";
+import { SearchHistory } from "@/types/response.types";
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
 export default function SearchInput() {
@@ -49,18 +50,58 @@ export default function SearchInput() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
     },
+    onError: (error, id) => {
+      console.error('검색 기록 삭제 실패:', error);
+
+      if (localStorage.getItem('searchHistory')) {
+        let searchHistory : SearchHistory[] = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        searchHistory = searchHistory.filter(item => item.id !== id);
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+      }
+    }
   })
 
   const postMutation = useMutation({
     mutationFn: (keyword: string) => postSearchHistory(keyword),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
+      console.log('검색 기록 저장 응답:', response);
     },
+    onError: (error) => {
+      console.error('검색 기록 저장 실패:', error);
+
+      if (localStorage.getItem('searchHistory')) {
+        const searchHistory : SearchHistory[] = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+        let isIncluded = false;
+
+        for (const item of searchHistory) {
+          if (item.keyword === inputValue) {
+            isIncluded = true;
+            item.createdAt = new Date().toISOString();
+            searchHistory.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+          }
+        }
+
+        if (!isIncluded) {
+          searchHistory.push({
+            id: searchHistory[searchHistory.length - 1].id + 1,
+            keyword: inputValue,
+            createdAt: new Date().toISOString()
+          });
+        }
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+      } else {
+        localStorage.setItem('searchHistory', JSON.stringify([{
+          id: 1,
+          keyword: inputValue,
+          createdAt: new Date().toISOString()
+        }]));
+      }
+    }
   })
   
   const handleInputClick = () => {
-    postMutation.mutate(inputValue);
-
     if (searchStatus === 'CLOSED') {
       setSearchStatus(inputValue.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
     } else {
@@ -99,6 +140,8 @@ export default function SearchInput() {
   }
 
   const handleSearch = (event: React.FormEvent) => {
+    postMutation.mutate(inputValue);
+    
     event.preventDefault();
     if (inputValue.trim()) {
       router.push(`/search?keyword=${inputValue.trim()}`);
@@ -114,6 +157,10 @@ export default function SearchInput() {
     }
   }
 
+  const isSearchContentOpen = searchStatus !== 'CLOSED';
+  const isRecentSearchContentOpen = searchStatus === 'RECENT_RECOMMENDED';
+  const isRelatedSearchContentOpen = searchStatus === 'RELATED';
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (formRef.current && !formRef.current.contains(event.target as Node)) {
@@ -127,15 +174,18 @@ export default function SearchInput() {
     };
   }, []);
 
-  const isSearchContentOpen = searchStatus !== 'CLOSED';
-  const isRecentSearchContentOpen = searchStatus === 'RECENT_RECOMMENDED';
-  const isRelatedSearchContentOpen = searchStatus === 'RELATED';
-
   useEffect(() => {
     if (searchParams.get('keyword')) {
       setInputValue(searchParams.get('keyword') || "");
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    console.log(searchHistory);
+    if (!searchHistory) {
+      
+    }
+  }, [searchHistory]);
 
   return (
     <form 
@@ -176,7 +226,7 @@ export default function SearchInput() {
       {isRecentSearchContentOpen && (
         <RecentSearchContent
           handleDeleteAllSearches={handleDeleteAllSearches}
-          recentSearches={searchHistory?.data || []}
+          recentSearches={searchHistory?.data || JSON.parse(localStorage.getItem('searchHistory') || '[]')}
           handleDeleteSearch={handleDeleteSearch}
           recommendedSearches={recommendedSearches}
           handleCloseSearchContent={handleCloseSearchContent}

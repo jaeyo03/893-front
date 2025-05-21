@@ -30,7 +30,7 @@ export async function getRelatedWords(keyword: string) : Promise<BaseResponse<st
   }
 }
 
-export async function postSearchHistory(keyword: string) {
+export async function postSearchHistory(keyword: string) : Promise<BaseResponse<string>> {
   try {
     const response = await axiosSearchboxInstance.post('/api/search', { keyword : keyword });
     return response.data;

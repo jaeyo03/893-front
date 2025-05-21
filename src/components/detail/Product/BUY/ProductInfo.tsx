@@ -20,37 +20,37 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
   const [isHighestBidder, setIsHighestBidder] = useState<boolean>(false);
   const [myBidId,setMyBidId] = useState<number>(0);
   const [,setMyBidEmail] = useState<string>();
-  const [cancelTimer, setCancelTimer] = useState<number>(0);
+  const [cancelTimer, setCancelTimer] = useState<number | null>(null);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
 
   useEffect(() => {
-    if (auctionBidData.bids.length > 0) {
-      const highestBid = auctionBidData.bids.reduce((max, bid) => {
-        return bid.bidPrice > max ? bid.bidPrice : max;
-      }, 0);
-      setCurrentPrice(Math.max(highestBid, product.basePrice));
-      setLastBidPrice(Math.max(highestBid, product.basePrice)); // 마지막 입찰 가격도 업데이트
+    const firstUserBid = auctionBidData?.userBids?.[0];
+    if (firstUserBid) {
+      const createdAt = new Date(firstUserBid.createdAt).getTime();
+      const now = Date.now();
+      const secondsPassed = Math.floor((now - createdAt) / 1000);
+      const remainingTime = Math.max(60 - secondsPassed, 0);
+      setCancelTimer(remainingTime);
     } else {
-      setCurrentPrice(product.basePrice); // 입찰이 없다면 기본 가격으로 설정
-      setLastBidPrice(product.basePrice);
+      setCancelTimer(null);
     }
-  }, [auctionBidData, product.basePrice]);
+  }, [auctionBidData]);
 
   // 타이머 감소
   useEffect(() => {
-    if (cancelTimer > 0) {
-      const timer = setInterval(() => {
+    if (cancelTimer && cancelTimer > 0) {
+      const interval = setInterval(() => {
         setCancelTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
+          if (prev && prev <= 1) {
+            clearInterval(interval);
             setIsHighestBidder(false);
             return 0;
           }
-          return prev - 1;
+          return prev! - 1;
         });
       }, 1000);
-      return () => clearInterval(timer);
+      return () => clearInterval(interval);
     }
   }, [cancelTimer]);
 
@@ -139,7 +139,9 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
                   setIsBookmarked(true);
                 }
                 const updatedProduct = await getProductData(product.auctionId);
-                setScrapCount(updatedProduct?.data.scrapCount);
+                if (updatedProduct) {
+                  setScrapCount(updatedProduct.scrapCount); // ✅ 수정된 부분
+                }
               } catch (error) {
                 alert('스크랩 처리 중 오류가 발생했습니다.');
               }
@@ -154,7 +156,7 @@ export default function ProductInfo({ product, auctionBidData, updateBidData, re
             onBid={handleBid}
             onCancelBid={handleCancelBid}
             isHighestBidder={isHighestBidder}
-            cancelTimer={cancelTimer}
+            cancelTimer={Number(cancelTimer)}
             endTime={product.endTime} 
             itemId={product.auctionId}
           />

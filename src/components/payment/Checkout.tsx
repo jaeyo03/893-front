@@ -17,18 +17,23 @@ const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
   const [ready, setReady] = useState(false);
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
+  const finalPrice = userOrderInfo?.finalPrice ?? 0;
   const [amount, setAmount] = useState({
     currency: "KRW",
-    value: userOrderInfo?.finalPrice ?? 0, // TODO 추후 예외처리 필요
+    value: finalPrice, // TODO 추후 예외처리 필요
   });
+  
+  console.log(userOrderInfo);
 
   const finalPaymentInfo : TossPaymentRequest = {
-    recipientName: userOrderInfo?.deliveryAddress?.name ?? "",
+    recipientName: userOrderInfo?.customerName ?? "",
     phoneNumber: userOrderInfo?.deliveryAddress?.phoneNumber ?? "",
     addressLine1: userOrderInfo?.deliveryAddress?.addressLine1 ?? "",
     addressLine2: userOrderInfo?.deliveryAddress?.addressLine2 ?? "",
     zipCode: userOrderInfo?.deliveryAddress?.zipCode ?? "",
-    finalPrice: userOrderInfo?.finalPrice ?? 0,
+    itemPrice: userOrderInfo?.itemPrice ?? 0,
+    deliveryFee: userOrderInfo?.deliveryFee ?? 0,
+    finalPrice: finalPrice,
     successUrl: "http://localhost:3000/payment/success",
     failUrl: "http://localhost:3000/payment/fail"  
   }
@@ -102,7 +107,7 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
                  * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
                  */
                 const response = await postPaymentInfo(auctionId, finalPaymentInfo);
-                
+                console.log(response);
                 const orderId = response?.data?.orderId;
                 const orderName = response?.data?.orderName;
                 const customerName = response?.data?.customerName;

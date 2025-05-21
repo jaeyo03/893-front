@@ -6,6 +6,8 @@ export interface TossPaymentRequest {
   addressLine1: string;
   addressLine2?: string;
   zipCode: string;
+  itemPrice: number;
+  deliveryFee: number;
   finalPrice: number;
   successUrl: string;
   failUrl: string;
@@ -27,4 +29,15 @@ export interface TossPaymentConfirmRequest {
   orderId: string;
   amount: number;
   paymentType: PaymentType;
+}
+
+export interface TossPaymentConfirmResponse {
+  paymentKey: string;
+  orderId: string;
+  orderName: string;
+  approvedAt: string;
+  totalAmount: number;
+  customerEmail: string;
+  customerName: string;
+  customerMobilePhone: string;
 }

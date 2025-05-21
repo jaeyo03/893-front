@@ -41,8 +41,8 @@ export default function NotificationContents({
   // 알림 클릭 시: 읽음 처리 + 상세 페이지 이동
   const handleClick = async () => {
     try {
-      console.log("🧾 클릭한 알림 ID:", id);
-      console.log("📦 auctionId 확인:", auctionId);
+      // console.log("🧾 클릭한 알림 ID:", id);
+      // console.log("📦 auctionId 확인:", auctionId);
 
       if (!isRead) {
         await fetch(`/api/notification/read/${id}`, { method: "POST" });
@@ -52,7 +52,8 @@ export default function NotificationContents({
       // 경매 상세 페이지로 이동
       if (auctionId) router.push(`/auction/${auctionId}`);
     } catch (err) {
-      console.error("알림 클릭 실패:", err);
+      // console.error("알림 클릭 실패:", err);
+      alert("알림 클릭 처리에 실패했습니다.");
     }
   };
 

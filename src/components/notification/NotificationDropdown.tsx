@@ -49,16 +49,16 @@ export default function NotificationDropdown({ onClose }: Props) {
       try {
         const res = await axios.get("/notifications");
 
-        console.log("✅ 응답 성공:", res.data);
+        // console.log("✅ 응답 성공:", res.data);
 
-        const list = res.data.data || []; // ✅ 바로 배열로 처리
-        console.log("📦 알림 목록:", list);
+        const list = res?.data?.data || [];
+        // console.log("📦 알림 목록:", list);
 
         const formatted = list.map((n: any): Notification => {
-          const typeList = n.subscriptionTypeList || []; // ✅ 여기만 수정!
+          const typeList = n.subscriptionTypeList || [];
 
           // 디버깅용 로그
-          console.log(`🔔 ID ${n.id} 의 타입 목록:`, typeList);
+          // console.log(`🔔 ID ${n.id} 의 타입 목록:`, typeList);
 
           let category: "구매" | "판매" | "기타" = "기타";
           if (typeList.includes("SELLER")) {
@@ -70,7 +70,7 @@ export default function NotificationDropdown({ onClose }: Props) {
             category = "구매";
           }
 
-          console.log(`📌 분류된 category for ID ${n.id}:`, category);
+          // console.log(`📌 분류된 category for ID ${n.id}:`, category);
 
           return {
             id: n.id,
@@ -85,7 +85,7 @@ export default function NotificationDropdown({ onClose }: Props) {
           };
         });
 
-        console.log("🟢 변환된 알림 목록:", formatted);
+        // console.log("🟢 변환된 알림 목록:", formatted);
 
         setNotifications(formatted);
       } catch (err: any) {
@@ -93,6 +93,7 @@ export default function NotificationDropdown({ onClose }: Props) {
           "💥 알림 불러오기 실패:",
           err.response?.data || err.message
         );
+        alert("알림을 불러오는 데 실패했습니다. 다시 시도해주세요.");
       }
     }
 
@@ -118,7 +119,8 @@ export default function NotificationDropdown({ onClose }: Props) {
         setNotifications((prev) => [newNotification, ...prev]);
       })
       .catch((err) => {
-        console.error("💥 FCM 수신 실패:", err);
+        // console.error("💥 FCM 수신 실패:", err);
+        alert("알림 수신에 실패했습니다. 다시 시도해주세요.");
       });
   }, []);
 
@@ -126,9 +128,10 @@ export default function NotificationDropdown({ onClose }: Props) {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     try {
       await axios.delete(`/notifications/${id}`); // ✅ 경로 수정됨
-      console.log(`🗑️ 알림 ${id} 삭제 완료`);
+      // console.log(`🗑️ 알림 ${id} 삭제 완료`);
     } catch (err) {
-      console.error("❌ 알림 삭제 실패", err);
+      // console.error("❌ 알림 삭제 실패", err);
+      alert("알림 삭제에 실패했습니다. 다시 시도해주세요.");
     }
     setOptionTargetId(null);
   };

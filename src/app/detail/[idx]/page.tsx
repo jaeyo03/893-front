@@ -230,7 +230,7 @@ export default function DetailPage({ params }: DetailPageProps) {
 
       <hr />
 
-      <div style={{ padding: '20px' }}>
+      <div className="p-5">
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
         <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
           {Array.isArray(relatedItem) && relatedItem.length > 0 ? (

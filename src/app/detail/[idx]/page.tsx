@@ -17,8 +17,7 @@ interface DetailPageProps {
   params: { idx: string };
 }
 
-export default function AuctionDetailPage({ params }: DetailPageProps) {
-  console.log("✅ Received params:", params);
+export default function DetailPage({ params }: DetailPageProps) {
   const pathname = usePathname();
   const itemId = Number(params.idx);
 
@@ -26,6 +25,7 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
   const [bidData, setBidData] = useState<AuctionBidData>({
     bids: [],
     cancelledBids: [],
+    userBids: [],
     totalBid: 0,
     auctionId: 1,
     totalBidder: 0,
@@ -56,7 +56,7 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
     };
 
     fetchData();
-  },[pathname, itemId]);
+  }, [pathname, itemId]);
 
   useEffect(() => {
     if (!itemId) return;
@@ -75,44 +75,89 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
 
   useEffect(() => {
     if (!itemId) return;
-  
+
     const eventSource = new EventSource(
       `http://localhost:8080/api/auctions/${itemId}/stream`,
       { withCredentials: true }
     );
-  
+
     eventSource.addEventListener('connect', (event) => {
       console.log('SSE connected:', event.data);
     });
-  
+
     eventSource.addEventListener('bid-update', (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === 'NEW_BID') {
-          updateBidData(data.bid);
-        } else if (data.type === 'CANCEL_BID') {
-          removeBidData(data.bidId);
+    
+        // isCancelled 여부에 따라 분기 처리
+        if (data.isCancelled) {
+          removeBidData(data.bid.bidId);
+        } else {
+          updateBidDataFromSSE(data);
         }
       } catch (error) {
         console.error('SSE parse error:', error);
       }
     });
-  
+    
+
     eventSource.onerror = (err) => {
       console.error('SSE error:', err);
+    };
+
+    return () => {
       eventSource.close();
     };
-  
-    return () => {
-      eventSource.close();  // 컴포넌트 언마운트 시 연결 종료
-    };
   }, [pathname, itemId]);
+
+  const updateBidDataFromSSE = (data: {
+    bid: Bid;
+    currentPrice: number;
+    totalBid: number;
+    totalBidder: number;
+  }) => {
+    const newBid = data.bid;
+  
+    setBidData(prev => {
+      const existingBidIndex = prev.bids.findIndex(b => b.bidId === newBid.bidId);
+      const updatedBids = existingBidIndex >= 0
+        ? prev.bids
+        : [newBid, ...prev.bids];
+  
+      return {
+        ...prev,
+        bids: updatedBids,
+        totalBid: data.totalBid,
+        totalBidder: data.totalBidder,
+      };
+    });
+  
+    setProductData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        currentPrice: data.currentPrice,
+      };
+    });
+  };
   
 
   const updateBidData = (newBid: Bid) => {
     setBidData(prev => {
       const updatedBids = [newBid, ...prev.bids];
-      return { ...prev, bids: updatedBids, totalBid: updatedBids.length };
+      return {
+        ...prev,
+        bids: updatedBids,
+        totalBid: updatedBids.length,
+      };
+    });
+
+    setProductData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        currentPrice: newBid.bidPrice,
+      };
     });
   };
 
@@ -120,10 +165,19 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
     setBidData(prev => {
       const bidToCancel = prev.bids.find(bid => bid.bidId === bidId);
       if (!bidToCancel) return prev;
-
+  
       const updatedBids = prev.bids.filter(bid => bid.bidId !== bidId);
-      const updatedCancelledBids = [bidToCancel, ...(prev.cancelledBids || [])];
-
+      const updatedCancelledBids = [bidToCancel, ...prev.cancelledBids];
+      const newCurrentPrice = updatedBids.length > 0 ? updatedBids[0].bidPrice : 0;
+  
+      setProductData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          currentPrice: newCurrentPrice,
+        };
+      });
+  
       return {
         ...prev,
         bids: updatedBids,
@@ -132,6 +186,7 @@ export default function AuctionDetailPage({ params }: DetailPageProps) {
       };
     });
   };
+  
 
   if (isLoading) return <LoadingSpinner />;
   if (!productData || !bidData) {

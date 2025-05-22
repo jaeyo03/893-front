@@ -11,9 +11,10 @@ import { deleteAuction } from '@/lib/api/auction';
 
 interface Props {
   auctions: MyAuctionsProduct;
+  onDelete: (auctionId: number) => void;
 }
 
-export default function MyAuctionsProductCard({ auctions }: Props) {
+export default function MyAuctionsProductCard({ auctions,onDelete }: Props) {
   const router = useRouter();
   const status = getAuctionStatus(auctions.status);
 
@@ -42,7 +43,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
     try {
       await deleteAuction(auctions.auctionId);
       alert('삭제되었습니다.');
-      router.refresh()
+      onDelete(auctions.auctionId);
     } catch (error) {
       alert('삭제에 실패했습니다.');
       console.error('삭제 실패:', error);
@@ -76,6 +77,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
               {status.label}
             </span>
             <Button
+              type = "button"
               className="mt-auto text-xs tracking-wide h-[32px] border-[1px] border-red text-red bg-white px-2 py-[1px] hover:bg-red hover:text-white shadow-none"
               onClick={handleDelete}
             >

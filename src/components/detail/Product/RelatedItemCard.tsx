@@ -3,6 +3,7 @@
 import {Bookmark} from 'lucide-react';
 import {useState} from 'react';
 import {RelatedItem} from '@/types/productData';
+import { useRouter } from 'next/router';
 
 interface RelatedItemCardProps {
     product: RelatedItem;
@@ -16,18 +17,26 @@ const statusMap: Record<RelatedItem['status'], { label: string; color: string }>
 };
 
 export default function RelatedItemCard({product}: RelatedItemCardProps) {
+    const router = useRouter();
     const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped);
     const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
 
     const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};
 
-    const handleScrapToggle = () => {
+    const handleScrapToggle = (e: React.MouseEvent) => {
+        e.stopPropagation(); // 카드 클릭 이벤트 버블링 방지
         setIsScraped((prev) => !prev);
         setBookmarkCount((prev) => (isScraped ? prev - 1 : prev + 1));
+      };
+    
+    const handleCardClick = () => {
+      router.push(`/detail/${product.auctionId}`); // 이 경로는 실제 라우팅 구조에 맞게 수정
     };
 
     return (
-        <div className="p-2 rounded-xl shadow border w-[231px] bg-white">
+        <div
+          onClick={handleCardClick}
+          className="p-2 rounded-xl shadow-none w-[231px] bg-white">
             <div className="grid grid-cols-1 grid-rows-1">
                 <img
                     src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}

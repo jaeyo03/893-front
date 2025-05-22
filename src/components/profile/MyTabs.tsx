@@ -59,6 +59,9 @@ export default function MyTabs() {
     }
   }, [selectedTab]);
 
+  const handleDelete = (auctionId: number) => {
+    setAuctions((prev) => prev.filter(item => item.auctionId !== auctionId));
+  };
 
   return (
     <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
@@ -99,7 +102,10 @@ export default function MyTabs() {
         </TabsContent>
         <TabsContent value="auctions" className="p-2">
           {auctions.map((auction) => (
-            <MyAuctionsProductCard key={auction.auctionId} auctions={auction} />
+            <MyAuctionsProductCard 
+              key={auction.auctionId} 
+              auctions={auction} 
+              onDelete={handleDelete}/>
           ))}
         </TabsContent>
         <TabsContent value="scraps" className="p-2">

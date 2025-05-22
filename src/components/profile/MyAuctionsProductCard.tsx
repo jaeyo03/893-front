@@ -50,7 +50,11 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
             <p className="font-bold text-[16px]">{auctions.title}</p>
             <div className="text-[14px] mt-2">현재 입찰가</div>
             <div className="text-[16px]">{auctions.bidHighestPrice.toLocaleString()}원</div>
-            <p className="text-xs mt-6">남은 시간: {remainingTime}</p>
+            <p className="text-xs mt-6">
+              {remainingTime === '종료됨' || remainingTime === '0시간 0분 0초'
+                ? '종료됨'
+                : `남은 시간: ${remainingTime}`}
+            </p>
           </div>
           <div className="flex flex-col justify-between items-center ml-4 h-full py-2">
             <span className={`text-xs text-white px-3 py-1 rounded-full ${status.className}`}>

@@ -102,16 +102,19 @@ export default function BidInteraction({
       toast.error(`입찰 금액은 현재가보다 높아야 합니다.`);
       return;
     }
+  
     setIsLoading(true);
     try {
+      // 서버에 입찰 요청만 보내고, 상태는 SSE로 갱신되기를 기다림
       await onBid(bidAmount);
-      
+      toast.success('입찰이 성공적으로 처리되었습니다.');
     } catch (error: any) {
       toast.error(error?.message || '입찰에 실패했습니다.');
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
+  
   
   
 

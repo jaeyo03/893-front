@@ -227,7 +227,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
         onSubmit={(e) => e.preventDefault()}
       >
         {/* 이미지 */}
-        <div ref={refs.images} className="flex flex-col pb-[79px]">
+        <div ref={refs.images} className="flex flex-col pb-[55px]">
           <ImageUploader
             value={images}
             onChange={setImages}

@@ -214,7 +214,7 @@ export default function DetailPage({ params }: DetailPageProps) {
               <ProductInfo
                 product={productData}
                 auctionBidData={bidData}
-                updateBidData={updateBidData}
+                updateBidData={()=>{}}
                 removeBidData={removeBidData}
               />
             )}

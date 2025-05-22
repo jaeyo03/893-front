@@ -45,10 +45,10 @@ export default function MyScrapsProductCard({ scrap }: Props) {
     <div className="flex justify-center w-full">
       <Card
         onClick={handleClick}
-        className="p-4 mb-4 w-full !h-[166px] border-2 border-checkbox"
+        className="p-4 mb-4 w-full !h-[156px] border-width: 1.2px; border-checkbox cursor-pointer shadow-none"
       >
         <div className="flex items-center h-full">
-          <div className="w-24 h-24 bg-gray-100 mr-4" />
+          <div className="w-32 h-32 bg-gray-100 mr-4" />
           <div className="flex-1">
             <p className="font-bold text-[16px]">{scrap.title}</p>
 
@@ -59,7 +59,11 @@ export default function MyScrapsProductCard({ scrap }: Props) {
                 className={`w-5 h-5 ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
               />
             </button>
-            <p className="text-xs mt-1">종료 시간: {remainingTime}</p>
+            <p className="text-xs mt-4">
+              {remainingTime === '종료됨' || remainingTime === '0시간 0분 0초'
+                ? '종료됨'
+                : `남은 시간: ${remainingTime}`}
+            </p>
           </div>
 
           <div className="flex flex-col justify-between items-center ml-4 h-full py-2">

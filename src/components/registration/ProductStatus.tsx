@@ -10,8 +10,8 @@ type ProductStatusProps = {
 
 export default function ProductStatus({ value, onChange }: ProductStatusProps) {
   return (
-    <div className="flex flex-col w-full max-w-md gap-6">
-      <label className="text-resgisterchecktext font-thin font-[15px]">
+    <div className="flex flex-col w-full max-w-md gap-4">
+      <label className="text-resgisterchecktext font-normal font-[15px]">
         상품상태
       </label>
       <div className="flex flex-col gap-2">

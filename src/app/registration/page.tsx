@@ -158,7 +158,7 @@ export default function Registration() {
         className="flex flex-col gap-4"
         onSubmit={(e) => e.preventDefault()}
       >
-        <div ref={refs.images} className="flex flex-col pb-[79px]">
+        <div ref={refs.images} className="flex flex-col pb-[55px]">
           <ImageUploader
             value={images}
             onChange={setImages}

@@ -43,12 +43,12 @@ export default function MyBidsProductCard({ myBidProduct }: Props) {
     <div className="flex flex-col items-center w-full">
           <Card
             onClick={handleClick}
-            className="p-4 mb-4 w-full !h-[166px] border-2 border-checkbox">
+            className="p-4 mb-4 w-full !h-[156px] border-width: 1.2px; border-checkbox cursor-pointer shadow-none">
             <div className="flex items-center h-full">
               <img 
                 src={`http://localhost:8080${myBidProduct.mainImageUrl}`} 
                 alt={myBidProduct.title} 
-                className="w-24 h-24 object-cover mr-4" 
+                className="w-32 h-32 object-cover mr-4" 
               />
               <div className="flex-1">
                 <p className="font-bold text-[16px]">{myBidProduct.title}</p>
@@ -68,7 +68,7 @@ export default function MyBidsProductCard({ myBidProduct }: Props) {
                     className={`w-5 h-5 ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
                   />
                 </button>
-                <p className="text-xs mt-6">
+                <p className="text-xs mt-2">
                   {remainingTime === '종료됨' || remainingTime === '0시간 0분 0초'
                     ? '종료됨'
                     : `남은 시간: ${remainingTime}`}

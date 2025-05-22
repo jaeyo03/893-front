@@ -175,7 +175,7 @@ export default function UserProfile() {
   };
 
   return (
-    <Card className="w-full p-4 mb-4 relative mx-auto">
+    <Card className="w-full p-4 mb-4 relative mx-auto shadow-none">
       <div className="flex">
         {/* 좌측 아바타 */}
         <div className="mr-6 flex flex-col items-center w-24">

@@ -7,12 +7,11 @@ import { MyAuctionsProduct } from '@/types/userData';
 import { getAuctionStatus } from './constants/MyPageProduct';
 import { useEffect, useState } from 'react';
 import { getRemainingTime } from './TimeCalculator';
+import { deleteAuction } from '@/lib/api/auction';
 
 interface Props {
   auctions: MyAuctionsProduct;
 }
-
-
 
 export default function MyAuctionsProductCard({ auctions }: Props) {
   const router = useRouter();
@@ -32,6 +31,22 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
 
   const handleClick = () => {
     router.push(`/detail/${auctions.auctionId}`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    const confirmDelete = window.confirm('정말 삭제하시겠습니까?');
+    if (!confirmDelete) return;
+
+    try {
+      await deleteAuction(auctions.auctionId);
+      alert('삭제되었습니다.');
+      router.refresh()
+    } catch (error) {
+      alert('삭제에 실패했습니다.');
+      console.error('삭제 실패:', error);
+    }
   };
 
   return (
@@ -58,10 +73,7 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
             </span>
             <Button
               className="mt-auto text-xs border-2 border-red text-red bg-white px-2 py-1 hover:bg-red hover:text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                // TODO: 삭제 처리
-              }}
+              onClick={handleDelete}
             >
               삭제하기
             </Button>
@@ -71,4 +83,3 @@ export default function MyAuctionsProductCard({ auctions }: Props) {
     </div>
   );
 }
-

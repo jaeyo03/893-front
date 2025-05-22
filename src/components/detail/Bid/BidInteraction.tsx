@@ -153,7 +153,7 @@ export default function BidInteraction({
       <div className="flex items-center justify-between mt-4 mb-1">
         <p className="font-medium text-black text-sl">
           입찰 금액
-          <span className="text-xs font-thin text-red"> ※ 최소 입찰 단위 100원</span>
+          <span className="text-xs ml-2 font-thin text-red"> ※ 최소 입찰 단위 100원</span>
         </p>
       </div>
       <div className="flex items-center gap-2 mt-4">

@@ -195,15 +195,15 @@ export default function DetailPage({ params }: DetailPageProps) {
 
   return (
     <>
-      <div className="flex justify-between p-5">
-        <div className="flex-1 mr-5">
+      <div className="flex justify-between p-2">
+        <div className="flex-1 mr-6 flex flex-col gap-6">
           <ImageSlider key={productData.auctionId} images={productData.images} product={productData} />
           <GoodsInfo
             description={productData.description}
             itemCondition={productData.itemCondition}
           />
         </div>
-        <div className="flex-1 max-w-[620px]">
+        <div className="flex-1 ml-6 max-w-[620px]">
           <div className="mb-4">
             {productData.isSeller ? (
               <SellerProductInfo

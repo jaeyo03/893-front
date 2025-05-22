@@ -35,7 +35,7 @@ export default function GoodsInfo({ description, itemCondition }: GoodsInfoProps
   };
 
   return (
-    <div className="pt-10 px-5">
+    <div className="pl-6 pt-6">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium text-gray-700">상품 상세 정보</h2>
         <span

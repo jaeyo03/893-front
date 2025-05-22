@@ -8,17 +8,21 @@ interface BidHistoryProps {
 export default function BidHistory({ bidData, cancelData }: BidHistoryProps) {
   const renderTable = (data: Bid[], title: string, isCancelled: boolean) => (
     <div className="mb-6">
-      <h2 className={`pr-4 mb-2 text-lg text-end ${isCancelled ? 'bg-cancel' : 'bg-detailbid'}`}>
+      <h2
+        className={`pr-4 mb-2 pt-1 pb-1 text-lg text-end font-semibold tracking-wide rounded-[3px] ${
+          isCancelled ? 'bg-cancel' : 'bg-detailbid'
+        }`}
+      >
         {title}
       </h2>
       <div className="max-h-64 min-h-[160px] overflow-y-auto border rounded-md">
         <table className="w-full text-sm text-center table-fixed">
           <thead className="text-gray-600 border-b sticky top-0 bg-white z-10">
             <tr>
-              <th className="w-[10%] px-1 py-2">순위</th>
-              <th className="w-[40%] px-1 py-2">이메일</th>
-              <th className="w-[20%] px-1 py-2">입찰가</th>
-              <th className="w-[30%] px-1 py-2">시간</th>
+              <th className="w-[10%] px-1 py-2 font-semibold tracking-wide">순위</th>
+              <th className="w-[40%] px-1 py-2 font-semibold tracking-wide">이메일</th>
+              <th className="w-[20%] px-1 py-2 font-semibold tracking-wide">입찰가</th>
+              <th className="w-[30%] px-1 py-2 font-semibold tracking-wide">시간</th>
             </tr>
           </thead>
           <tbody>

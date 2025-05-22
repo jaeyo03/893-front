@@ -113,3 +113,15 @@ export const removeScrap = async (id:number) => {
     throw error;
   }
 };
+
+export const deleteAuction = async ( auctionId: number ) => {
+  try {
+    const response = await axios.delete(`${API_URL}/${auctionId}`,
+      {withCredentials:true}
+    );
+    return response.data;
+  } catch(error) {
+    console.error("삭제 실패: ", error);
+    throw error;
+  }
+}

@@ -1,5 +1,5 @@
 import { OrderResponse, BaseResponse } from "@/types/response.types";
-import { TossPaymentConfirmRequest, TossPaymentRequest, TossPaymentResponse } from "@/types/payment.types";
+import { TossPaymentConfirmRequest, TossPaymentConfirmResponse, TossPaymentRequest, TossPaymentResponse } from "@/types/payment.types";
 import axios from "axios";
 
 // 서버 컴포넌트 버전
@@ -55,7 +55,7 @@ export async function postPaymentInfo(auctionId : string, paymentRequest : TossP
   }
 }
 
-export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<unknown>>{ // TODO 타입 추가
+export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<TossPaymentConfirmResponse | null>>{
   try {
     const response = await axiosInstance.post(`/api/payments/confirm`, paymentConfirmRequest);
     return response.data;

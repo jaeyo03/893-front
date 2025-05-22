@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import LoadingState from "@/components/payment/LoadingState";
 import CompletedState from "@/components/payment/CompletedState";
-import { PaymentResponse } from "@/types/response.types";
-import { PaymentType } from "@/types/payment.types";
+import { PaymentType, TossPaymentConfirmResponse } from "@/types/payment.types";
 import { postPaymentConfirm } from "@/lib/api/order";
 import { useMutation } from "@tanstack/react-query";
 
@@ -48,21 +47,20 @@ export default function PaySuccess({ paymentKey, orderId, amount, paymentType } 
     confirmPayment();
   }, [confirmPayment]);
   
-  const mockPaymentResponse: PaymentResponse = {
+  const mockPaymentResponse: TossPaymentConfirmResponse = {
+    paymentKey: "PAY20250515123456",
     orderId: "ORD20250515123456",
     orderName: "테스트 상품 결제",
-    successUrl: "https://example.com/payment/success",
-    failUrl: "https://example.com/payment/fail",
+    approvedAt: "2025-05-15T12:34:56Z",
+    totalAmount: 25000,
     customerEmail: "hong.gildong@example.com",
     customerName: "홍길동",
     customerMobilePhone: "010-1234-5678",
-    finalPrice: 25000,
   };
 
   return (
     <div className="mt-10">
       {isConfirmed ? (
-        // TODO 추후 payment 응답 연결
         <CompletedState paymentData={paymentResponse?.data || mockPaymentResponse} />
       ) : (
         <LoadingState />

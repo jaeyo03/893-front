@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/select"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
+import { AuctionCategory } from "@/types/productData";
 
-export default function CategoryDetail() {
+export default function CategoryDetail({ categoryList }: { categoryList: AuctionCategory[] | null }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get('detailCategoryId') || ""
@@ -38,21 +39,9 @@ export default function CategoryDetail() {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {currentCategorySub === "2" && (
-              <>
-                <SelectItem value="3">스마트폰</SelectItem>
-              </>
-            )}
-            {currentCategorySub === "5" && (
-              <>
-                <SelectItem value="chair">의자</SelectItem>
-              </>
-            )}
-            {currentCategorySub === "7" && (
-              <>
-                <SelectItem value="23">아우터</SelectItem>
-              </>
-            )}
+            {categoryList?.filter((category) => category.parentId === parseInt(currentCategorySub || "0")).map((category) => (
+              <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
+            ))}
           </SelectGroup>
         </SelectContent>
       </Select>

@@ -2,8 +2,8 @@ import { CheckCircle, Package, Home, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { TossPaymentConfirmResponse } from "@/types/payment.types";
 
-import { PaymentResponse } from "@/types/response.types";
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("ko-KR", {
     style: "currency",
@@ -13,7 +13,7 @@ function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
-export default function CompletedState({ paymentData }: { paymentData: PaymentResponse }) {
+export default function CompletedState({ paymentData }: { paymentData: TossPaymentConfirmResponse }) {
   if (!paymentData) return null
 
   return (
@@ -48,7 +48,7 @@ export default function CompletedState({ paymentData }: { paymentData: PaymentRe
               <div className="flex items-center gap-4 py-3 border-b">
                 <div className="flex-1">
                   <h4>{paymentData.orderName}</h4>
-                  <p className="text-main font-semibold mt-1">{formatCurrency(paymentData.finalPrice)}</p>
+                  <p className="text-main font-semibold mt-1">{formatCurrency(paymentData.totalAmount)}</p>
                 </div>
               </div>
             </div>

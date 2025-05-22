@@ -4,8 +4,9 @@ import CategoryMain from "@/components/molecules/searchpage/CategoryMain"
 import CategorySub from "@/components/molecules/searchpage/CategorySub"
 import CategoryDetail from "@/components/molecules/searchpage/CategoryDetail"
 import { useSearchParams } from "next/navigation"
+import { AuctionCategory } from "@/types/productData";
 
-export default function CategoryFilter() {
+export default function CategoryFilter({ categoryList }: { categoryList: AuctionCategory[] | null }) {
   const searchParams = useSearchParams()
   const currentCategoryMain = searchParams.get('mainCategoryId')
   const currentCategorySub = searchParams.get('subCategoryId')
@@ -18,9 +19,9 @@ export default function CategoryFilter() {
         </label>
       </div>
       <div className="grid gap-2 px-4 py-2">
-        <CategoryMain/>
-        {currentCategoryMain && <CategorySub/>}
-        {currentCategorySub && <CategoryDetail/>}
+        <CategoryMain categoryList={categoryList}/>
+        {currentCategoryMain && <CategorySub categoryList={categoryList}/>}
+        {currentCategorySub && <CategoryDetail categoryList={categoryList}/>}
       </div>
     </div>
   )

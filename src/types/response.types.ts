@@ -29,17 +29,6 @@ export interface SearchListResponse {
   auctionList: Auction[];
 }
 
-export interface PaymentResponse {
-  orderId: string;
-  orderName: string;
-  successUrl: string;
-  failUrl: string;
-  customerEmail: string;
-  customerName: string;
-  customerMobilePhone: string;
-  finalPrice: number;
-}
-
 interface DeliveryAddress{
   id: number;
   name: string;
@@ -51,12 +40,12 @@ interface DeliveryAddress{
 }
 
 export interface OrderResponse {
-  orderId: string;
   auctionId: number;
   auctionTitle: string;
   auctionThumbnail: string;
-  finalPrice: number;
+  customerName: string;
   deliveryAddress: DeliveryAddress;
-  paymentType: string;
-  paymentStatus: string;
+  deliveryFee: number;
+  finalPrice: number;
+  itemPrice: number;
 }

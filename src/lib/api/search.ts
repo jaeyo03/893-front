@@ -1,3 +1,4 @@
+import { AuctionCategory } from "@/types/productData";
 import {BaseResponse, SearchListResponse} from "@/types/response.types";
 
 function makeSearchParams(
@@ -77,8 +78,7 @@ export async function getRelatedWords(
   
   try {
     const encodedKeyword = encodeURIComponent(keyword);
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
       {
         cache: "no-store",
         headers: {
@@ -95,6 +95,23 @@ export async function getRelatedWords(
     return {
       data: [],
       message: "Failed to fetch related words",
+      code: 500,
+    };
+  }
+}
+
+export async function getCategoryList() : Promise<BaseResponse<AuctionCategory[] | null>> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch category list");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching category list:", error);
+    return {
+      data: null,
+      message: "Failed to fetch category list",
       code: 500,
     };
   }

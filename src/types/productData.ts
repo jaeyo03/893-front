@@ -87,3 +87,10 @@ export interface RelatedItem {
   scrapCount: number;
   isScrapped: boolean;
 }
+
+export interface AuctionCategory {
+  id : number;
+  name : string;
+  parentId : number | null;
+  childrendIdList : number[];
+}

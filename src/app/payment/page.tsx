@@ -26,7 +26,7 @@ export default async function Payment({ searchParams } : { searchParams : { [key
           phoneNumber={userOrderData?.data?.deliveryAddress?.phoneNumber ?? ""}
         />
         {/*<PaymentMethodSelector/>*/}
-        <FinalPaymentSummary productPrice={userOrderData?.data?.finalPrice ?? 0} deliveryFee={2500}/>
+        <FinalPaymentSummary productPrice={userOrderData?.data?.itemPrice ?? 0} deliveryFee={userOrderData?.data?.deliveryFee ?? 0}/>
         <Checkout
           userOrderInfo={userOrderData?.data}
           auctionId={auctionId as string}

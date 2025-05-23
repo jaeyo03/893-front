@@ -67,7 +67,7 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   const handleLogout = async () => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/auth/logout`,
       {
         method: "POST",
         credentials: "include",

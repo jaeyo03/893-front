@@ -212,7 +212,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
         }
       );
       alert("경매 수정이 완료되었습니다!");
-      router.push(`/buyer/detail/${auctionId}`);
+      router.push(`/detail/${auctionId}`);
       setIsModalOpen(false);
     } catch (err) {
       console.error("❌ PATCH 실패", err);

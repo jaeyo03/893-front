@@ -110,7 +110,7 @@ export default function CategorySelector({ value, onChange }: Props) {
   }, [step1, step2, step3]);
 
   return (
-    <div className="flex w-full max-w-[1280px] h-[240px] border-none rounded overflow-hidden text-resgisterchecktext font-thin text-[13.125px]">
+    <div className="flex w-full max-w-[1280px] h-[240px] border-none rounded overflow-hidden text-resgisterchecktext font-normal text-[13.125px]">
       {/* Step 1 */}
       <div
         className={`w-1/3 overflow-y-auto border border-solid rounded ${

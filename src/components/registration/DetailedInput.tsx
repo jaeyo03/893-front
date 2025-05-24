@@ -30,7 +30,7 @@ export default function DetailedInput({
         value={value}
         onChange={handleChange}
         placeholder={`- 상품명(브랜드)\n- 구매 시기 (년, 월, 일)\n- 착용 기간\n- 오염 여부\n- 하자 여부\n* 실제 촬영한 사진과 함께 상세 정보를 입력해주세요.`}
-        className="pl-[16px] pt-[55px] border rounded-md border-registerline  font-thin focus:outline-none focus:ring-2 focus:ring-main text-resgistersubtext resize-none h-[220px] overflow-hidden"
+        className="pl-[16px] pt-[35px] border rounded-md border-registerline  font-thin focus:outline-none focus:ring-2 focus:ring-main text-black resize-none h-[220px] overflow-hidden"
       />
 
       {/* 글자 수 카운터 */}

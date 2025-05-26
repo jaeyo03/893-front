@@ -16,23 +16,28 @@ export interface Product {
   images: Image[];
 }
 
-export interface Image{
+export interface Image {
   originalName: string;
   storeName: string;
   url: string;
-  imageSeq:number;
+  imageSeq: number;
 }
 
-export interface Category{
-  id :number;
-  mainCategory:string;
-  subCategory:string;
-  detailCategory:string;
+export interface Category {
+  id: number;
+  mainCategory: string;
+  subCategory: string;
+  detailCategory: string;
 }
 
-export type ItemCondition = 'brand_new' | 'like_new' | 'gently_used' | 'heavily_used' | 'damaged';
+export type ItemCondition =
+  | "brand_new"
+  | "like_new"
+  | "gently_used"
+  | "heavily_used"
+  | "damaged";
 
-export type Status = 'pending' | 'active' | 'completed' | 'cancelled';
+export type Status = "pending" | "active" | "completed" | "cancelled";
 
 export interface Bid {
   bidId: number;
@@ -63,6 +68,7 @@ export interface AuctionStatsProps {
   isBookmarked: boolean;
   bookmarkCount: number;
   onBookmarkToggle: () => void;
+  isLoggedIn: boolean;
 }
 
 export interface BidInteractionProps {
@@ -74,6 +80,8 @@ export interface BidInteractionProps {
   cancelTimer: number;
   endTime: string; // ✅ 경매 종료까지 남은 시간 (초 단위)
   itemId: number;
+  isLoggedIn: boolean; // ✅ 추가
+  isSeller: boolean;
 }
 
 export interface RelatedItem {
@@ -89,8 +97,8 @@ export interface RelatedItem {
 }
 
 export interface AuctionCategory {
-  id : number;
-  name : string;
-  parentId : number | null;
-  childrendIdList : number[];
+  id: number;
+  name: string;
+  parentId: number | null;
+  childrendIdList: number[];
 }

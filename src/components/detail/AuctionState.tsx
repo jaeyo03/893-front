@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { Bookmark, Timer } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { AuctionStatsProps } from '@/types/productData';
-import toast from 'react-hot-toast';
+import { Bookmark, Timer } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AuctionStatsProps } from "@/types/productData";
+import toast from "react-hot-toast";
 
 export function AuctionState({
   product,
   auctionBidData,
   isBookmarked = false,
   bookmarkCount = 0,
-  onBookmarkToggle
+  onBookmarkToggle,
+  isLoggedIn,
 }: AuctionStatsProps) {
   const { basePrice, startTime, endTime } = product;
 
@@ -32,7 +33,7 @@ export function AuctionState({
     const end = new Date(endTime).getTime();
 
     if (isNaN(start) || isNaN(end)) {
-      console.error('잘못된 날짜 형식입니다:', { startTime, endTime });
+      console.error("잘못된 날짜 형식입니다:", { startTime, endTime });
       return;
     }
 
@@ -51,19 +52,24 @@ export function AuctionState({
 
   // 시간 포맷
   const formatTime = (seconds: number) => {
-    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const sec = String(seconds % 60).padStart(2, '0');
+    const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const sec = String(seconds % 60).padStart(2, "0");
     return `${hours}:${min}:${sec}`;
   };
 
   // 북마크 클릭
   const handleBookmarkClick = async () => {
+    if (!isLoggedIn) {
+      //  비로그인 시 차단
+      toast.error("로그인 후 이용 가능합니다.");
+      return;
+    }
     try {
       await onBookmarkToggle();
     } catch (error: any) {
-      console.error('북마크 토글 실패:', error);
-      toast.error('북마크 변경에 실패했습니다.');
+      console.error("북마크 토글 실패:", error);
+      toast.error("북마크 변경에 실패했습니다.");
     }
   };
 
@@ -72,11 +78,13 @@ export function AuctionState({
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-sm text-black">현재가</p>
-          <p className="text-xl font-bold text-main">₩{currentPrice.toLocaleString()}</p>
+          <p className="text-xl font-bold text-main">
+            ₩{currentPrice.toLocaleString()}
+          </p>
         </div>
         <div className="w-1/2">
           <p className="text-sm text-black">
-            {isBeforeStart ? '시작까지 남은 시간' : '종료까지 남은 시간'}
+            {isBeforeStart ? "시작까지 남은 시간" : "종료까지 남은 시간"}
           </p>
           <p className="flex items-center gap-1 text-xl font-bold text-blue-600">
             <Timer className="w-5 h-5" />
@@ -97,9 +105,23 @@ export function AuctionState({
       </div>
 
       <div className="flex items-center gap-1 text-gray-700">
-        <button onClick={handleBookmarkClick} aria-label="북마크 토글">
+        <button
+          onClick={handleBookmarkClick}
+          aria-label="북마크 토글"
+          className={
+            !isLoggedIn
+              ? "cursor-not-allowed opacity-50 pointer-events-none"
+              : ""
+          }
+        >
           <Bookmark
-            className={`w-5 h-5 ${isBookmarked ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}`}
+            className={`w-5 h-5 ${
+              !isLoggedIn
+                ? "text-gray-300" // ✅ 수정됨: 비로그인 상태에서 회색 처리
+                : isBookmarked
+                ? "text-black fill-black"
+                : "text-gray-400 hover:text-black hover:fill-black"
+            }`}
           />
         </button>
         <span className="text-sm">{bookmarkCount}</span>

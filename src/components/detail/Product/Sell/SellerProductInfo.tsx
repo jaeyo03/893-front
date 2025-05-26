@@ -1,17 +1,20 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Product, AuctionBidData } from '@/types/productData';
-import { AuctionState } from '../../AuctionState';
-import SellerProductHeader from './SellerProductHeader';
-import { addScrap, getProductData, removeScrap } from '@/lib/api/auction';
+import { useEffect, useState } from "react";
+import { Product, AuctionBidData } from "@/types/productData";
+import { AuctionState } from "../../AuctionState";
+import SellerProductHeader from "./SellerProductHeader";
+import { addScrap, getProductData, removeScrap } from "@/lib/api/auction";
 
 interface ProductInfoProps {
   product: Product;
   auctionBidData: AuctionBidData;
 }
 
-export default function SellerProductInfo({ product, auctionBidData }: ProductInfoProps) {
+export default function SellerProductInfo({
+  product,
+  auctionBidData,
+}: ProductInfoProps) {
   const [, setCurrentPrice] = useState<number>(product.basePrice);
   const [, setBidCount] = useState<number>(auctionBidData.totalBid);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(product.isScrap);
@@ -20,7 +23,8 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
   useEffect(() => {
     const hasBids = auctionBidData.bids?.length > 0;
     const latestBid = hasBids
-      ? [...auctionBidData.bids].sort((a, b) => b.bidPrice - a.bidPrice)[0].bidPrice
+      ? [...auctionBidData.bids].sort((a, b) => b.bidPrice - a.bidPrice)[0]
+          .bidPrice
       : product.basePrice;
 
     setCurrentPrice(latestBid);
@@ -55,11 +59,12 @@ export default function SellerProductInfo({ product, auctionBidData }: ProductIn
                 setIsBookmarked(true);
               }
               const updatedProduct = await getProductData(product.auctionId);
-              setScrapCount(updatedProduct?.data.scrapCount);
+              setScrapCount(updatedProduct?.scrapCount ?? scrapCount);
             } catch (error) {
-              alert('스크랩 처리 중 오류가 발생했습니다.');
+              alert("스크랩 처리 중 오류가 발생했습니다.");
             }
           }}
+          isLoggedIn={true} // ✅ (임시) 판매자 페이지이므로 항상 로그인 상태로 가정? 수정해야됨 <-- 이 부분은 실제 로그인 상태에 따라 변경 필요 -->
         />
       </div>
     </div>

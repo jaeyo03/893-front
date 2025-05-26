@@ -4,7 +4,7 @@ import { AuctionBidData, Product,RelatedItem } from "@/types/productData";
 
 const API_URL = "http://localhost:8080/api/auctions";
 
-export async function getBidData(itemId: number): Promise<AuctionBidData | null> {
+export async function getBidData(itemId: string): Promise<AuctionBidData | null> {
   try {
     const response = await axios.get(
       `${API_URL}/${itemId}/bids`,
@@ -17,14 +17,14 @@ export async function getBidData(itemId: number): Promise<AuctionBidData | null>
   }
 }
 
-export const getProductData = async (itemId: number): Promise<Product | null> => {
+export const getProductData = async (itemId: string): Promise<Product | null> => {
   try {
     const response = await axios.get(`${API_URL}/${itemId}`,
       {withCredentials: true }
     );
     return response.data?.data;
   } catch (error) {
-    console.error('❌ 상품 데이터를 불러오는 중 오류 발생:', error);
+    console.error('상품 데이터를 불러오는 중 오류 발생:', error);
     return null;
   }
 };
@@ -77,7 +77,7 @@ export const cancelBid = async ({
 };
 
 
-export const getRelatedItem = async (auctionId:number) => {
+export const getRelatedItem = async (auctionId:string) => {
   try {
     const response = await axios.get(`${API_URL}/${auctionId}/related`,{
       withCredentials:true

@@ -15,72 +15,27 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { notFound, usePathname } from "next/navigation";
 
 interface DetailPageClientProps {
-  params: { idx: string };
+  initialBidData: AuctionBidData | null;
+  initialProductData: Product | null;
   isLoggedIn: boolean;
+  relatedItem: RelatedItem[];
 }
 
 export default function DetailPageClient({
-  params,
+  initialBidData,
+  initialProductData,
   isLoggedIn,
+  relatedItem,
 }: DetailPageClientProps) {
+  if (!initialProductData || !initialBidData || !relatedItem) return notFound();
+
   const pathname = usePathname();
-  const itemId = Number(params.idx);
-
-  const [productData, setProductData] = useState<Product>();
-  const [bidData, setBidData] = useState<AuctionBidData>({
-    bids: [],
-    cancelledBids: [],
-    userBids: [],
-    totalBid: 0,
-    auctionId: 1,
-    totalBidder: 0,
-  });
-  const [relatedItem, setRelatedItem] = useState<RelatedItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [productData, setProductData] = useState<Product>(initialProductData);
+  const [bidData, setBidData] = useState<AuctionBidData>(initialBidData);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bidResponse, productResponse] = await Promise.all([
-          getBidData(itemId),
-          getProductData(itemId),
-        ]);
-
-        if (!productResponse) notFound();
-
-        setProductData(productResponse);
-        if (bidResponse) setBidData(bidResponse);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        notFound();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [pathname, itemId]);
-
-  useEffect(() => {
-    if (!itemId) return;
-
-    const fetchRelated = async () => {
-      try {
-        const data = await getRelatedItem(itemId);
-        setRelatedItem(data.data);
-      } catch (error) {
-        console.error("Failed to fetch related auctions:", error);
-      }
-    };
-
-    fetchRelated();
-  }, [itemId]);
-
-  useEffect(() => {
-    if (!itemId) return;
-
     const eventSource = new EventSource(
-      `http://localhost:8080/api/auctions/${itemId}/stream`,
+      `http://localhost:8080/api/auctions/${productData.auctionId}/stream`,
       { withCredentials: true }
     );
 
@@ -109,7 +64,7 @@ export default function DetailPageClient({
     return () => {
       eventSource.close();
     };
-  }, [pathname, itemId]);
+  }, [pathname]);
 
   const updateBidDataFromSSE = (data: {
     bid: Bid;
@@ -188,9 +143,6 @@ export default function DetailPageClient({
       };
     });
   };
-
-  if (isLoading) return <LoadingSpinner />;
-  if (!productData || !bidData) notFound();
 
   return (
     <>

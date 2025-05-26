@@ -34,7 +34,7 @@ export async function getSearchProducts(
 
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}api/auctions/search${queryString}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`,
       {
         cache: "no-store",
         headers: {
@@ -79,7 +79,7 @@ export async function getRelatedWords(
   try {
     const encodedKeyword = encodeURIComponent(keyword);
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}api/search/suggestions?keyword=${encodedKeyword}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
       {
         cache: "no-store",
         headers: {
@@ -106,7 +106,7 @@ export async function getCategoryList(): Promise<
 > {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}api/category`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/category`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch category list");

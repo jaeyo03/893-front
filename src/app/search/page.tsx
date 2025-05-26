@@ -1,4 +1,4 @@
-import SearchInput from "@/components/templates/SearchInput";
+import SearchInput from "@/components/templates/SearchBox";
 import CategoryFilter from "@/components/templates/searchpage/CategoryFilter";
 import PriceFilter from "@/components/molecules/searchpage/PriceFilter";
 import AuctionStatusFilter from "@/components/templates/searchpage/AuctionStatusFilter";
@@ -67,7 +67,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 						경매에 참여하고 싶은 물건을 검색해보세요
 					</div>
 					<QueryProvider>
-						<SearchInput/>
+						<SearchInput isLogin={accessToken ? true : false}/>
 					</QueryProvider>
 				</div>
 				{relatedWords.data.length > 0 ? (
@@ -98,7 +98,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 						{products?.data?.auctionList?.length > 0 ? (
 							<>
 								<QueryProvider>
-									<div className="grid grid-cols-4 gap-4 mt-4 h-[1022px]">
+									<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
 										{products.data.auctionList.map((product) => (
 											<AuctionCard key={product.id} product={product} isLogin={accessToken ? true : false}/>
 										))}

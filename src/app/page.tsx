@@ -1,6 +1,6 @@
 import HomeTitle from "@/components/molecules/HomeTitle";
 import SpinningWord from "@/components/atoms/SpinningWord";
-import SearchInput from "@/components/templates/SearchInput";
+import SearchInput from "@/components/templates/SearchBox";
 import {Metadata} from "next";
 import QueryProvider from "@/components/QueryProvider";
 
@@ -19,7 +19,7 @@ export default async function Home() {
         </HomeTitle>
         <div className="flex justify-center w-full">
           <QueryProvider>
-            <SearchInput/>
+            <SearchInput isLogin={accessToken ? true : false}/>
           </QueryProvider>
         </div>
       </div>

@@ -44,12 +44,6 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
       active: pathname === "/",
     },
     {
-      href: "/search",
-      label: "경매 검색",
-      icon: <Search className="w-4 h-4 mr-2" />,
-      active: pathname === "/search" || pathname.startsWith("/search/"),
-    },
-    {
       href: "/profile",
       label: "마이페이지",
       icon: <User className="w-4 h-4 mr-2" />,

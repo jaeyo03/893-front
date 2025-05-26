@@ -97,11 +97,13 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 						<ProductSort/>
 						{products?.data?.auctionList?.length > 0 ? (
 							<>
-								<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
-									{products.data.auctionList.map((product) => (
-										<AuctionCard key={product.id} product={product}/>
-									))}
-								</div>
+								<QueryProvider>
+									<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
+										{products.data.auctionList.map((product) => (
+											<AuctionCard key={product.id} product={product} isLogin={accessToken ? true : false}/>
+										))}
+									</div>
+								</QueryProvider>
 								<SearchPagination
 									totalPages={Math.ceil(products.data.totalAuctionsCount / 12)}
 									currentPage={currentPage}

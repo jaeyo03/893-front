@@ -1,12 +1,14 @@
 'use client';
 
-import {Bookmark} from 'lucide-react';
-import {useState} from 'react';
-import {Auction} from '@/types/response.types';
+import { Bookmark, Clock, UsersRound } from 'lucide-react';
+import { useState } from 'react';
+import { Auction } from '@/types/response.types';
 import { useRouter } from 'next/navigation';
+import { useAddScrap, useDeleteScrap } from '@/hooks/useScarp';
 
 interface AuctionCardProps {
   product: Auction;
+  isLogin: boolean;
 }
 
 const statusMap: Record<Auction['status'], { label: string; color: string }> = {
@@ -16,8 +18,8 @@ const statusMap: Record<Auction['status'], { label: string; color: string }> = {
   cancelled: {label: "취소", color: "bg-red"},
 };
 
-export default function AuctionCard({product}: AuctionCardProps) {
-  
+export default function AuctionCard({product, isLogin}: AuctionCardProps) {
+  console.log(product);
   const router = useRouter()
   const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped ?? false);
   const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
@@ -26,21 +28,28 @@ export default function AuctionCard({product}: AuctionCardProps) {
   
   const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};
   
+  const {mutate: addScrapMutation} = useAddScrap();
+  const {mutate: removeScrapMutation} = useDeleteScrap();
   
   const handleScrapToggle = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 버블링 방지
+    e.stopPropagation();
     setIsScraped((prev) => !prev);
     setBookmarkCount((prev) => (isScraped ? prev - 1 : prev + 1));
+    if (isScraped) {
+      removeScrapMutation(product.id);
+    } else {
+      addScrapMutation(product.id);
+    }
   };
 
   const handleCardClick = () => {
-    router.push(`/detail/${product.id}`); // 이 경로는 실제 라우팅 구조에 맞게 수정
+    router.push(`/detail/${product.id}`);
   };
   
   return (
     <div 
       onClick={handleCardClick}
-      className="p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white">
+      className="p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white cursor-pointer hover:drop-shadow-md">
       <div className="grid grid-cols-1 grid-rows-1">
         <img
           src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}
@@ -60,33 +69,41 @@ export default function AuctionCard({product}: AuctionCardProps) {
         >
           {statusInfo.label}
         </span>
-        <button
-          onClick={handleScrapToggle}
-          className="row-start-1 col-start-1 self-end justify-self-end mb-2 mr-2 p-1">
-          <Bookmark
+        {isLogin && (
+          <button
+            onClick={handleScrapToggle}
+            className="row-start-1 col-start-1 self-end justify-self-end mb-2 mr-2 p-1">
+            <Bookmark
             className={`
-            w-5 h-5
-            ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:fill-black'}
-            `}
-          />
-        </button>
+              w-6 h-6
+              ${isScraped ? 'text-black fill-black' : 'text-gray-400 hover:text-black hover:rounded'}`}
+            />
+          </button>
+        )}
       </div>
       
       <div className="pt-3 space-y-1">
-        <p className="text-sm font-medium truncate">{product.title}</p>
+        <p className="text-sm font-semibold truncate">{product.title}</p>
         <div className="flex items-center gap-1 text-xs text-gray-600">
-          <span>🕒 종료 :</span>
-          <span>{new Date(product.endTime).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}</span>
+          <Clock size={16}/>
+          <span>경매 종료 :</span>
+          <span>
+            {product.endTime && new Date(product.endTime).toLocaleString('ko-KR', {
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            })}
+          </span>
         </div>
         <div className="flex items-center gap-1 text-xs text-gray-600">
-          <span>👥</span>
-          <span>{product.status === 'pending' ? 0 : product.scrapCount}명</span>
+          <UsersRound size={16}/>
+          <span>입찰자 수 :</span>
+          <span>{product.status === 'pending' ? 0 : product.bidderCount}명</span>
         </div>
-        <p className="pt-1 text-sm font-bold text-black">
+        <p className="pt-1 text-sm font-semibold text-black">
           현재 입찰가 : {(product.status === 'pending' ? product.basePrice : product.basePrice).toLocaleString()}원
         </p>
         <p className="text-xs text-gray-500">스크랩 {bookmarkCount}</p>

@@ -1,22 +1,22 @@
 import RecentSearchWordButton from "@/components/atoms/RecentSearchWordButton";
-import RecommendSearchWord from "@/components/atoms/RecommendSearchWordButton";
+import PopularSearchWordButton from "@/components/atoms/PopularSearchWordButton";
 import { SearchHistory } from "@/types/response.types";
 import React from "react";
+
 interface RecentSearchContentProps {
-  handleDeleteAllSearches: () => void;
   recentSearches : SearchHistory[]
   handleDeleteSearch: (id: number) => void;
-  recommendedSearches: string[]
+  popularSearches: string[]
   handleCloseSearchContent: () => void;
-  handleClickRecentWord : (event: React.MouseEvent, searchKeyword: string) => void;
+  handleClickWordButton : (event: React.MouseEvent, searchKeyword: string) => void;
 }
-export default function RecentSearchContent({ handleDeleteAllSearches, handleClickRecentWord, recentSearches, handleDeleteSearch, recommendedSearches, handleCloseSearchContent } : RecentSearchContentProps) {
+
+export default function RecentSearchContent({ handleClickWordButton, recentSearches, handleDeleteSearch, popularSearches, handleCloseSearchContent } : RecentSearchContentProps) {
   return (
     <div className="absolute z-10 rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
       <div className="border-t border-t-[#E5E9EC]">
         <div className="pr-4 pl-4 pt-4 pb-2 text-[#373737] flex text-sm items-center justify-between">
           <div>최근 검색어</div>
-          <button type="button" onClick={handleDeleteAllSearches} className="text-[#898989]">전체 삭제</button>
         </div>
         {recentSearches.length > 0 ? (
           recentSearches.map((search, index) => (
@@ -24,9 +24,10 @@ export default function RecentSearchContent({ handleDeleteAllSearches, handleCli
               key={index} 
               id={search.id}
               searchKeyword={search.keyword} 
-              createdAt={search.createdAt} 
+              createdAt={search.createdAt}
+              updatedAt={search.updatedAt}
               handleDeleteSearch={handleDeleteSearch}
-              handleClickRecentWord={handleClickRecentWord}
+              handleClickWordButton={handleClickWordButton}
             />
           ))
         ) : (
@@ -35,11 +36,15 @@ export default function RecentSearchContent({ handleDeleteAllSearches, handleCli
       </div>
       <div className="grid gap-2">
         <div className="pl-4 pr-4 text-[#373737] flex text-sm items-center justify-between">
-          추천 검색어
+          인기 검색어
         </div>
         <div className="pl-4 pr-4 pt-1 pb-2 flex gap-2 flex-wrap">
-          {recommendedSearches.map((search, index) => (
-            <RecommendSearchWord searchWord={search} key={index}/>
+          {popularSearches.map((search, index) => (
+            <PopularSearchWordButton 
+              searchWord={search} 
+              key={index}
+              handleClickWordButton={handleClickWordButton}
+            />
           ))}
         </div>
       </div>

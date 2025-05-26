@@ -18,7 +18,6 @@ function makeSearchParams(
       urlSearchParams.append(key, value);
     }
   });
-  console.log(urlSearchParams.toString());
   return urlSearchParams.toString();
 }
 

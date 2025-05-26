@@ -7,15 +7,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import RecentSearchContent from "../molecules/searchinput/RecentSearchContent";
 import RelatedSearchContent from "../molecules/searchinput/RelatedSearchContent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteSearchHistory, getRelatedWords, getUserSearchHistory, postSearchHistory } from "@/lib/api/searchbox";
+import { deleteSearchHistory, getRelatedWords, getUserSearchHistory, postSearchHistory } from "@/lib/api/searchboxApi";
 import { SearchHistory } from "@/types/response.types";
+import { useAddSearchHistory, useDeleteSearchHistory, useRelatedWords, useSearchHistory } from "@/hooks/useSearchBox";
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
-export default function SearchInput() {
+interface SearchBoxProps {
+  isLogin: boolean;
+}
+
+export default function SearchBox({ isLogin }: SearchBoxProps) {
   const router = useRouter();
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('CLOSED');
   const formRef = useRef<HTMLFormElement>(null);
-  const [recommendedSearches] = useState(searchData.recommendedSearches); // TODO 추후 백엔드 연동
+  const [popularSearches] = useState(searchData.popularSearches); // TODO 추후 백엔드 연동
   const searchParams = useSearchParams()
   const currentKeyword = searchParams.get('keyword')
   const [inputValue, setInputValue] = useState(currentKeyword || "");
@@ -32,77 +37,14 @@ export default function SearchInput() {
     };
   }, [inputValue]);
 
-  const {data : searchHistory} = useQuery({
-    queryKey: ['searchHistory'],
-    queryFn: () => getUserSearchHistory(),
-  })
-  
-  const {data : relatedWords} = useQuery({
-    queryKey: ['relatedWords', debouncedInputValue],
-    queryFn: () => getRelatedWords(debouncedInputValue),
-    enabled: debouncedInputValue.length > 0,
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-  })
-  
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteSearchHistory(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
-    },
-    onError: (error, id) => {
-      console.error('검색 기록 삭제 실패:', error);
-
-      if (localStorage.getItem('searchHistory')) {
-        let searchHistory : SearchHistory[] = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-        searchHistory = searchHistory.filter(item => item.id !== id);
-        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-      }
-    }
-  })
-
-  const postMutation = useMutation({
-    mutationFn: (keyword: string) => postSearchHistory(keyword),
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['searchHistory'] });
-      console.log('검색 기록 저장 응답:', response);
-    },
-    onError: (error) => {
-      console.error('검색 기록 저장 실패:', error);
-
-      if (localStorage.getItem('searchHistory')) {
-        const searchHistory : SearchHistory[] = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-        let isIncluded = false;
-
-        for (const item of searchHistory) {
-          if (item.keyword === inputValue) {
-            isIncluded = true;
-            item.createdAt = new Date().toISOString();
-            searchHistory.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            break;
-          }
-        }
-
-        if (!isIncluded) {
-          searchHistory.push({
-            id: searchHistory[searchHistory.length - 1].id + 1,
-            keyword: inputValue,
-            createdAt: new Date().toISOString()
-          });
-        }
-        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-      } else {
-        localStorage.setItem('searchHistory', JSON.stringify([{
-          id: 1,
-          keyword: inputValue,
-          createdAt: new Date().toISOString()
-        }]));
-      }
-    }
-  })
+  const {data : searchHistory} = useSearchHistory(isLogin);
+  const {data : relatedWords} = useRelatedWords(debouncedInputValue);
+  const deleteHistoryMutation = useDeleteSearchHistory(isLogin);
+  const addHistoryMutation = useAddSearchHistory(isLogin);
   
   const handleInputClick = () => {
     if (searchStatus === 'CLOSED') {
+      queryClient.invalidateQueries({ queryKey: ['searchHistory', isLogin] });
       setSearchStatus(inputValue.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
     } else {
       setSearchStatus('CLOSED');
@@ -114,7 +56,7 @@ export default function SearchInput() {
   }
 
   const handleDeleteSearch = (id: number) => {
-    deleteMutation.mutate(id);
+    deleteHistoryMutation.mutate(id);
   }
 
   const handleDeleteCurrentSearch = () => {
@@ -122,14 +64,15 @@ export default function SearchInput() {
     setSearchStatus('RECENT_RECOMMENDED');
   }
 
-  const handleDeleteAllSearches = () => {
-    alert("추후 구현 예정"); // TODO 추후 구현 예정
-  }
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setInputValue(value);
-    setSearchStatus(value.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
+    
+    if (value.length < 30) {
+      setInputValue(value);
+      setSearchStatus(value.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
+    } else {
+      alert("검색어는 30자 이하로 입력해주세요.");
+    }
   }
 
   const handleAddSearch = (event: React.MouseEvent, searchKeyword: string) => {
@@ -140,9 +83,14 @@ export default function SearchInput() {
   }
 
   const handleSearch = (event: React.FormEvent) => {
-    postMutation.mutate(inputValue);
-    
     event.preventDefault();
+    if (inputValue.trim() === "") {
+      alert("검색어를 입력해주세요.");
+      return;
+    }
+
+    addHistoryMutation.mutate(inputValue);
+    
     if (inputValue.trim()) {
       router.push(`/search?keyword=${inputValue.trim()}`);
       setSearchStatus('CLOSED');
@@ -151,6 +99,7 @@ export default function SearchInput() {
 
   const handleClickWordButton = (event: React.MouseEvent, searchKeyword: string) => {
     event.preventDefault();
+    addHistoryMutation.mutate(searchKeyword);
     if (searchKeyword.trim()) {
       router.push(`/search?keyword=${searchKeyword.trim()}`);
       setSearchStatus('CLOSED');
@@ -179,13 +128,6 @@ export default function SearchInput() {
       setInputValue(searchParams.get('keyword') || "");
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    console.log(searchHistory);
-    if (!searchHistory) {
-      
-    }
-  }, [searchHistory]);
 
   return (
     <form 
@@ -225,19 +167,18 @@ export default function SearchInput() {
       </div>
       {isRecentSearchContentOpen && (
         <RecentSearchContent
-          handleDeleteAllSearches={handleDeleteAllSearches}
-          recentSearches={searchHistory?.data || JSON.parse(localStorage.getItem('searchHistory') || '[]')}
+          recentSearches={searchHistory || []}
           handleDeleteSearch={handleDeleteSearch}
-          recommendedSearches={recommendedSearches}
+          popularSearches={popularSearches}
           handleCloseSearchContent={handleCloseSearchContent}
-          handleClickRecentWord={handleClickWordButton}
+          handleClickWordButton={handleClickWordButton}
         />
       )}
       {isRelatedSearchContentOpen && (
         <RelatedSearchContent
           relatedWords={relatedWords?.data || []}
           handleAddSearch={handleAddSearch}
-          handleClickRelatedWord={handleClickWordButton}
+          handleClickWordButton={handleClickWordButton}
         />
       )}
     </form>

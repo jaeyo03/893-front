@@ -1,6 +1,7 @@
 // api/auction.ts 또는 컴포넌트 파일 상단에 작성
 import axios from "axios";
 import { AuctionBidData, Product,RelatedItem } from "@/types/productData";
+import { axiosInstance } from "../axios";
 
 const API_URL = "http://localhost:8080/api/auctions";
 
@@ -89,12 +90,9 @@ export const getRelatedItem = async (auctionId:number) => {
   }
 };
 
-export const addScrap = async (id:number) => {
+export const addScrap = async (auctionId:number) => {
   try {
-    const response = await axios.post(`${API_URL}/${id}/scrap`,
-      {},
-      {withCredentials:true}
-    );
+    const response = await axiosInstance.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/scrap`);
     return response.data;
   } catch (error) {
     console.error("스크랩 성공 실패: ", error);
@@ -102,11 +100,9 @@ export const addScrap = async (id:number) => {
   }
 };
 
-export const removeScrap = async (id:number) => {
+export const removeScrap = async (auctionId:number) => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}/scrap`,
-      {withCredentials:true}
-    );
+    const response = await axiosInstance.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/scrap`);
     return response.data;
   } catch (error) {
     console.error("스크랩 취소 실패: ", error);

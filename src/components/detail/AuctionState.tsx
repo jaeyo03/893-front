@@ -116,7 +116,9 @@ export function AuctionState({
         >
           <Bookmark
             className={`w-5 h-5 ${
-              isBookmarked
+              !isLoggedIn
+                ? "text-gray-300" // ✅ 수정됨: 비로그인 상태에서 회색 처리
+                : isBookmarked
                 ? "text-black fill-black"
                 : "text-gray-400 hover:text-black hover:fill-black"
             }`}

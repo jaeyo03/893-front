@@ -64,6 +64,7 @@ export default function SellerProductInfo({
               alert("스크랩 처리 중 오류가 발생했습니다.");
             }
           }}
+          isLoggedIn={true} // ✅ (임시) 판매자 페이지이므로 항상 로그인 상태로 가정? 수정해야됨 <-- 이 부분은 실제 로그인 상태에 따라 변경 필요 -->
         />
       </div>
     </div>

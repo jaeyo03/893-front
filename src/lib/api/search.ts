@@ -1,11 +1,11 @@
 import { AuctionCategory } from "@/types/productData";
-import {BaseResponse, SearchListResponse} from "@/types/response.types";
+import { BaseResponse, SearchListResponse } from "@/types/response.types";
 
 function makeSearchParams(
   searchParams: Record<string, string | string[] | undefined>
 ): string {
   const urlSearchParams = new URLSearchParams();
-  
+
   // searchParams을 순회하며 URLSearchParams에 추가
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
@@ -27,14 +27,14 @@ export async function getSearchProducts(
   cookieHeader: string
 ): Promise<BaseResponse<SearchListResponse>> {
   let queryString = makeSearchParams(searchParams);
-  
+
   if (queryString.length > 0) {
     queryString = `?${queryString}`;
   }
-  
+
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`,
+      `${process.env.NEXT_PUBLIC_API_URL}api/auctions/search${queryString}`,
       {
         cache: "no-store",
         headers: {
@@ -65,7 +65,7 @@ export async function getRelatedWords(
   cookieHeader: string
 ): Promise<BaseResponse<string[]>> {
   let keyword = "";
-  
+
   if (searchParams.keyword) {
     keyword = searchParams.keyword as string;
   } else {
@@ -75,10 +75,11 @@ export async function getRelatedWords(
       code: 400,
     };
   }
-  
+
   try {
     const encodedKeyword = encodeURIComponent(keyword);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}api/search/suggestions?keyword=${encodedKeyword}`,
       {
         cache: "no-store",
         headers: {
@@ -100,9 +101,13 @@ export async function getRelatedWords(
   }
 }
 
-export async function getCategoryList() : Promise<BaseResponse<AuctionCategory[] | null>> {
+export async function getCategoryList(): Promise<
+  BaseResponse<AuctionCategory[] | null>
+> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category`);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}api/category`
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch category list");
     }

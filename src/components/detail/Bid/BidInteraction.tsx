@@ -1,23 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { TriangleAlert } from 'lucide-react';
-import { BidInteractionProps } from '@/types/productData';
-import WarningModal from '../WarningModal';
-import toast from 'react-hot-toast'
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { TriangleAlert } from "lucide-react";
+import { BidInteractionProps } from "@/types/productData";
+import WarningModal from "../WarningModal";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 function numberToKorean(num: number): string {
   if (num === 0) return "0원";
-
   const units = [
     { value: 10 ** 8, label: "억" },
     { value: 10 ** 4, label: "만" },
     { value: 1, label: "" },
   ];
-
   let result = "";
-
   for (const unit of units) {
     const unitValue = Math.floor(num / unit.value);
     if (unitValue > 0) {
@@ -25,7 +22,6 @@ function numberToKorean(num: number): string {
       num %= unit.value;
     }
   }
-
   return result.trim() + "원";
 }
 
@@ -37,7 +33,6 @@ function getRemainTime(endAt: string): number {
   return Math.max(diff, 0);
 }
 
-
 export default function BidInteraction({
   product,
   currentPrice,
@@ -47,15 +42,18 @@ export default function BidInteraction({
   cancelTimer,
   endTime,
   itemId,
+  isLoggedIn,
+  isSeller,
 }: BidInteractionProps) {
-  const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : 0);
+  const [bidAmount, setBidAmount] = useState<number>(
+    Number.isFinite(currentPrice) ? currentPrice + 100 : 0
+  );
   const [show, setShow] = useState(false);
   const [remainTime, setRemainTime] = useState<number>(getRemainTime(endTime));
   const [isLoading, setIsLoading] = useState(false);
 
   const isAuctionEnded = remainTime <= 0;
-
-  const router = useRouter(); // 결제하기 버튼
+  const router = useRouter();
 
   const handlePayment = () => {
     router.push(`/payment?auctionId=${itemId}`);
@@ -63,10 +61,8 @@ export default function BidInteraction({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const timeLeft = getRemainTime(endTime);
-      setRemainTime(timeLeft);
-    }, 1000); // 매초 갱신
-
+      setRemainTime(getRemainTime(endTime));
+    }, 1000);
     return () => clearInterval(interval);
   }, [endTime]);
 
@@ -77,86 +73,76 @@ export default function BidInteraction({
   }, [currentPrice]);
 
   const formatTime = (seconds: number) => {
-    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const sec = String(seconds % 60).padStart(2, '0');
+    const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const min = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const sec = String(seconds % 60).padStart(2, "0");
     return `${hours}:${min}:${sec}`;
   };
 
   const handleBid = async () => {
-    if (cancelTimer > 0) return;
-    if (isLoading) return;
+    if (cancelTimer > 0 || isLoading) return;
     const isInitialBid = currentPrice === product.basePrice;
-  
+
     if (bidAmount % 100 !== 0) {
-      toast.error('입찰 금액은 100원 단위여야 합니다.');
+      toast.error("입찰 금액은 100원 단위여야 합니다.");
       return;
     }
-  
     if (!isInitialBid && bidAmount < currentPrice + 100) {
-      toast.error(`입찰 금액은 현재가보다 최소 100원 이상이어야 합니다.`);
+      toast.error("입찰 금액은 현재가보다 최소 100원 이상이어야 합니다.");
       return;
     }
-  
     if (isInitialBid && bidAmount <= currentPrice) {
-      toast.error(`입찰 금액은 현재가보다 높아야 합니다.`);
+      toast.error("입찰 금액은 현재가보다 높아야 합니다.");
       return;
     }
-  
+
     setIsLoading(true);
     try {
-      // 서버에 입찰 요청만 보내고, 상태는 SSE로 갱신되기를 기다림
       await onBid(bidAmount);
-      toast.success('입찰이 성공적으로 처리되었습니다.');
+      toast.success("입찰이 성공적으로 처리되었습니다.");
     } catch (error: any) {
-      toast.error(error?.message || '입찰에 실패했습니다.');
+      toast.error(error?.message || "입찰에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
-  
-  
-  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/[^0-9]/g, '');
+    const raw = e.target.value.replace(/[^0-9]/g, "");
     if (!raw) {
       setBidAmount(0);
       return;
     }
-  
     const num = Number(raw);
     if (!Number.isFinite(num)) return;
-  
     setBidAmount(Math.min(num, 1_000_000_000));
   };
 
   const handleCancelBid = async () => {
-    if (isLoading) return; // 중복 클릭 방지
+    if (isLoading) return;
     setIsLoading(true);
-  
     try {
       await onCancelBid();
-      toast.success('입찰이 취소되었습니다.');
+      toast.success("입찰이 취소되었습니다.");
     } catch (error: any) {
-      console.error('입찰 취소 에러:', error);
-      toast.error(error?.message || '입찰 취소에 실패했습니다.');
+      toast.error(error?.message || "입찰 취소에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!itemId || !product || typeof currentPrice !== 'number') {
+  if (!itemId || !product || typeof currentPrice !== "number") {
     return <div className="text-red-500">잘못된 경매 정보입니다.</div>;
   }
-  
 
   return (
     <div>
       <div className="flex items-center justify-between mt-4 mb-1">
         <p className="font-medium text-black text-sl">
           입찰 금액
-          <span className="text-xs ml-2 font-thin text-red"> ※ 최소 입찰 단위 100원</span>
+          <span className="text-xs ml-2 font-thin text-red">
+            ※ 최소 입찰 단위 100원
+          </span>
         </p>
       </div>
       <div className="flex items-center gap-2 mt-4">
@@ -165,43 +151,61 @@ export default function BidInteraction({
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          value={bidAmount !== 0 ? bidAmount : ''}
+          value={
+            !isLoggedIn || isSeller ? "" : bidAmount !== 0 ? bidAmount : ""
+          }
           onChange={handleInputChange}
           disabled={isAuctionEnded}
+          readOnly={!isLoggedIn || isSeller}
           className="w-full px-2 py-1 text-right border rounded bg-gray-100"
         />
 
-        <button
-          className={`w-[72px] h-[32px] text-sm text-white rounded ${
-            isAuctionEnded
-              ? 'bg-green-600 hover:bg-green-700'
-              : 'bg-main hover:bg-blue-700'
-          }`}
-          onClick={isAuctionEnded ? handlePayment : handleBid}
-        >
-          {isAuctionEnded ? '결제하기' : '입찰하기'}
-        </button>
-        <div
-          className="relative inline-block"
-          onMouseEnter={() => setShow(true)}
-          onMouseLeave={() => setShow(false)}
-        >
-          <TriangleAlert className="w-5 h-5 cursor-pointer" fill="red" color="white" />
-          <WarningModal
-            isOpen={show}
-            positionClass="left-1/2 top-full mt-2 -translate-x-1/2"
-          />
-        </div>
+        {isLoggedIn && !isSeller ? (
+          <button
+            className={`w-[72px] h-[32px] text-sm text-white rounded ${
+              isAuctionEnded
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-main hover:bg-blue-700"
+            }`}
+            onClick={isAuctionEnded ? handlePayment : handleBid}
+          >
+            {isAuctionEnded ? "결제하기" : "입찰하기"}
+          </button>
+        ) : (
+          <div className="w-[72px] h-[32px]" />
+        )}
+
+        {isLoggedIn && !isSeller ? (
+          <div
+            className="relative inline-block"
+            onMouseEnter={() => setShow(true)}
+            onMouseLeave={() => setShow(false)}
+          >
+            <TriangleAlert
+              className="w-5 h-5 cursor-pointer"
+              fill="red"
+              color="white"
+            />
+            <WarningModal
+              isOpen={show}
+              positionClass="left-1/2 top-full mt-2 -translate-x-1/2"
+            />
+          </div>
+        ) : null}
       </div>
 
-      <p className="mt-1 text-xs font-thin text-right text-red mr-[100px]">
-        {bidAmount > 0 ? numberToKorean(bidAmount) : ''}
-      </p>
+      {isLoggedIn && !isSeller ? (
+        <p className="mt-1 text-xs font-thin text-right text-red mr-[100px]">
+          {bidAmount > 0 ? numberToKorean(bidAmount) : ""}
+        </p>
+      ) : null}
 
       {cancelTimer > 0 && (
         <div className="flex items-center justify-between p-3 text-yellow-800 bg-yellow-100 rounded-lg">
           <div>
-            <p className="text-sm">입찰 취소 가능 시간: {formatTime(cancelTimer)}</p>
+            <p className="text-sm">
+              입찰 취소 가능 시간: {formatTime(cancelTimer)}
+            </p>
           </div>
           <button
             className="px-3 py-1 text-yellow-600 border border-yellow-600 rounded hover:bg-yellow-200"

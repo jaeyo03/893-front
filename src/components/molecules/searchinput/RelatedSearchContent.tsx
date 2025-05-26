@@ -4,10 +4,10 @@ import React from "react";
 interface RelatedSearchContentProps {
   relatedWords: string[];
   handleAddSearch: (event: React.MouseEvent, searchKeyword: string) => void;
-  handleClickRelatedWord: (event: React.MouseEvent, searchKeyword: string) => void;
+  handleClickWordButton: (event: React.MouseEvent, searchKeyword: string) => void;
 }
 
-export default function RelatedSearchContent({ relatedWords, handleClickRelatedWord, handleAddSearch } : RelatedSearchContentProps) {
+export default function RelatedSearchContent({ relatedWords, handleClickWordButton, handleAddSearch } : RelatedSearchContentProps) {
   return (
     <div className="absolute z-10 rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
       <div className="border-t border-t-[#E5E9EC]">
@@ -20,7 +20,7 @@ export default function RelatedSearchContent({ relatedWords, handleClickRelatedW
               isLast={index === relatedWords.length - 1}
               searchKeyword={word}
               handleAddSearch={handleAddSearch}
-              handleClickRelatedWord={handleClickRelatedWord}
+              handleClickWordButton={handleClickWordButton}
             />
           ))
         )}

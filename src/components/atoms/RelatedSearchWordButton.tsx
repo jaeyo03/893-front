@@ -5,13 +5,13 @@ interface RelatedSearchWordButtonProps {
   searchKeyword: string;
   isLast : boolean;
   handleAddSearch: (event: React.MouseEvent, searchKeyword: string) => void;
-  handleClickRelatedWord: (event: React.MouseEvent, searchKeyword: string) => void;
+  handleClickWordButton: (event: React.MouseEvent, searchKeyword: string) => void;
 }
 
-export default function RelatedSearchWordButton({ searchKeyword, isLast, handleClickRelatedWord, handleAddSearch } : RelatedSearchWordButtonProps) {
+export default function RelatedSearchWordButton({ searchKeyword, isLast, handleClickWordButton, handleAddSearch } : RelatedSearchWordButtonProps) {
   return (
   <div
-    onClick={(e) => {handleClickRelatedWord(e, searchKeyword)}}
+    onClick={(e) => {handleClickWordButton(e, searchKeyword)}}
     className={`
     group hover:bg-[#EFF2F4]
     h-10 w-full cursor-pointer

@@ -3,6 +3,7 @@ import SpinningWord from "@/components/atoms/SpinningWord";
 import SearchInput from "@/components/templates/SearchBox";
 import {Metadata} from "next";
 import QueryProvider from "@/components/QueryProvider";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
@@ -10,6 +11,9 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
+  const cookieStore = cookies();
+	const accessToken = cookieStore.get('accessToken')?.value
+  
   return (
     <>
       <div className="grid justify-center items-center gap-6 w-full mt-6">

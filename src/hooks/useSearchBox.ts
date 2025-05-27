@@ -7,7 +7,6 @@ import {
 } from '@/lib/api/searchboxApi'
 import { SearchHistory } from '@/types/response.types'
 
-// 2) localStorage 읽기/쓰기 함수
 function readLocalHistory(): SearchHistory[] {
   return JSON.parse(localStorage.getItem('searchHistory') || '[]');
 }
@@ -16,18 +15,13 @@ function writeLocalHistory(history: SearchHistory[]) {
   localStorage.setItem('searchHistory', JSON.stringify(history));
 }
 
-function resetLocalHistory() {
-  localStorage.removeItem('searchHistory');
-}
-
 export function useSearchHistory(isLogin: boolean) {
   return useQuery<SearchHistory[]>({
     queryKey: ['searchHistory', isLogin],
     queryFn: async () => {
       if (isLogin) {
-        resetLocalHistory();
         const response = await getUserSearchHistory();
-        return response.data;
+        return response.data.sort((a, b) => new Date(b?.updatedAt || b?.createdAt).getTime() - new Date(a?.updatedAt || a?.createdAt).getTime());
       } else {
         return readLocalHistory();
       }

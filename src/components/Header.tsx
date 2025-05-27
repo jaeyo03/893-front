@@ -51,13 +51,13 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
     },
   ];
 
-  if (isLoggedIn) {
-    routes.push({
-      href: "/notifications",
-      label: "알림",
-      icon: <Bell className="w-4 h-4 mr-2" />,
-    });
-  }
+  // if (isLoggedIn) {
+  //   routes.push({
+  //     href: "/notifications",
+  //     label: "알림",
+  //     icon: <Bell className="w-4 h-4 mr-2" />,
+  //   });
+  // }
 
   const handleLogout = async () => {
     const response = await fetch(

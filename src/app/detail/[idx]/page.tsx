@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 import DetailPageClient from "./DetailPageClient";
 import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
+import { notFound } from "next/navigation";
 
 interface PageProps {
   params: { idx : string };
@@ -9,14 +10,24 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const cookieStore = cookies();
-	const auctionId = params?.idx;
+	const auctionId = parseInt(params?.idx);
+	const accessToken = cookieStore.get('accessToken')?.value;
+	const cookieHeader = accessToken ? `accessToken=${accessToken}` : '';
   const isLoggedIn = cookieStore.has("accessToken");
 
-	const [bidData, productData, relatedItem] = await Promise.all([
-		getBidData(auctionId),
-		getProductData(auctionId),
-		getRelatedItem(auctionId)
+	if (isNaN(auctionId)) {
+		return notFound();
+	}
+
+	const [initialBidData, productData, relatedItemData] = await Promise.all([
+		getBidData(auctionId, cookieHeader),
+		getProductData(auctionId, cookieHeader),
+		getRelatedItem(auctionId, cookieHeader)
 	]);
 
-  return <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={bidData} initialProductData={productData} relatedItem={relatedItem} />;
+	console.log(initialBidData);
+	console.log(productData);
+	console.log(relatedItemData);
+	
+  return <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={initialBidData} product={productData} relatedItem={relatedItemData.data} />;
 }

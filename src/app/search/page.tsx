@@ -6,7 +6,7 @@ import ProductStatusFilter from "@/components/templates/searchpage/ProductStatus
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
-import AuctionCard from "@/components/detail/Product/AuctionCard";
+import AuctionCard from "@/components/AuctionCard";
 import {getRelatedWords, getSearchProducts, getCategoryList} from "@/lib/api/search";
 import QueryProvider from "@/components/QueryProvider";
 import {cookies} from "next/headers";

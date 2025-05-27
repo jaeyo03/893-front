@@ -14,6 +14,8 @@ export interface Product {
   endTime: string;
   mainImage: Image;
   images: Image[];
+  hasBeenPaid: boolean;
+  currentUserBuyer: boolean;
 }
 
 export interface Image {
@@ -51,7 +53,9 @@ export interface AuctionBidData {
   auctionId: number;
   totalBid: number;
   totalBidder: number;
+  recentUserBid : Bid;
   bids: Bid[];
+  canCancelBid: boolean;
   cancelledBids: Bid[];
   userBids: UserBids[];
 }
@@ -62,26 +66,9 @@ export interface UserBids {
   createdAt: string;
 }
 
-export interface AuctionStatsProps {
-  product: Product;
-  auctionBidData: AuctionBidData;
-  isBookmarked: boolean;
-  bookmarkCount: number;
-  onBookmarkToggle: () => void;
-  isLoggedIn: boolean;
-}
-
-export interface BidInteractionProps {
-  product: Product;
-  currentPrice: number;
-  onBid: (amount: number) => Promise<void>;
-  onCancelBid: () => void;
-  isHighestBidder: boolean;
-  cancelTimer: number;
-  endTime: string; // ✅ 경매 종료까지 남은 시간 (초 단위)
-  itemId: number;
-  isLoggedIn: boolean; // ✅ 추가
-  isSeller: boolean;
+export interface BidPostResponse {
+  canCancelBid: boolean;
+  bid : Bid;
 }
 
 export interface RelatedItem {

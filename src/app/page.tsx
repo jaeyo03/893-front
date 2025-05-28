@@ -4,6 +4,7 @@ import SearchInput from "@/components/templates/SearchBox";
 import { Metadata } from "next";
 import QueryProvider from "@/components/QueryProvider";
 import { cookies } from "next/headers";
+import RecentAuctionList from "@/components/home/RecentAuctionList";
 import ImageCarousel, { Slide } from "@/components/home/ImageCarousel";
 import DashboardStats from "@/components/home/DashboardStats.tsx";
 
@@ -52,7 +53,7 @@ export default async function Home() {
 
   return (
     <>
-      <div className="grid items-center gap-6 w-full mt-6">
+      <div className="grid w-full gap-6 mt-6">
         <HomeTitle>
           <SpinningWord />
           <span>&nbsp;경매에 참여해보세요</span>
@@ -61,6 +62,9 @@ export default async function Home() {
           <QueryProvider>
             <SearchInput isLogin={accessToken ? true : false} />
           </QueryProvider>
+        </div>
+        <div className="flex justify-start w-[800px] h-[400px]">
+          <RecentAuctionList />
         </div>
         <div className="flex justify-start w-full">
           <DashboardStats stats={statsData} />

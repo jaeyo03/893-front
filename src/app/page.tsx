@@ -6,7 +6,7 @@ import QueryProvider from "@/components/QueryProvider";
 import { cookies } from "next/headers";
 import ImageCarousel, { Slide } from "@/components/home/ImageCarousel";
 import DashboardStats from "@/components/home/DashboardStats.tsx";
-
+import RealTimeRankingItem from "@/components/home/RealTimeRankingItem";
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
   description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
@@ -40,7 +40,6 @@ const slides: Slide[] = [
   },
 ];
 
-
 const statsData = [
   { label: "현재 이용자 수", value: 1504 },
   { label: "현재 등록된 경매 수", value: 984 },
@@ -53,21 +52,32 @@ export default async function Home() {
 
   return (
     <>
-      <div className="grid items-center gap-6 w-full mt-6">
+      <div className="w-full mt-6 px-4">
         <HomeTitle>
           <SpinningWord />
           <span>&nbsp;경매에 참여해보세요</span>
         </HomeTitle>
-        <div className="flex justify-center w-full">
+
+        <div className="flex justify-center w-full mt-4">
           <QueryProvider>
-            <SearchInput isLogin={accessToken ? true : false} />
+            <SearchInput isLogin={!!accessToken} />
           </QueryProvider>
         </div>
-        <div className="flex justify-start px-4 py-8">
-          <ImageCarousel slides={slides} />
-        </div>
-        <div className="flex justify-start w-full">
-          <DashboardStats stats={statsData} />
+
+        {/* 메인 콘텐츠 + 실시간 랭킹 flex row 구성 */}
+        <div className="flex items-start gap-6 w-full max-w-screen-xl mx-auto px-4 mt-6">
+          {/* 왼쪽 콘텐츠 */}
+          <div className="flex-1 max-w-[780px]">
+            <DashboardStats stats={statsData} />
+            <div className="mt-8">
+              <ImageCarousel slides={slides} />
+            </div>
+          </div>
+
+          {/* 오른쪽 실시간 랭킹 */}
+          <div className="w-[300px] shrink-0">
+            <RealTimeRankingItem />
+          </div>
         </div>
       </div>
     </>

@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { MyPaymentsProduct } from "@/types/userData";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Props {
   payments: MyPaymentsProduct;

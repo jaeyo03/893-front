@@ -6,7 +6,7 @@ import ProductStatusFilter from "@/components/templates/searchpage/ProductStatus
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
-import AuctionCard from "@/components/detail/Product/AuctionCard";
+import AuctionCard from "@/components/AuctionCard";
 import {getRelatedWords, getSearchProducts, getCategoryList} from "@/lib/api/search";
 import QueryProvider from "@/components/QueryProvider";
 import {cookies} from "next/headers";
@@ -17,6 +17,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 	const cookieStore = cookies();
 	const accessToken = cookieStore.get('accessToken')?.value;
 	const cookieHeader = accessToken ? `accessToken=${accessToken}` : '';
+	const isLoggedIn = accessToken ? true : false;
 
 	const productsData = getSearchProducts(searchParams, cookieHeader);
 	const relatedWordsData = getRelatedWords(searchParams, cookieHeader);
@@ -29,21 +30,8 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 			categoryListData,
 	]);
 
+	console.log(categoryList);
 	console.log(products);
-
-	interface Auction {
-		id: number;
-		title: string;
-		startTime: string;
-		endTime: string;
-		status: 'pending' | 'active' | 'completed' | 'cancelled';
-		basePrice: number;
-		currentPrice: number;
-		bidderCount: number;
-		scrapCount: number;
-		thumbnailUrl: string | null;
-		isScrapped: boolean | null;
-	}
 
 	const { min: lowestPrice, max: highestPrice } = products?.data?.auctionList.reduce(
 		(accumulator, product) => ({
@@ -67,7 +55,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 						경매에 참여하고 싶은 물건을 검색해보세요
 					</div>
 					<QueryProvider>
-						<SearchInput isLogin={accessToken ? true : false}/>
+						<SearchInput isLoggedIn={isLoggedIn}/>
 					</QueryProvider>
 				</div>
 				{relatedWords.data.length > 0 ? (
@@ -100,7 +88,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 								<QueryProvider>
 									<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
 										{products.data.auctionList.map((product) => (
-											<AuctionCard key={product.id} product={product} isLogin={accessToken ? true : false}/>
+											<AuctionCard key={product.id} product={product} isLoggedIn={isLoggedIn}/>
 										))}
 									</div>
 								</QueryProvider>

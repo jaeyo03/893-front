@@ -6,17 +6,15 @@ import searchData from "@/data/searchData.json";
 import { useRouter, useSearchParams } from "next/navigation";
 import RecentSearchContent from "../molecules/searchinput/RecentSearchContent";
 import RelatedSearchContent from "../molecules/searchinput/RelatedSearchContent";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteSearchHistory, getRelatedWords, getUserSearchHistory, postSearchHistory } from "@/lib/api/searchboxApi";
-import { SearchHistory } from "@/types/response.types";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAddSearchHistory, useDeleteSearchHistory, useRelatedWords, useSearchHistory } from "@/hooks/useSearchBox";
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
 interface SearchBoxProps {
-  isLogin: boolean;
+  isLoggedIn: boolean;
 }
 
-export default function SearchBox({ isLogin }: SearchBoxProps) {
+export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
   const router = useRouter();
   const [searchStatus, setSearchStatus] = useState<SearchStatus>('CLOSED');
   const formRef = useRef<HTMLFormElement>(null);
@@ -37,14 +35,14 @@ export default function SearchBox({ isLogin }: SearchBoxProps) {
     };
   }, [inputValue]);
 
-  const {data : searchHistory} = useSearchHistory(isLogin);
+  const {data : searchHistory} = useSearchHistory(isLoggedIn);
   const {data : relatedWords} = useRelatedWords(debouncedInputValue);
-  const deleteHistoryMutation = useDeleteSearchHistory(isLogin);
-  const addHistoryMutation = useAddSearchHistory(isLogin);
+  const deleteHistoryMutation = useDeleteSearchHistory(isLoggedIn);
+  const addHistoryMutation = useAddSearchHistory(isLoggedIn);
   
   const handleInputClick = () => {
     if (searchStatus === 'CLOSED') {
-      queryClient.invalidateQueries({ queryKey: ['searchHistory', isLogin] });
+      queryClient.invalidateQueries({ queryKey: ['searchHistory', isLoggedIn] });
       setSearchStatus(inputValue.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
     } else {
       setSearchStatus('CLOSED');

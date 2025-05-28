@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} font-pretendard grid justify-center`}
       >
-        {isLoggedIn && <GlobalFCMSetup />}
+        {/* {isLoggedIn && <GlobalFCMSetup />} */}
         <header className="sticky top-0 z-50 w-full border-b bg-background">
           <div className="container flex h-16 items-center">
             <Header isLoggedIn={isLoggedIn} />

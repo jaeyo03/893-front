@@ -87,6 +87,7 @@ export default async function Home() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
   const limited = auctionSoonData.slice(0, 3); // 최대 3개만 보여줌
+  const isLoggedIn = accessToken ? true : false;
 
   return (
     <>
@@ -98,7 +99,7 @@ export default async function Home() {
 
         <div className="flex justify-center w-full mt-4">
           <QueryProvider>
-            <SearchInput isLogin={!!accessToken} />
+            <SearchInput isLoggedIn={isLoggedIn}/>
           </QueryProvider>
         </div>
         {/*  */}

@@ -19,7 +19,7 @@ interface ImageCarouselProps {
 
 export default function ImageCarousel({ slides }: ImageCarouselProps) {
   return (
-    <div className="relative w-[750px] h-[250px]">
+    <div className="relative w-full h-[250px]">
       {/* Swiper 캐러셀 */}
       <Swiper
         modules={[Navigation, Pagination]}

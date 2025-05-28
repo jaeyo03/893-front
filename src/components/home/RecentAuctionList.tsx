@@ -10,7 +10,7 @@ const dummyRecentAuctions = [
     title: "아이폰 14 미개봉",
     description: "거의 사용 안했고 배터리 성능 90퍼예요.",
     basePrice: 120000,
-    thumbnailUrl: "/images/자전거.jpg",
+    thumbnailUrl: "/images/adidas.jpg",
     status: "active",
     isScraped: true,
   },
@@ -19,16 +19,16 @@ const dummyRecentAuctions = [
     title: "에어팟 프로 2세대",
     description: "정품이며 거의 새제품입니다.",
     basePrice: 90000,
-    thumbnailUrl: "/images/자전거.jpg",
+    thumbnailUrl: "/images/라이젠.jpg",
     status: "active",
-    isScraped: false,
+    isScraped: true,
   },
   {
     auctionId: 103,
     title: "갤럭시 버즈 라이브",
     description: "사용감 있으나 정상 작동합니다.",
     basePrice: 30000,
-    thumbnailUrl: "/images/자전거.jpg",
+    thumbnailUrl: "/images/맥.jpg",
     status: "active",
     isScraped: true,
   },
@@ -46,7 +46,7 @@ const dummyRecentAuctions = [
     title: "갤럭시 버즈 라이브",
     description: "사용감 있으나 정상 작동합니다.",
     basePrice: 30000,
-    thumbnailUrl: "/images/자전거.jpg",
+    thumbnailUrl: "/images/nike.jpg",
     status: "active",
     isScraped: true,
   },
@@ -55,7 +55,7 @@ const dummyRecentAuctions = [
     title: "갤럭시 버즈 라이브",
     description: "사용감 있으나 정상 작동합니다.",
     basePrice: 30000,
-    thumbnailUrl: "/images/자전거.jpg",
+    thumbnailUrl: "/images/아이폰.jpg",
     status: "actives",
     isScraped: true,
   },
@@ -65,8 +65,7 @@ export default function RecentAuctionList() {
   const [items] = useState(dummyRecentAuctions);
 
   return (
-    <div className="p-4">
-      {/* <h2 className="mb-4 text-xl font-bold">최근 등록한 경매</h2> */}
+    <div className="">
       <div className="grid grid-cols-3 gap-4">
         {items.map((item) => (
           <div

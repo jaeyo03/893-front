@@ -20,6 +20,7 @@ interface ImageCarouselProps {
 export default function ImageCarousel({ slides }: ImageCarouselProps) {
   return (
     <div className="relative w-[750px] h-[250px]">
+      {/* Swiper 캐러셀 */}
       <Swiper
         modules={[Navigation, Pagination]}
         navigation={{
@@ -28,7 +29,7 @@ export default function ImageCarousel({ slides }: ImageCarouselProps) {
         }}
         pagination={{
           type: "progressbar",
-          el: ".custom-progress",
+          el: ".custom-progress", // 외부 진행 바 DOM 연결
         }}
         slidesPerView={1}
         loop
@@ -56,7 +57,7 @@ export default function ImageCarousel({ slides }: ImageCarouselProps) {
         ))}
       </Swiper>
 
-      {/* 버튼 */}
+      {/* 이전/다음 버튼 */}
       <div className="absolute bottom-9 right-1 -translate-x-1/2 z-20 flex gap-3">
         <button className="custom-prev bg-black/50 text-white w-12 h-12 rounded-full flex items-center justify-center">
           <ChevronLeft className="w-8 h-8" />
@@ -65,9 +66,9 @@ export default function ImageCarousel({ slides }: ImageCarouselProps) {
           <ChevronRight className="w-8 h-8" />
         </button>
       </div>
-
-      {/* 진행 바 */}
-      <div className="custom-progress swiper-pagination-progressbar absolute bottom-[-12px] left-0 w-full h-[4px] bg-gray-300 z-8" />
+      <div className="absolute -bottom-3 left-0 w-full h-[4px] z-5">
+        <div className="custom-progress swiper-pagination-progressbar h-full bg-gray-300" />
+      </div>
     </div>
   );
 }

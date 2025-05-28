@@ -4,6 +4,7 @@ import SearchInput from "@/components/templates/SearchBox";
 import { Metadata } from "next";
 import QueryProvider from "@/components/QueryProvider";
 import { cookies } from "next/headers";
+import RecentAuctionList from "@/components/home/RecentAuctionList";
 import ImageCarousel, { Slide } from "@/components/home/ImageCarousel";
 import DashboardStats from "@/components/home/DashboardStats.tsx";
 import RealTimeRankingItem from "@/components/home/RealTimeRankingItem";
@@ -63,7 +64,6 @@ export default async function Home() {
             <SearchInput isLogin={!!accessToken} />
           </QueryProvider>
         </div>
-
         {/* 메인 콘텐츠 + 실시간 랭킹 flex row 구성 */}
         <div className="flex items-start gap-6 w-full max-w-screen-xl mx-auto px-4 mt-6">
           {/* 왼쪽 콘텐츠 */}
@@ -78,6 +78,15 @@ export default async function Home() {
           <div className="w-[300px] shrink-0">
             <RealTimeRankingItem />
           </div>
+        </div>
+        <div className="flex justify-start w-[800px] h-[400px]">
+          <RecentAuctionList />
+        </div>
+        <div className="flex justify-start w-full">
+          <DashboardStats stats={statsData} />
+        </div>
+        <div className="flex justify-start px-4 py-8">
+          <ImageCarousel slides={slides} />
         </div>
       </div>
     </>

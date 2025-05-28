@@ -7,7 +7,6 @@ import {
 } from '@/lib/api/searchboxApi'
 import { SearchHistory } from '@/types/response.types'
 
-// 2) localStorage 읽기/쓰기 함수
 function readLocalHistory(): SearchHistory[] {
   return JSON.parse(localStorage.getItem('searchHistory') || '[]');
 }
@@ -16,18 +15,13 @@ function writeLocalHistory(history: SearchHistory[]) {
   localStorage.setItem('searchHistory', JSON.stringify(history));
 }
 
-function resetLocalHistory() {
-  localStorage.removeItem('searchHistory');
-}
-
-export function useSearchHistory(isLogin: boolean) {
+export function useSearchHistory(isLoggedIn: boolean) {
   return useQuery<SearchHistory[]>({
-    queryKey: ['searchHistory', isLogin],
+    queryKey: ['searchHistory', isLoggedIn],
     queryFn: async () => {
-      if (isLogin) {
-        resetLocalHistory();
+      if (isLoggedIn) {
         const response = await getUserSearchHistory();
-        return response.data;
+        return response.data.sort((a, b) => new Date(b?.updatedAt || b?.createdAt).getTime() - new Date(a?.updatedAt || a?.createdAt).getTime());
       } else {
         return readLocalHistory();
       }
@@ -46,11 +40,11 @@ export function useRelatedWords(keyword: string) {
   })
 }
 
-export function useAddSearchHistory(isLogin: boolean) {
+export function useAddSearchHistory(isLoggedIn: boolean) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (keyword: string) => {
-      if (isLogin) {
+      if (isLoggedIn) {
         return postSearchHistory(keyword);
       } else {
         const localHistory = readLocalHistory();
@@ -69,11 +63,11 @@ export function useAddSearchHistory(isLogin: boolean) {
   });
 }
 
-export function useDeleteSearchHistory(isLogin: boolean) {
+export function useDeleteSearchHistory(isLoggedIn: boolean) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      if (isLogin) {
+      if (isLoggedIn) {
         return deleteSearchHistory(id);
       } else {
         const localHistory = readLocalHistory();

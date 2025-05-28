@@ -49,7 +49,8 @@ const statsData = [
 
 export default async function Home() {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+	const accessToken = cookieStore.get('accessToken')?.value
+  const isLoggedIn = accessToken ? true : false;
 
   return (
     <>
@@ -61,7 +62,7 @@ export default async function Home() {
 
         <div className="flex justify-center w-full mt-4">
           <QueryProvider>
-            <SearchInput isLogin={!!accessToken} />
+            <SearchInput isLoggedIn={isLoggedIn}/>
           </QueryProvider>
         </div>
         {/* 메인 콘텐츠 + 실시간 랭킹 flex row 구성 */}

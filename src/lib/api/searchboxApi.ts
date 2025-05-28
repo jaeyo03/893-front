@@ -1,4 +1,3 @@
-import axios from "axios";
 import { BaseResponse, SearchHistory } from "@/types/response.types";
 import { axiosInstance } from "@/lib/axios";
 

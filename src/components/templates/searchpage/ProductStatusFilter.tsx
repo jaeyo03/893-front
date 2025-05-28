@@ -39,11 +39,11 @@ export default function ProductStatusFilter() {
       </div>
       <div className="px-4 py-2 w-full">
         <FilterFieldSet>
-            <FilterCheckBox id="isBrandNew" name="isBrandNew" label="새상품" checked={productNew === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isBrandNew" name="isBrandNew" label="새 상품" checked={productNew === "true"} onChange={handleProductStatusChange}/>
             <FilterCheckBox id="isLikeNew" name="isLikeNew" label="사용감 없음" checked={productLikeNew === "true"} onChange={handleProductStatusChange}/>
             <FilterCheckBox id="isGentlyUsed" name="isGentlyUsed" label="사용감 적음" checked={productGentlyUsed === "true"} onChange={handleProductStatusChange}/>
             <FilterCheckBox id="isHeavilyUsed" name="isHeavilyUsed" label="사용감 많음" checked={productHeavilyUsed === "true"} onChange={handleProductStatusChange}/>
-            <FilterCheckBox id="isDamaged" name="isDamaged" label="고장/파손" checked={productDamaged === "true"} onChange={handleProductStatusChange}/>
+            <FilterCheckBox id="isDamaged" name="isDamaged" label="고장/파손 상품" checked={productDamaged === "true"} onChange={handleProductStatusChange}/>
         </FilterFieldSet>
       </div>
     </div>

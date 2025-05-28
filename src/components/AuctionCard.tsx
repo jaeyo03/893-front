@@ -8,7 +8,7 @@ import { useAddScrap, useDeleteScrap } from '@/hooks/useScarp';
 
 interface AuctionCardProps {
   product: Auction;
-  isLogin: boolean;
+  isLoggedIn: boolean;
 }
 
 const statusMap: Record<Auction['status'], { label: string; color: string }> = {
@@ -18,13 +18,10 @@ const statusMap: Record<Auction['status'], { label: string; color: string }> = {
   cancelled: {label: "취소", color: "bg-red"},
 };
 
-export default function AuctionCard({product, isLogin}: AuctionCardProps) {
-  console.log(product);
+export default function AuctionCard({product, isLoggedIn}: AuctionCardProps) {
   const router = useRouter()
   const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped ?? false);
-  const [bookmarkCount, setBookmarkCount] = useState<number>(product.scrapCount);
-  
-  if (!product) return null;
+  const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   
   const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};
   
@@ -34,7 +31,7 @@ export default function AuctionCard({product, isLogin}: AuctionCardProps) {
   const handleScrapToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsScraped((prev) => !prev);
-    setBookmarkCount((prev) => (isScraped ? prev - 1 : prev + 1));
+    setScrapCount((prev) => (isScraped ? prev - 1 : prev + 1));
     if (isScraped) {
       removeScrapMutation(product.id);
     } else {
@@ -69,7 +66,7 @@ export default function AuctionCard({product, isLogin}: AuctionCardProps) {
         >
           {statusInfo.label}
         </span>
-        {isLogin && (
+        {isLoggedIn && (
           <button
             onClick={handleScrapToggle}
             className="row-start-1 col-start-1 self-end justify-self-end mb-2 mr-2 p-1">
@@ -104,9 +101,9 @@ export default function AuctionCard({product, isLogin}: AuctionCardProps) {
           <span>{product.status === 'pending' ? 0 : product.bidderCount}명</span>
         </div>
         <p className="pt-1 text-sm font-semibold text-black">
-          현재 입찰가 : {(product.status === 'pending' ? product.basePrice : product.basePrice).toLocaleString()}원
+          {(product.status === 'pending' ? `경매 시작가 : ${product.basePrice.toLocaleString()}원` : `현재 입찰가 : ${product.currentPrice.toLocaleString()}원`)}
         </p>
-        <p className="text-xs text-gray-500">스크랩 {bookmarkCount}</p>
+        <p className="text-xs text-gray-500">스크랩 {scrapCount}</p>
       </div>
     </div>
   );

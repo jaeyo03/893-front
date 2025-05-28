@@ -1,7 +1,7 @@
 import { Status } from "@/types/productData";
 import { Auction } from "@/types/response.types";
 
-interface AuctionItemCardProps {
+interface AuctionImageCardProps {
   imageUrl: string;
   label: Status;
 };
@@ -13,7 +13,7 @@ const statusMap: Record<Auction['status'], { label: string; color: string }> = {
   cancelled: {label: "취소", color: "bg-red"},
 };
 
-export default function AuctionItemCard({imageUrl,label}: AuctionItemCardProps) {
+export default function AuctionImageCard({imageUrl,label}: AuctionImageCardProps) {
 
 
 const statusInfo = statusMap[label] ?? {label: "알 수 없음", color: "bg-red-500"};

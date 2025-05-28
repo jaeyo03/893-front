@@ -66,8 +66,6 @@ export default function ImageCarousel({ slides }: ImageCarouselProps) {
           <ChevronRight className="w-8 h-8" />
         </button>
       </div>
-
-      {/* ✅ Swiper 외부, 부모 기준으로 절대 위치 지정 */}
       <div className="absolute -bottom-3 left-0 w-full h-[4px] z-5">
         <div className="custom-progress swiper-pagination-progressbar h-full bg-gray-300" />
       </div>

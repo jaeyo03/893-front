@@ -40,7 +40,6 @@ const slides: Slide[] = [
   },
 ];
 
-
 const statsData = [
   { label: "현재 이용자 수", value: 1504 },
   { label: "현재 등록된 경매 수", value: 984 },
@@ -63,11 +62,11 @@ export default async function Home() {
             <SearchInput isLogin={accessToken ? true : false} />
           </QueryProvider>
         </div>
-        <div className="flex justify-start px-4 py-8">
-          <ImageCarousel slides={slides} />
-        </div>
         <div className="flex justify-start w-full">
           <DashboardStats stats={statsData} />
+        </div>
+        <div className="flex justify-start px-4 py-8">
+          <ImageCarousel slides={slides} />
         </div>
       </div>
     </>

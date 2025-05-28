@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import DetailPageClient from "./DetailPageClient";
 import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
 import { notFound } from "next/navigation";
+import QueryProvider from "@/components/QueryProvider";
 
 interface PageProps {
   params: { idx : string };
@@ -25,9 +26,13 @@ export default async function Page({ params }: PageProps) {
 		getRelatedItem(auctionId, cookieHeader)
 	]);
 
-	console.log(initialBidData);
 	console.log(productData);
 	console.log(relatedItemData);
+	if (!productData) return notFound();
 	
-  return <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={initialBidData} product={productData} relatedItem={relatedItemData.data} />;
+  return (
+    <QueryProvider>
+      <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={initialBidData} product={productData} relatedItem={relatedItemData} />
+    </QueryProvider>
+  );
 }

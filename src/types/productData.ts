@@ -6,7 +6,7 @@ export interface Product {
   status: Status;
   itemCondition: ItemCondition;
   basePrice: number;
-  isScrap: boolean;
+  isScraped: boolean;
   scrapCount: number;
   isSeller: boolean;
   category: Category;

@@ -7,7 +7,6 @@ import BidHistory from "@/components/detail/Bid/BidHistory";
 import BidInteraction from "@/components/detail/BidInteraction";
 import { Product, AuctionBidData, Bid } from "@/types/productData";
 import { useEffect, useState } from "react";
-import { notFound } from "next/navigation";
 import ProductHeader from "@/components/detail/ProductHeader";
 import { AuctionInfo } from "@/components/detail/AuctionInfo";
 import AuctionCard from "@/components/AuctionCard";
@@ -15,12 +14,15 @@ import { Auction } from "@/types/response.types";
 import QueryProvider from "@/components/QueryProvider";
 import { useDeleteScrap } from "@/hooks/useScarp";
 import { useAddScrap } from "@/hooks/useScarp";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { getRemainTime } from "@/lib/util/detailpage";
 
 interface DetailPageClientProps {
-  initialBidData: AuctionBidData | null;
-  product: Product | null;
+  initialBidData: AuctionBidData;
+  product: Product;
   isLoggedIn: boolean;
-  relatedItem: Auction[];
+  relatedItem: Auction[] | null;
 }
 
 export default function DetailPageClient({
@@ -28,17 +30,44 @@ export default function DetailPageClient({
   product,
   isLoggedIn,
   relatedItem,
-}: DetailPageClientProps) {
-  if (!product || !initialBidData) return notFound();
-
-  const [isScraped, setIsScraped] = useState<boolean>(product.isScrap ?? false);
+}: DetailPageClientProps) { 
+  const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   const [bidData, setBidData] = useState<AuctionBidData>(initialBidData);
   const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.bids[0]?.bidPrice || product.basePrice);
-  
+  const [remainTime, setRemainTime] = useState<number>(getRemainTime(product.endTime));
+  const { startTime, endTime } = product;
+
+  // 남은 시간과 시작 여부
+  const start = new Date(startTime).getTime();
+  const end = new Date(endTime).getTime();
+  const isBeforeStart = Date.now() < start;
+
+  // 시간 계산 useEffect
+  useEffect(() => {
+    if (isNaN(start) || isNaN(end)) {
+      console.error("잘못된 날짜 형식입니다:", { startTime, endTime });
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diff = isBeforeStart ? start - now : end - now;
+      setRemainTime(Math.max(Math.floor(diff / 1000), 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const {mutate: addScrapMutation} = useAddScrap();
   const {mutate: removeScrapMutation} = useDeleteScrap();
   
+  const router = useRouter();
+
+  const handlePayment = () => {
+    router.push(`/payment?auctionId=${product.auctionId}`);
+  };
+
   const handleScrapToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsScraped((prev) => !prev);
@@ -57,10 +86,9 @@ export default function DetailPageClient({
     totalBidder: number;
   }) => {
     const newBid = data.bid;
-    
+    setCurrentPrice(data.currentPrice);
     setBidData((prev) => {
       const updatedBids = [newBid, ...prev.bids];
-      setCurrentPrice(data.currentPrice);
       return {
         ...prev,
         bids: updatedBids,
@@ -118,7 +146,7 @@ export default function DetailPageClient({
     return () => {
       eventSource.close();
     };
-  }, []);
+  }, [product.auctionId]);
 
   return (
     <>
@@ -151,9 +179,19 @@ export default function DetailPageClient({
                   scrapCount={scrapCount}
                   handleScrapToggle={handleScrapToggle}
                   isLoggedIn={isLoggedIn}
+                  remainTime={remainTime}
+                  isBeforeStart={isBeforeStart}
                 />
               </div>
-              {!product.isSeller && (
+              
+              {!isLoggedIn && (
+                <>
+                  <hr className="border-gray-300 my-4" />
+                  <div className="text-center text-gray-500">로그인 후 입찰 가능합니다.</div>
+                </>
+              )}
+
+              {isLoggedIn && !product.isSeller && product.status === "active" && (
                 <>
                   <hr className="border-gray-300 my-4" />
                   <BidInteraction
@@ -162,7 +200,17 @@ export default function DetailPageClient({
                     removeBidData={removeBidData}
                     isLoggedIn={isLoggedIn}
                     currentPrice={currentPrice}
+                    remainTime={remainTime}
                   />
+                </>
+              )}
+
+              {!product.isSeller && product.status === "completed" && !product.hasBeenPaid && product.currentUserBuyer && (
+                <>
+                  <hr className="border-gray-300 my-4" />
+                  <button className="w-[72px] h-[32px] text-sm text-white rounded bg-green-500 hover:bg-green-600" onClick={handlePayment}>
+                    결제하기
+                  </button>
                 </>
               )}
             </div>
@@ -182,10 +230,13 @@ export default function DetailPageClient({
           <QueryProvider>
             {Array.isArray(relatedItem) && relatedItem.length > 0 ? (
               relatedItem.map((item) => (
-                <AuctionCard product={item} isLogin={isLoggedIn} />
+                <AuctionCard key={item.id} product={item} isLoggedIn={isLoggedIn} />
               ))
             ) : (
-              <p className="text-sm text-gray-400 pl-4">관련 상품이 없습니다.</p>
+              <div className="grid items-center h-40 w-full gap-2 justify-center">
+                <Image src="/icons/SearchEmpty.svg" alt="관련 상품이 없습니다." width={136} height={99}/>
+                <div className="text-center text-gray-500">관련 상품이 없습니다</div>
+              </div>
             )}
           </QueryProvider>
         </div>

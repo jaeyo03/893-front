@@ -12,7 +12,7 @@ export default function GoodsInfo({ description, itemCondition }: GoodsInfoProps
       badgeColor: 'bg-green-100 text-green-800',
     },
     like_new: {
-      label: '거의 새 상품',
+      label: '사용감 없음',
       badgeColor: 'bg-blue-100 text-blue-800',
     },
     gently_used: {
@@ -24,7 +24,7 @@ export default function GoodsInfo({ description, itemCondition }: GoodsInfoProps
       badgeColor: 'bg-orange-100 text-orange-800',
     },
     damaged: {
-      label: '손상 있음',
+      label: '고장/파손 상품',
       badgeColor: 'bg-red-100 text-red-800',
     },
   };

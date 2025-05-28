@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Product, AuctionBidData, Bid } from "@/types/productData";
+import { useEffect, useState, useRef } from "react";
+import { Product, AuctionBidData } from "@/types/productData";
 import {
   cancelBid,
   postBid,
@@ -7,8 +7,8 @@ import {
 import toast from "react-hot-toast";
 import { TriangleAlert } from "lucide-react";
 import WarningModal from "./WarningModal";
-import { useRouter } from "next/navigation";
 import { numberToKorean, getRemainTime, formatTime } from "@/lib/util/detailpage";
+import { AxiosError } from "axios";
 
 interface BidInteractionProps {
   product: Product;
@@ -16,6 +16,7 @@ interface BidInteractionProps {
   removeBidData: (bidId: number) => void;
   isLoggedIn: boolean;
   currentPrice: number;
+  remainTime: number;
 }
 
 export default function BidInteraction({
@@ -24,23 +25,18 @@ export default function BidInteraction({
   removeBidData,
   isLoggedIn,
   currentPrice,
+  remainTime,
 }: BidInteractionProps) {
-  const [myBidId, setMyBidId] = useState<number>(0);
+  const myBidIdRef = useRef<number>(0);
   const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : product.basePrice);
   const [show, setShow] = useState(false);
   const [isCancelable, setIsCancelable] = useState(auctionBidData.canCancelBid);
   const myRecentBidCreatedDate = auctionBidData?.recentUserBid?.createdAt ? new Date(auctionBidData?.recentUserBid?.createdAt) : null;
   const cancelAvailableDate = myRecentBidCreatedDate ? new Date(myRecentBidCreatedDate.getTime() + 60 * 1000) : null;
   const [cancelTimer, setCancelTimer] = useState<number>(getRemainTime(cancelAvailableDate?.toISOString() || ""));
-  const [remainTime, setRemainTime] = useState<number>(getRemainTime(product.endTime));
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPaymentAvailable = product.hasBeenPaid && product.currentUserBuyer && remainTime <= 0;
-  const router = useRouter();
-
-  const handlePayment = () => {
-    router.push(`/payment?auctionId=${product.auctionId}`);
-  };
+  const isBidAvailable = !product.hasBeenPaid && remainTime > 0 && !product.isSeller && product.status === "active";
 
   const handleBid = async () => {
     const isInitialBid = bidAmount === product.basePrice;
@@ -69,8 +65,8 @@ export default function BidInteraction({
 
       if (response) {
         const bidResponse = response.data;
-        setMyBidId(bidResponse.bid.bidId);
-        
+        myBidIdRef.current = bidResponse.bid.bidId;
+
         const createdDate = new Date(bidResponse.bid.createdAt);
         const cancelDate = new Date(createdDate.getTime() + 60 * 1000);
         setCancelTimer(getRemainTime(cancelDate.toISOString()));
@@ -78,7 +74,10 @@ export default function BidInteraction({
         setIsCancelable(bidResponse.canCancelBid);
       }
       toast.success("입찰이 성공적으로 처리되었습니다.");
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error("서버 응답 내용:", error.response?.data);
+      }
       toast.error("입찰에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       setIsLoading(false);
@@ -102,27 +101,23 @@ export default function BidInteraction({
     try {
       const response = await cancelBid({
         auctionId: product.auctionId,
-        bidId: myBidId,
+        bidId: myBidIdRef.current,
       });
 
       if (response) {
         setCancelTimer(0);
-        removeBidData(myBidId);
+        removeBidData(myBidIdRef.current);
       }
       toast.success("입찰이 취소되었습니다.");
-    } catch (error: any) {
-      toast.error(error?.message || "입찰 취소에 실패했습니다.");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error("서버 응답 내용:", error.response?.data);
+      }
+      toast.error("입찰 취소에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRemainTime(getRemainTime(product.endTime));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [product.endTime]);
 
   useEffect(() => {
     if (currentPrice > 0) {
@@ -169,50 +164,40 @@ export default function BidInteraction({
             !isLoggedIn || product.isSeller ? "" : bidAmount !== 0 ? bidAmount : ""
           }
           onChange={handleInputChange}
-          disabled={isPaymentAvailable}
+          disabled={!isBidAvailable}
           readOnly={!isLoggedIn || product.isSeller}
           className="w-full px-2 py-1 text-right border rounded bg-gray-100"
         />
 
-        {isLoggedIn && !product.isSeller ? (
-          <button
-            className={`w-[72px] h-[32px] text-sm text-white rounded ${
-              isPaymentAvailable
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-main hover:bg-blue-700"
-            }`}
-            onClick={isPaymentAvailable ? handlePayment : handleBid}
-          >
-            {isPaymentAvailable ? "결제하기" : "입찰하기"}
-          </button>
-        ) : (
-          <div className="w-[72px] h-[32px]" />
+        {isLoggedIn && isBidAvailable && (
+          <>
+            <button className="w-[72px] h-[32px] text-sm text-white rounded bg-main hover:bg-blue-700" onClick={handleBid}>
+              입찰하기
+            </button>
+            <div
+              className="relative inline-block"
+              onMouseEnter={() => setShow(true)}
+              onMouseLeave={() => setShow(false)}
+            >
+              <TriangleAlert
+                className="w-5 h-5 cursor-pointer"
+                fill="red"
+                color="white"
+              />
+              <WarningModal
+                isOpen={show}
+                positionClass="left-1/2 top-full mt-2 -translate-x-1/2"
+              />
+            </div>
+          </>
         )}
+      </div> 
 
-        {isLoggedIn && !product.isSeller ? (
-          <div
-            className="relative inline-block"
-            onMouseEnter={() => setShow(true)}
-            onMouseLeave={() => setShow(false)}
-          >
-            <TriangleAlert
-              className="w-5 h-5 cursor-pointer"
-              fill="red"
-              color="white"
-            />
-            <WarningModal
-              isOpen={show}
-              positionClass="left-1/2 top-full mt-2 -translate-x-1/2"
-            />
-          </div>
-        ) : null}
-      </div>
-
-      {isLoggedIn && !product.isSeller ? (
-        <p className="mt-1 text-xs font-thin text-right text-red mr-[100px]">
+      {isLoggedIn && isBidAvailable && (
+        <p className="mt-1 text-xs font-thin text-right text-red mr-[96px]">
           {bidAmount > 0 ? numberToKorean(bidAmount) : ""}
         </p>
-      ) : null}
+      )}
 
       {cancelTimer > 0 && isCancelable && (
         <div className="flex items-center justify-between p-3 text-yellow-800 bg-yellow-100 rounded-lg">

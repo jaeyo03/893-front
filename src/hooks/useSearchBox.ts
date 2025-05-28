@@ -15,11 +15,11 @@ function writeLocalHistory(history: SearchHistory[]) {
   localStorage.setItem('searchHistory', JSON.stringify(history));
 }
 
-export function useSearchHistory(isLogin: boolean) {
+export function useSearchHistory(isLoggedIn: boolean) {
   return useQuery<SearchHistory[]>({
-    queryKey: ['searchHistory', isLogin],
+    queryKey: ['searchHistory', isLoggedIn],
     queryFn: async () => {
-      if (isLogin) {
+      if (isLoggedIn) {
         const response = await getUserSearchHistory();
         return response.data.sort((a, b) => new Date(b?.updatedAt || b?.createdAt).getTime() - new Date(a?.updatedAt || a?.createdAt).getTime());
       } else {
@@ -40,11 +40,11 @@ export function useRelatedWords(keyword: string) {
   })
 }
 
-export function useAddSearchHistory(isLogin: boolean) {
+export function useAddSearchHistory(isLoggedIn: boolean) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (keyword: string) => {
-      if (isLogin) {
+      if (isLoggedIn) {
         return postSearchHistory(keyword);
       } else {
         const localHistory = readLocalHistory();
@@ -63,11 +63,11 @@ export function useAddSearchHistory(isLogin: boolean) {
   });
 }
 
-export function useDeleteSearchHistory(isLogin: boolean) {
+export function useDeleteSearchHistory(isLoggedIn: boolean) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: number) => {
-      if (isLogin) {
+      if (isLoggedIn) {
         return deleteSearchHistory(id);
       } else {
         const localHistory = readLocalHistory();

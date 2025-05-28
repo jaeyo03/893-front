@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 export default async function Home() {
   const cookieStore = cookies();
 	const accessToken = cookieStore.get('accessToken')?.value
-  
+  const isLoggedIn = accessToken ? true : false;
+
   return (
     <>
       <div className="grid justify-center items-center gap-6 w-full mt-6">
@@ -23,7 +24,7 @@ export default async function Home() {
         </HomeTitle>
         <div className="flex justify-center w-full">
           <QueryProvider>
-            <SearchInput isLogin={accessToken ? true : false}/>
+            <SearchInput isLoggedIn={isLoggedIn}/>
           </QueryProvider>
         </div>
       </div>

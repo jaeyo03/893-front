@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {loadTossPayments, ANONYMOUS, TossPaymentsWidgets} from "@tosspayments/tosspayments-sdk";
 import { OrderResponse } from "@/types/response.types";
 import {postPaymentInfo} from "@/lib/api/order";
@@ -11,17 +11,16 @@ interface CheckoutPageProps {
   userOrderInfo : OrderResponse | null;
 }
 
-const generateRandomString = () => window.btoa(String(Math.random())).slice(0, 20);
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
 export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
-  const [ready, setReady] = useState(false);
+  const [, setReady] = useState(false);
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
   const finalPrice = userOrderInfo?.finalPrice ?? 0;
-  const [amount, setAmount] = useState({
+  const amount = {
     currency: "KRW",
     value: finalPrice, // TODO 추후 예외처리 필요
-  });
+  };
   
   console.log(userOrderInfo);
 

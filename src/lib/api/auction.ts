@@ -49,7 +49,7 @@ export const postBid = async ({
     });
 
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('Axios Error:', error.response?.data || error.message);
     } else {
@@ -69,7 +69,7 @@ export const cancelBid = async ({
   try {
     const response = await axiosInstance.patch(`/api/auctions/${auctionId}/bids/${bidId}`);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('Axios Error:', error.response?.data || error.message);
     } else {

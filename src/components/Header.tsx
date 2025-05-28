@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Gavel, Bell, User, Menu, X, Search } from "lucide-react";
+import { Home, Gavel, User, Menu, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "@/components/notification/NotificationDropdown";
 

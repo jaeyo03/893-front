@@ -8,7 +8,7 @@ import { useAddScrap, useDeleteScrap } from '@/hooks/useScarp';
 
 interface AuctionCardProps {
   product: Auction;
-  isLogin: boolean;
+  isLoggedIn: boolean;
 }
 
 const statusMap: Record<Auction['status'], { label: string; color: string }> = {
@@ -18,12 +18,10 @@ const statusMap: Record<Auction['status'], { label: string; color: string }> = {
   cancelled: {label: "취소", color: "bg-red"},
 };
 
-export default function AuctionCard({product, isLogin}: AuctionCardProps) {
+export default function AuctionCard({product, isLoggedIn}: AuctionCardProps) {
   const router = useRouter()
   const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
-  
-  if (!product) return null;
   
   const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};
   
@@ -68,7 +66,7 @@ export default function AuctionCard({product, isLogin}: AuctionCardProps) {
         >
           {statusInfo.label}
         </span>
-        {isLogin && (
+        {isLoggedIn && (
           <button
             onClick={handleScrapToggle}
             className="row-start-1 col-start-1 self-end justify-self-end mb-2 mr-2 p-1">

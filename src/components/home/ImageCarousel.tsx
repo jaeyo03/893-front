@@ -67,7 +67,7 @@ export default function ImageCarousel({ slides }: ImageCarouselProps) {
       </div>
 
       {/* 진행 바 */}
-      <div className="custom-progress swiper-pagination-progressbar absolute bottom-[-12px] left-0 w-full h-[4px] bg-gray-300 z-10" />
+      <div className="custom-progress swiper-pagination-progressbar absolute bottom-[-12px] left-0 w-full h-[4px] bg-gray-300 z-8" />
     </div>
   );
 }

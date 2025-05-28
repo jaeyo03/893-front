@@ -201,7 +201,7 @@ input[type="text"]:focus {
 .btn {
   padding: 11px 22px;
   border: none;
-  border-radius:  8px;
+  border-radius: 8px;
 
   background-color: #f2f4f6;
   color: #4e5968;
@@ -310,4 +310,9 @@ input[type="text"]:focus {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+.swiper-pagination-progressbar-fill {
+  background-color: #3b82f6 !important;
+  height: 100%; /* 높이를 100%로 줘야 바가 꽉 찬다 */
 }

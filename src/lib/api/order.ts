@@ -63,17 +63,19 @@ export async function postPaymentInfo(auctionId : string, paymentRequest : TossP
   }
 }
 
-export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<TossPaymentConfirmResponse | null>>{
+export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest, cookieHeader : string) : Promise<BaseResponse<TossPaymentConfirmResponse> | ErrorResponse>{
   try {
-    const response = await axiosInstance.post(`/api/payments/confirm`, paymentConfirmRequest);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify(paymentConfirmRequest),
+      cache: "no-store",
+    });
 
-    // if (response.status !== 200) {
-    //   const error = response.data;
-    //   console.log(error);
-    //   throw new Error(error.response.data || "결제 승인 실패");
-    // }
-
-    return response.data;
+    return response.json();
   } catch (error) {
     console.error("Error posting payment confirm:", error);
     throw error;

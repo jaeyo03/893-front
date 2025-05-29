@@ -96,26 +96,26 @@ export default function MyTabs() {
 
         {/* TabsContent - 탭의 내용 정의 */}
         <TabsContent value="bids" className="p-2">
-          {bids.map((bid) => (
-            <MyBidsProductCard key={bid.auctionId} myBidProduct={bid} />
+          {bids.map((bid, index) => (
+            <MyBidsProductCard key={index + 'bids'} myBidProduct={bid} />
           ))}
         </TabsContent>
         <TabsContent value="auctions" className="p-2">
           {auctions.map((auction) => (
             <MyAuctionsProductCard 
-              key={auction.auctionId} 
+              key={auction.auctionId + 'auctions'} 
               auctions={auction} 
               onDelete={handleDelete}/>
           ))}
         </TabsContent>
         <TabsContent value="scraps" className="p-2">
           {scraps.map((scrap) => (
-            <MyScrapsProductCard key = { scrap.auctionId} scrap={scrap} />
+            <MyScrapsProductCard key = { scrap.auctionId + 'scraps'} scrap={scrap} />
           ))}
         </TabsContent>
         <TabsContent value="payments" className="p-2">
           {payments.map((payment) => (
-            <MyPaymentsProductCard key={payment.auctionId} payments={payment}/>
+            <MyPaymentsProductCard key={payment.auctionId + 'payments'} payments={payment}/>
           ))}
         </TabsContent>
       </div>

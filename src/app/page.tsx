@@ -11,7 +11,8 @@ import RealTimeRankingItem from "@/components/home/RealTimeRankingItem";
 import AuctionSoonItem, {
   AuctionSoonItemProps,
 } from "@/components/home/AuctionSoonList";
-import TopBidCard, { TopBidItemProps } from "@/components/home/TopBodCard";
+import TopBidCard, { TopBidItemProps } from "@/components/home/TopBidCard";
+import BestByCategory from "@/components/home/BestItemByCategory";
 
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
@@ -188,6 +189,15 @@ export default async function Home() {
             {top5.map((item) => (
               <TopBidCard key={item.auctionId} {...item} />
             ))}
+          </div>
+        </div>
+
+        <div className="pt-20 pb-20">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
+            카테고리별 베스트 TOP3
+          </h2>
+          <div className="flex gap-4">
+            <BestByCategory />
           </div>
         </div>
       </div>

@@ -16,6 +16,8 @@ export default function CategorySub({ categoryList }: { categoryList: AuctionCat
   const currentCategoryMain = searchParams.get('mainCategoryId')
   const currentCategory = searchParams.get('subCategoryId') || ""
   
+  const subCategoryList = categoryList?.filter((category) => category.parentId === parseInt(currentCategoryMain || "0"))
+
   // 카테고리 값 변경 시 URL 업데이트
   const handleCategoryChange = useCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -28,6 +30,8 @@ export default function CategorySub({ categoryList }: { categoryList: AuctionCat
     
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [router, searchParams])
+  
+  if (!subCategoryList || subCategoryList.length === 0) return null;
 
   return (
     <div>
@@ -38,7 +42,7 @@ export default function CategorySub({ categoryList }: { categoryList: AuctionCat
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {categoryList?.filter((category) => category.parentId === parseInt(currentCategoryMain || "0")).map((category) => (
+            {subCategoryList?.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
             ))}
           </SelectGroup>

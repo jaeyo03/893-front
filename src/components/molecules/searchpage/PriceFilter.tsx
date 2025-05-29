@@ -49,6 +49,15 @@ export default function PriceFilter({ minPrice, maxPrice }: PriceFilterProps) {
 
     if (currentMinPrice !== null && currentMinPrice >= currentMaxPrice) {
       alert('최소 가격이 최대 가격보다 클 수 없습니다.'); // TODO Toast로 변경
+      setCurrentMinPrice(null);
+      setCurrentMaxPrice(null);
+      return;
+    }
+
+    if(currentMaxPrice > 1000000000) {
+      alert('최대 가격은 10억원을 넘을 수 없습니다.'); // TODO Toast로 변경
+      setCurrentMaxPrice(null);
+      setCurrentMinPrice(null);
       return;
     }
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import LoadingState from "@/components/payment/LoadingState";
 import CompletedState from "@/components/payment/CompletedState";
-import { PaymentType, TossPaymentConfirmResponse } from "@/types/payment.types";
+import { PaymentType } from "@/types/payment.types";
 import { postPaymentConfirm } from "@/lib/api/order";
 import { useMutation } from "@tanstack/react-query";
 
@@ -15,16 +15,13 @@ interface PaySuccessProps {
 }
 
 export default function PaySuccess({ paymentKey, orderId, amount, paymentType } : PaySuccessProps) {
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  
-  console.log(paymentKey, orderId, amount, paymentType);
+  const hasCalledApi = useRef(false);
 
   // TODO: API를 호출해서 서버에게 paymentKey, orderId, amount를 넘겨주세요.
   // 서버에선 해당 데이터를 가지고 승인 API를 호출하면 결제가 완료됩니다.
   // https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
-
   
-  const { mutate: confirmPayment, data: paymentResponse } = useMutation({
+  const { mutate: confirmPayment, data: paymentResponse, isSuccess, isPending, isError } = useMutation({
     mutationFn: () => postPaymentConfirm({
       paymentKey : paymentKey || "",
       orderId : orderId || "",
@@ -33,38 +30,28 @@ export default function PaySuccess({ paymentKey, orderId, amount, paymentType } 
     }),
     onSuccess: (data) => {
       console.log('Payment response:', data);
-      setTimeout(() => {
-        setIsConfirmed(true);
-      }, 2000);
     },
     onError: (error) => {
       console.error('Payment error:', error);
-      setIsConfirmed(false);
     }
   });
-  
+
   useEffect(() => {
-    confirmPayment();
+    if (!hasCalledApi.current) {
+      confirmPayment();
+      hasCalledApi.current = true;
+    }
   }, [confirmPayment]);
-  
-  const mockPaymentResponse: TossPaymentConfirmResponse = {
-    paymentKey: "PAY20250515123456",
-    orderId: "ORD20250515123456",
-    orderName: "테스트 상품 결제",
-    approvedAt: "2025-05-15T12:34:56Z",
-    totalAmount: 25000,
-    customerEmail: "hong.gildong@example.com",
-    customerName: "홍길동",
-    customerMobilePhone: "010-1234-5678",
-  };
 
   return (
     <div className="mt-10">
-      {isConfirmed ? (
-        <CompletedState paymentData={paymentResponse?.data || mockPaymentResponse} />
-      ) : (
-        <LoadingState />
+      {isPending && <LoadingState />}
+
+      {isSuccess && paymentResponse?.data && (
+        <CompletedState paymentData={paymentResponse?.data} />
       )}
+
+      {isError && <div>에러 발생</div>}
     </div>
   );
 }

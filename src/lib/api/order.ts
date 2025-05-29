@@ -66,13 +66,16 @@ export async function postPaymentInfo(auctionId : string, paymentRequest : TossP
 export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<TossPaymentConfirmResponse | null>>{
   try {
     const response = await axiosInstance.post(`/api/payments/confirm`, paymentConfirmRequest);
+
+    // if (response.status !== 200) {
+    //   const error = response.data;
+    //   console.log(error);
+    //   throw new Error(error.response.data || "결제 승인 실패");
+    // }
+
     return response.data;
   } catch (error) {
     console.error("Error posting payment confirm:", error);
-    return {
-      data: null,
-      message: "Failed to post payment confirm",
-      code: 500,
-    }
+    throw error;
   }
 }

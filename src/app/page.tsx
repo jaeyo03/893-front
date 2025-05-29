@@ -11,6 +11,8 @@ import RealTimeRankingItem from "@/components/home/RealTimeRankingItem";
 import AuctionSoonItem, {
   AuctionSoonItemProps,
 } from "@/components/home/AuctionSoonList";
+import TopBidCard, { TopBidItemProps } from "@/components/home/TopBodCard";
+
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
   description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
@@ -20,7 +22,6 @@ const slides: Slide[] = [
   {
     imageUrl: "/images/adidas.jpg",
     label: "덕질은\n삶의 에너지니까",
-    // badge: "재호",
   },
   {
     imageUrl: "/images/nike.jpg",
@@ -44,11 +45,11 @@ const slides: Slide[] = [
   },
 ];
 
-const statsData = [
-  { label: "현재 이용자 수", value: 1504 },
-  { label: "현재 등록된 경매 수", value: 984 },
-  { label: "현재 진행중인 경매 수", value: 324 },
-];
+// const statsData = [
+//   { label: "현재 이용자 수", value: 1504 },
+//   { label: "현재 등록된 경매 수", value: 984 },
+//   { label: "현재 진행중인 경매 수", value: 324 },
+// ];
 
 const auctionSoonData: AuctionSoonItemProps[] = [
   {
@@ -83,6 +84,53 @@ const auctionSoonData: AuctionSoonItemProps[] = [
   },
 ];
 
+const top5: TopBidItemProps[] = [
+  {
+    auctionId: 101,
+    title: "컵라면 100개 묶음 한정판",
+    bidCount: 764,
+    thumbnailUrl: "/images/라이젠.jpg",
+    basePrice: 350000,
+    itemPrice: 2400000,
+    isCurrentUserBuyer: "김*진",
+  },
+  {
+    auctionId: 102,
+    title: "발마사지 발판 | 편안한 하루의 시작",
+    bidCount: 152,
+    thumbnailUrl: "/images/자전거.jpg",
+    basePrice: 12000,
+    itemPrice: 39000,
+    isCurrentUserBuyer: "이*현",
+  },
+  {
+    auctionId: 103,
+    title: "무흠집 스텐 후라이팬 풀세트",
+    bidCount: 321,
+    thumbnailUrl: "/images/아이폰.jpg",
+    basePrice: 45000,
+    itemPrice: 105000,
+    isCurrentUserBuyer: "최*미",
+  },
+  {
+    auctionId: 104,
+    title: "짱구 식기 세트 완구 포함 풀구성",
+    bidCount: 435,
+    thumbnailUrl: "/images/맥.jpg",
+    basePrice: 19800,
+    itemPrice: 31900,
+    isCurrentUserBuyer: "박*수",
+  },
+  {
+    auctionId: 105,
+    title: "어른이를 위한 감성 타자기 세트",
+    bidCount: 869,
+    thumbnailUrl: "/images/nike.jpg",
+    basePrice: 15000,
+    itemPrice: 29400,
+    isCurrentUserBuyer: "정*웅",
+  },
+];
 export default async function Home() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -99,14 +147,14 @@ export default async function Home() {
 
         <div className="flex justify-center w-full mt-4">
           <QueryProvider>
-            <SearchInput isLoggedIn={isLoggedIn}/>
+            <SearchInput isLoggedIn={isLoggedIn} />
           </QueryProvider>
         </div>
         {/*  */}
         <div className="flex items-start gap-6 w-full max-w-screen-xl  px-4 mt-6">
           {/* 좌 */}
           <div className="flex-1 max-w-[780px]">
-            <DashboardStats stats={statsData} />
+            <DashboardStats />
             <div className="mt-10">
               <ImageCarousel slides={slides} />
             </div>
@@ -128,6 +176,17 @@ export default async function Home() {
           <div className="flex justify-center gap-6">
             {limited.map((item) => (
               <AuctionSoonItem key={item.auctionId} {...item} />
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-20">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
+            최근 7일 최고 낙찰가 TOP 5
+          </h2>
+          <div className="flex gap-4">
+            {top5.map((item) => (
+              <TopBidCard key={item.auctionId} {...item} />
             ))}
           </div>
         </div>

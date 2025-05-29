@@ -14,7 +14,7 @@ function formatCurrency(amount: number): string {
 }
 
 export default function CompletedState({ paymentData }: { paymentData: TossPaymentConfirmResponse }) {
-  if (!paymentData) return null
+  console.log(paymentData);
 
   return (
     <div className="space-y-8 grid items-center justify-center">
@@ -71,9 +71,9 @@ export default function CompletedState({ paymentData }: { paymentData: TossPayme
               주문 내역 보기
             </Button>
           </Link>
-          <Link href="/search" className="w-full sm:w-auto">
+          <Link href="/" className="w-full sm:w-auto">
             <Button className="w-full bg-main hover:bg-main/90">
-              쇼핑 계속하기 <ArrowRight className="ml-2 h-4 w-4" />
+              메인으로 가기 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </CardFooter>

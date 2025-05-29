@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   const cookieStore = cookies();
   const isLoggedIn = cookieStore.has("accessToken");
-  console.log(isLoggedIn);
+  
   return (
     <html lang="ko">
       <body

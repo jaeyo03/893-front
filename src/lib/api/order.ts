@@ -1,22 +1,30 @@
-import { OrderResponse, BaseResponse } from "@/types/response.types";
+import { OrderResponse, BaseResponse, ErrorResponse } from "@/types/response.types";
 import { TossPaymentConfirmRequest, TossPaymentConfirmResponse, TossPaymentRequest, TossPaymentResponse } from "@/types/payment.types";
 import axios from "axios";
 
 // 서버 컴포넌트 버전
-export async function getUserOrderInfoForServer(auctionId : string, cookieHeader : string) : Promise<BaseResponse<OrderResponse | null>>{
+export async function getUserOrderInfoForServer(auctionId : string, cookieHeader : string) : Promise<BaseResponse<OrderResponse> | ErrorResponse>{
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/orders`, {
       headers: {
         Cookie: cookieHeader,
       },
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return errorData;
+    }
+
     return response.json();
   } catch (error) {
     console.error("Error fetching user payment info:", error);
     return {
-      data: null,
-      message: "Failed to fetch user payment info",
-      code: 500,
+      type: "error",
+      title: "Failed to fetch user payment info",
+      status: 500,
+      detail: "Failed to fetch user payment info",
+      instance: `/api/auctions/${auctionId}/orders`,
     }
   }
 }
@@ -55,16 +63,21 @@ export async function postPaymentInfo(auctionId : string, paymentRequest : TossP
   }
 }
 
-export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest) : Promise<BaseResponse<TossPaymentConfirmResponse | null>>{
+export async function postPaymentConfirm(paymentConfirmRequest : TossPaymentConfirmRequest, cookieHeader : string) : Promise<BaseResponse<TossPaymentConfirmResponse> | ErrorResponse>{
   try {
-    const response = await axiosInstance.post(`/api/payments/confirm`, paymentConfirmRequest);
-    return response.data;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: cookieHeader,
+      },
+      body: JSON.stringify(paymentConfirmRequest),
+      cache: "no-store",
+    });
+
+    return response.json();
   } catch (error) {
     console.error("Error posting payment confirm:", error);
-    return {
-      data: null,
-      message: "Failed to post payment confirm",
-      code: 500,
-    }
+    throw error;
   }
 }

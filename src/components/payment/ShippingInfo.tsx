@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface ShippingInfoProps {
   name : string;
   addressLine1 : string;
@@ -14,7 +16,7 @@ export default function ShippingInfo({ name, addressLine1, addressLine2, phoneNu
           배송지 <span className="font-normal">| {name}</span>
         </div>
         <button className="border border-blue-500 text-blue-600 text-sm px-3 py-1 rounded-md hover:bg-blue-50">
-          배송지 변경
+          <Link href="/profile">배송지 변경</Link>
         </button>
       </div>
 

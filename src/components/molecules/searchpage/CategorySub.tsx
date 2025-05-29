@@ -31,6 +31,8 @@ export default function CategorySub({ categoryList }: { categoryList: AuctionCat
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [router, searchParams])
   
+  if (!subCategoryList || subCategoryList.length === 0) return null;
+
   return (
     <div>
       <div className="text-sm text-gray-500">중분류</div>

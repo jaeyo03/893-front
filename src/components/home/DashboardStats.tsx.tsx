@@ -39,7 +39,7 @@ const DashboardStats: React.FC = () => {
 
         setStats(transformed);
       } catch (error) {
-        console.error("📛 Dashboard 통계 가져오기 실패:", error);
+        console.error("Dashboard 통계 가져오기 실패:", error);
       } finally {
         setLoading(false);
       }

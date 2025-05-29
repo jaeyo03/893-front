@@ -15,6 +15,8 @@ export default function CategoryDetail({ categoryList }: { categoryList: Auction
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get('detailCategoryId') || ""
   const currentCategorySub = searchParams.get('subCategoryId') || ""
+  const detailCategoryList = categoryList?.filter((category) => category.parentId === parseInt(currentCategorySub || "0"))
+  console.log(detailCategoryList)
 
   // 카테고리 값 변경 시 URL 업데이트
   const handleCategoryChange = useCallback((value: string) => {
@@ -30,6 +32,8 @@ export default function CategoryDetail({ categoryList }: { categoryList: Auction
     router.replace(`/search?${params.toString()}`, { scroll: false })
   }, [router, searchParams])
 
+  if (!detailCategoryList || detailCategoryList.length === 0) return null;
+
   return (
     <div>
       <div className="text-sm text-gray-500">소분류</div>
@@ -39,7 +43,7 @@ export default function CategoryDetail({ categoryList }: { categoryList: Auction
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {categoryList?.filter((category) => category.parentId === parseInt(currentCategorySub || "0")).map((category) => (
+            {detailCategoryList?.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>{category.name}</SelectItem>
             ))}
           </SelectGroup>

@@ -12,7 +12,7 @@ export default function DeliveryAddressCard({ data, onDelete, onSetMain }: Deliv
   return (
     <div className="border rounded-md p-4 bg-gray-50 mb-3">
       <div className="flex justify-between items-center mb-2">
-        <div className="font-bold">| {data.name}</div>
+        <div className="font-bold">{data.name}</div>
         <div className="space-x-2">
           {!data.isDefault && onSetMain && (
             <Button size="sm" className="bg-blue-500 text-white" onClick={onSetMain}>

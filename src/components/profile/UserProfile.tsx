@@ -205,11 +205,19 @@ export default function UserProfile() {
           </div>
           <div className="text-sm">
             <p className="text-gray-500">배송지</p>
-            <p>{userInfo.address}</p>
+            {userInfo.address ? (
+              <p>{userInfo.address}</p>
+            ) : (
+              <p className="text-rose-500">대표 배송지를 설정해주세요</p>
+            )}
           </div>
           <div className="text-sm">
             <p className="text-gray-500">전화번호</p>
-            <p>{userInfo.phone}</p>
+            {userInfo.phone ? (
+              <p>{userInfo.phone}</p>
+            ) : (
+              <p className="text-rose-500">대표 배송지를 설정해주세요</p>
+            )}
           </div>
         </div>
       </div>

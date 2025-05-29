@@ -19,7 +19,6 @@ export default function TopBidCard({
 }: TopBidItemProps) {
   return (
     <div className="w-full rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition">
-      {/* 이미지 + 추천 뱃지 */}
       <div className="relative">
         <img
           src={thumbnailUrl}
@@ -28,7 +27,6 @@ export default function TopBidCard({
         />
       </div>
 
-      {/* 내용 */}
       <div className="px-3 py-2 space-y-1">
         <p className="text-[13px] text-main font-bold">
           낙찰가: {itemPrice.toLocaleString()}원

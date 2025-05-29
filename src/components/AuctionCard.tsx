@@ -20,7 +20,7 @@ const statusMap: Record<Auction['status'], { label: string; color: string }> = {
 
 export default function AuctionCard({product, isLoggedIn}: AuctionCardProps) {
   const router = useRouter()
-  const [isScraped, setIsScraped] = useState<boolean>(product.isScrapped ?? false);
+  const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   
   const statusInfo = statusMap[product.status] ?? {label: "알 수 없음", color: "bg-red-500"};

@@ -9,7 +9,7 @@ export interface Auction {
   bidderCount: number;
   scrapCount: number;
   thumbnailUrl: string | null;
-  isScrapped: boolean | null;
+  isScraped: boolean | null;
 }
 
 export interface SearchHistory {

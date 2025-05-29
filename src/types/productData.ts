@@ -80,7 +80,7 @@ export interface RelatedItem {
   price?: number;
   bidCount: number;
   scrapCount: number;
-  isScrapped: boolean;
+  isScraped: boolean;
 }
 
 export interface AuctionCategory {

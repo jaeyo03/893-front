@@ -11,6 +11,15 @@ import RealTimeRankingItem from "@/components/home/RealTimeRankingItem";
 import TopBidCardList from "@/components/home/TopBidCardList";
 import BestByCategory from "@/components/home/BestItemByCategory";
 import AuctionSoonItemList from "@/components/home/AuctionSoonItemList";
+import {
+  getRecentAuctions,
+  getDashboardStats,
+  getAuctionSoonItems,
+  getTopBidItems,
+  getRealTimeRankingActive,
+  getRealTimeRankingPending,
+  getBestByCategory,
+} from "@/lib/api/home";
 export const metadata: Metadata = {
   title: "중고 경매 플랫폼 팔구삼 893",
   description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
@@ -46,8 +55,32 @@ const slides: Slide[] = [
 export default async function Home() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
-  // const limited = auctionSoonData.slice(0, 3); // 최대 3개만 보여줌
   const isLoggedIn = accessToken ? true : false;
+
+  const [
+    recentAuctionListData,
+    dashboardStatsData,
+    auctionSoonItemListData,
+    topBidCardListData,
+    realTimeRankingItemActiveData,
+    realTimeRankingItemPendingData,
+    bestByCategoryData,
+  ] = await Promise.all([
+    getRecentAuctions(),
+    getDashboardStats(),
+    getAuctionSoonItems(),
+    getTopBidItems(),
+    getRealTimeRankingActive(),
+    getRealTimeRankingPending(),
+    getBestByCategory(),
+  ]);
+  const recentAuctionList = recentAuctionListData.data;
+  const dashboardStats = dashboardStatsData.data;
+  const auctionSoonItemList = auctionSoonItemListData.data;
+  const topBidCardList = topBidCardListData.data;
+  const realTimeRankingItemActive = realTimeRankingItemActiveData.data;
+  const realTimeRankingItemPending = realTimeRankingItemPendingData.data;
+  const bestByCategory = bestByCategoryData.data;
 
   return (
     <>
@@ -66,32 +99,35 @@ export default async function Home() {
         <div className="flex items-start gap-6 w-full max-w-screen-xl  px-4 mt-6">
           {/* 좌 */}
           <div className="flex-1 max-w-[780px]">
-            <DashboardStats />
+            <DashboardStats dashboardStats={dashboardStats} />
             <div className="mt-10">
               <ImageCarousel slides={slides} />
             </div>
             <div className="mt-10">
-              <RecentAuctionList />
+              <RecentAuctionList recentAuctionList={recentAuctionList} />
             </div>
           </div>
 
           {/* 우 */}
           <div className="w-[300px] shrink-0">
-            <RealTimeRankingItem />
+            <RealTimeRankingItem
+              realTimeRankingItemActive={realTimeRankingItemActive}
+              realTimeRankingItemPending={realTimeRankingItemPending}
+            />
           </div>
         </div>
         <div className="pt-20">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
             경매 임박 물품
           </h2>
-          <AuctionSoonItemList />
+          <AuctionSoonItemList auctionSoonItemList={auctionSoonItemList} />
         </div>
 
         <div className="pt-20">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
             최근 7일 최고 낙찰가 TOP 5
           </h2>
-          <TopBidCardList />
+          <TopBidCardList topBidCardList={topBidCardList} />
         </div>
 
         <div className="pt-20 pb-32">
@@ -99,7 +135,7 @@ export default async function Home() {
             카테고리별 베스트 TOP3
           </h2>
           <div className="flex gap-4">
-            <BestByCategory />
+            <BestByCategory bestByCategory={bestByCategory} />
           </div>
         </div>
       </div>

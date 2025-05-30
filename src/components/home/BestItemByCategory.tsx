@@ -1,33 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Flame, ChevronLeft, ChevronRight, icons } from "lucide-react";
-import { BestCategoryGroup, fetchBestByCategory } from "@/lib/api/home";
+import { Flame, ChevronLeft, ChevronRight } from "lucide-react";
+import { BestCategoryGroup } from "@/lib/api/home";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-export default function BestByCategory() {
-  const [categories, setCategories] = useState<BestCategoryGroup[]>([]);
-  const [selectedTab, setSelectedTab] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+
+interface BestByCategoryProps {
+  bestByCategory: BestCategoryGroup[];
+}
+
+export default function BestByCategory({
+  bestByCategory,
+}: BestByCategoryProps) {
+  const [selectedTab, setSelectedTab] = useState<number | null>(
+    bestByCategory[0].subCategoryId
+  );
+
+  const selectedCategory = bestByCategory.find(
+    (cat) => cat.subCategoryId === selectedTab
+  );
+
   const router = useRouter();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await fetchBestByCategory();
-        setCategories(data);
-        if (data.length > 0) setSelectedTab(data[0].subCategoryId);
-      } catch (err) {
-        console.error("카테고리별 베스트 불러오기 실패:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, []);
 
   useEffect(() => {
     if (selectedTab === null) return;
@@ -51,12 +48,6 @@ export default function BestByCategory() {
     }
   };
 
-  const selectedCategory = categories.find(
-    (cat) => cat.subCategoryId === selectedTab
-  );
-
-  if (loading) return <p>로딩 중...</p>;
-
   return (
     <div className="p-4 overflow-x-auto">
       <div className="relative mb-6">
@@ -70,7 +61,7 @@ export default function BestByCategory() {
           ref={scrollRef}
           className="flex gap-3 px-8 overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth"
         >
-          {categories.map((cat) => (
+          {bestByCategory.map((cat) => (
             <button
               key={cat.subCategoryId}
               ref={(el) => {

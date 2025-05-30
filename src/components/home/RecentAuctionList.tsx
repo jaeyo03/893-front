@@ -3,27 +3,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
-import { fetchRecentAuctions, AuctionItem } from "@/lib/api/home";
+import { AuctionItem } from "@/lib/api/home";
 
-export default function RecentAuctionList() {
-  const [items, setItems] = useState<AuctionItem[]>([]);
+interface RecentAuctionListProps {
+  recentAuctionList: AuctionItem[];
+}
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await fetchRecentAuctions();
-        setItems(data);
-      } catch (err) {
-        console.error("API 에러:", err);
-      }
-    };
-    load();
-  }, []);
-
+export default function RecentAuctionList({
+  recentAuctionList,
+}: RecentAuctionListProps) {
   return (
     <div className="">
       <div className="grid grid-cols-3 gap-4">
-        {items.map((item) => (
+        {recentAuctionList.map((item) => (
           <Link href={`/detail/${item.auctionId}`} key={item.auctionId}>
             <div className="relative overflow-hidden transition border-none rounded-lg cursor-pointer">
               <div className="p-2 mb-1 bg-white rounded-xl">

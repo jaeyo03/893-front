@@ -1,154 +1,161 @@
 "use client";
 
-import { useState } from "react";
-import { Flame } from "lucide-react";
-const dummyBestBySubCategory = [
-  {
-    subCategoryId: 2,
-    subCategoryName: "모바일/태블릿",
-    items: [
-      {
-        auctionId: 101,
-        title: "아이폰 14 미개봉",
-        scrapCount: 14,
-        thumbnailUrl: "/images/아이폰.jpg",
-        itemCondition: "brand_new",
-        status: "active",
-        isAuctionImminent: false,
-        rank: 1,
-      },
-      {
-        auctionId: 102,
-        title: "갤럭시 Z플립 4",
-        scrapCount: 11,
-        thumbnailUrl: "/images/라이젠.jpg",
-        itemCondition: "like_new",
-        status: "pending",
-        isAuctionImminent: false,
-        rank: 2,
-      },
-      {
-        auctionId: 103,
-        title: "아이패드 에어 5세대",
-        scrapCount: 9,
-        thumbnailUrl: "/images/맥.jpg",
-        itemCondition: "gently_used",
-        status: "active",
-        isAuctionImminent: true,
-        rank: 3,
-      },
-    ],
-  },
-  {
-    subCategoryId: 13,
-    subCategoryName: "생활가전",
-    items: [
-      {
-        auctionId: 201,
-        title: "다이슨 에어랩",
-        scrapCount: 22,
-        thumbnailUrl: "/images/자전거.jpg",
-        itemCondition: "like_new",
-        status: "active",
-        isAuctionImminent: false,
-        rank: 1,
-      },
-      {
-        auctionId: 202,
-        title: "삼성 공기청정기",
-        scrapCount: 19,
-        thumbnailUrl: "/images/adidas.jpg",
-        itemCondition: "gently_used",
-        status: "pending",
-        isAuctionImminent: true,
-        rank: 2,
-      },
-      {
-        auctionId: 203,
-        title: "LG 스타일러",
-        scrapCount: 17,
-        thumbnailUrl: "/images/nike.jpg",
-        itemCondition: "brand_new",
-        status: "active",
-        isAuctionImminent: false,
-        rank: 3,
-      },
-    ],
-  },
-];
-
+import { useEffect, useRef, useState } from "react";
+import { Flame, ChevronLeft, ChevronRight, icons } from "lucide-react";
+import { BestCategoryGroup, fetchBestByCategory } from "@/lib/api/home";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 export default function BestByCategory() {
-  const [selectedTab, setSelectedTab] = useState<number>(
-    dummyBestBySubCategory[0].subCategoryId
-  );
-  const selectedCategory = dummyBestBySubCategory.find(
+  const [categories, setCategories] = useState<BestCategoryGroup[]>([]);
+  const [selectedTab, setSelectedTab] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchBestByCategory();
+        setCategories(data);
+        if (data.length > 0) setSelectedTab(data[0].subCategoryId);
+      } catch (err) {
+        console.error("카테고리별 베스트 불러오기 실패:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    if (selectedTab === null) return;
+    const button = buttonRefs.current.get(selectedTab);
+    const container = scrollRef.current;
+    if (button && container) {
+      const buttonLeft = button.offsetLeft;
+      const containerWidth = container.offsetWidth;
+      container.scrollTo({
+        left: buttonLeft - containerWidth / 2 + button.offsetWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  }, [selectedTab]);
+
+  const handleScroll = (direction: "left" | "right") => {
+    const container = scrollRef.current;
+    if (container) {
+      const scrollAmount = direction === "left" ? -200 : 200;
+      container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const selectedCategory = categories.find(
     (cat) => cat.subCategoryId === selectedTab
   );
 
+  if (loading) return <p>로딩 중...</p>;
+
   return (
     <div className="p-4 overflow-x-auto">
-      <div className="flex gap-3 mb-6 flex-wrap">
-        {dummyBestBySubCategory.map((cat) => (
-          <button
-            key={cat.subCategoryId}
-            onClick={() => setSelectedTab(cat.subCategoryId)}
-            className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
-              selectedTab === cat.subCategoryId
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {cat.subCategoryName}
-          </button>
-        ))}
+      <div className="relative mb-6">
+        <button
+          onClick={() => handleScroll("left")}
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <div
+          ref={scrollRef}
+          className="flex gap-3 px-8 overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth"
+        >
+          {categories.map((cat) => (
+            <button
+              key={cat.subCategoryId}
+              ref={(el) => {
+                if (el) buttonRefs.current.set(cat.subCategoryId, el);
+              }}
+              onClick={() => setSelectedTab(cat.subCategoryId)}
+              className={`shrink-0 px-4 py-2 rounded-full border text-sm font-medium transition ${
+                selectedTab === cat.subCategoryId
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {cat.subCategoryName}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => handleScroll("right")}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
+        >
+          <ChevronRight size={20} />
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {selectedCategory?.items.map((item) => (
-          <div
-            key={item.auctionId}
-            className="border rounded-lg shadow-sm overflow-hidden"
-          >
-            <div className="relative">
-              <img
-                src={item.thumbnailUrl}
-                alt={item.title}
-                className="w-[390px] h-[320px] object-cover"
-              />
-
-              <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                {item.rank}
-              </span>
-            </div>
-            <div className="p-3">
-              <h3 className="text-[18px] font-semibold">{item.title}</h3>
-              <p className="text-[16px] text-gray-500 mt-2">
-                스크랩 {item.scrapCount}회 ·{" "}
-                {translateCondition(item.itemCondition)}
-              </p>
-            </div>
-            <div className="flex items-center px-2 pb-2 gap-2">
-              <span
-                className={` top-2 right-2 text-[12px] px-2 py-1 rounded ${
-                  item.status === "active" ? "bg-main" : "bg-gray-400"
-                } text-white`}
-              >
-                {item.status === "active" ? "경매중" : "경매예정"}
-              </span>
-              {item.isAuctionImminent && (
-                <span className=" bottom-2 right-2 bg-rose-500 text-white text-[12px] px-2 py-1 rounded">
-                  곧 시작 <Flame className="inline h-4 w-4 ml-1" />
+      {selectedCategory && selectedCategory.items.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {selectedCategory.items.map((item) => (
+            <div
+              key={item.auctionId}
+              onClick={() => router.push(`/detail/${item.auctionId}`)}
+              className="border rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition"
+            >
+              <div className="relative">
+                <img
+                  src={`http://localhost:8080${item.thumbnailUrl}`}
+                  alt={item.title}
+                  className="w-[390px] h-[320px] object-cover"
+                />
+                <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                  {item.rankNum}
                 </span>
-              )}
+              </div>
+              <div className="p-3">
+                <h3 className="text-[18px] font-semibold">{item.title}</h3>
+                <p className="text-[16px] text-gray-500 mt-2">
+                  스크랩 {item.scrapCount}회 ·{" "}
+                  {translateCondition(item.itemCondition)}
+                </p>
+              </div>
+              <div className="flex items-center px-2 pb-2 gap-2">
+                <span
+                  className={`text-[12px] px-2 py-1 rounded ${
+                    item.status === "active" ? "bg-main" : "bg-gray-400"
+                  } text-white`}
+                >
+                  {item.status === "active" ? "경매중" : "경매예정"}
+                </span>
+                {item.isAuctionImminent && (
+                  <span className="bg-rose-500 text-white text-[12px] px-2 py-1 rounded">
+                    곧 시작 <Flame className="inline h-4 w-4 ml-1" />
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-400 text-sm pt-20 pb-[240px]">
+          <Image
+            src={"/icons/SearchEmpty.svg"}
+            alt="검색 결과 없음"
+            width={100}
+            height={100}
+            className="mx-auto mb-4"
+          />
+          <p className="text-lg font-semibold">
+            해당 카테고리에 등록된 상품이 없습니다.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-// 상품 상태 변환 유틸 파일로 분리 하기
 function translateCondition(cond: string): string {
   const map: Record<string, string> = {
     brand_new: "새 상품 (미사용)",

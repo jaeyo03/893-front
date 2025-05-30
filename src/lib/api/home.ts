@@ -42,7 +42,7 @@ export interface TopBidItem {
   thumbnailUrl: string;
   basePrice: number;
   itemPrice: number;
-  isCurrentUserBuyer: string;
+  buyer: string;
 }
 export interface AuctionRankingItem {
   auctionId: number;
@@ -118,7 +118,7 @@ export const getAuctionSoonItems = async (): Promise<
 > => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/home/auctionSoon`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/home/upcoming`
     );
     const data = await response.json();
     return data;

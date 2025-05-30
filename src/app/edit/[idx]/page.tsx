@@ -16,6 +16,7 @@ import SellerAgreementCheckbox from "@/components/registration/SellerAgreementCh
 import SellButton from "@/components/registration/SellButton";
 import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeButton";
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
+import toast from "react-hot-toast";
 
 import {
   productConditions,
@@ -211,12 +212,12 @@ export default function EditRegistration({ params }: AuctionIdProps) {
           withCredentials: true,
         }
       );
-      alert("경매 수정이 완료되었습니다!");
+      toast.success("경매 수정이 완료되었습니다!");
       router.push(`/detail/${auctionId}`);
       setIsModalOpen(false);
     } catch (err) {
       console.error("❌ PATCH 실패", err);
-      alert("수정 중 오류가 발생했습니다.");
+      toast.error("수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -235,7 +236,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
             onDeleteServerImage={(i) =>
               setServerImages((prev) => prev.filter((_, idx) => idx !== i))
             }
-            onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
+            onEmptyImage={() => toast.error("최소 1장의 이미지를 등록해주세요.")}
             mainImageIndex={mainImageIndex}
             onChangeMainImageIndex={setMainImageIndex}
           />

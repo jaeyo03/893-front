@@ -15,6 +15,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import toast from "react-hot-toast";
 
 interface AuctionTimeButtonProps {
   value: { hour: number; minute: number };
@@ -49,7 +50,7 @@ export default function AuctionTimeButton({
   const handleConfirm = () => {
     const totalMinutes = tempHour * 60 + tempMinute;
     if (totalMinutes < 10) {
-      alert("경매 시간은 최소 10분 이상이어야 합니다.");
+      toast.error("경매 시간은 최소 10분 이상이어야 합니다.");
       return;
     }
 

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Camera, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Type definitions
 
@@ -48,7 +49,7 @@ export default function ImageUploader({
 
     const total = serverImages.length + value.length + files.length;
     if (total > 10) {
-      alert("최대 10장까지 업로드할 수 있습니다.");
+      toast.error("최대 10장까지 업로드할 수 있습니다.");
       return;
     }
 

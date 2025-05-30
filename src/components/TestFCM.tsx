@@ -1,5 +1,6 @@
 // components/TestFCM.tsx
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect } from "react";
 import { requestPermissionAndGetToken } from "@/lib/firebase-messaging";
@@ -10,9 +11,10 @@ export default function TestFCM() {
       const token = await requestPermissionAndGetToken();
       if (token) {
         console.log("📦 FCM Token:", token);
-        alert("FCM 토큰이 콘솔에 출력되었습니다.");
+        toast.success("FCM 토큰이 콘솔에 출력되었습니다.");
       } else {
         console.warn("❌ FCM 토큰을 가져오지 못했습니다.");
+        toast.error("FCM 토큰을 가져오지 못했습니다.");
       }
     }
 

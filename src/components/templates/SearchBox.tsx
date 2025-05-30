@@ -8,6 +8,8 @@ import RecentSearchContent from "../molecules/searchinput/RecentSearchContent";
 import RelatedSearchContent from "../molecules/searchinput/RelatedSearchContent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAddSearchHistory, useDeleteSearchHistory, useRelatedWords, useSearchHistory } from "@/hooks/useSearchBox";
+import toast from "react-hot-toast";
+
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
 interface SearchBoxProps {
@@ -69,7 +71,7 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
       setInputValue(value);
       setSearchStatus(value.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
     } else {
-      alert("검색어는 30자 이하로 입력해주세요.");
+      toast.error("검색어는 30자 이하로 입력해주세요.");
     }
   }
 
@@ -83,7 +85,7 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (inputValue.trim() === "") {
-      alert("검색어를 입력해주세요.");
+      toast.error("검색어를 입력해주세요.");
       return;
     }
 

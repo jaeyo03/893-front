@@ -1,6 +1,7 @@
 import { EllipsisVertical, Dot } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 // 부모로부터 전달받는 props 타입
 type NotificationProps = {
@@ -53,7 +54,7 @@ export default function NotificationContents({
       if (auctionId) router.push(`/auction/${auctionId}`);
     } catch (err) {
       // console.error("알림 클릭 실패:", err);
-      alert("알림 클릭 처리에 실패했습니다.");
+      toast.error("알림 클릭 처리에 실패했습니다.");
     }
   };
 

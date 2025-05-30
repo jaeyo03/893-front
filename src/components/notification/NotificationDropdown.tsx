@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
 import { onMessageListener } from "@/lib/firebase-messaging";
-import axios from "@/lib/axios";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 // dayjs 설정
 dayjs.extend(relativeTime);
@@ -40,7 +41,7 @@ export default function NotificationDropdown({ onClose }: Props) {
     "전체"
   );
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isDimmed, setIsDimmed] = useState(false);
+  const [, setIsDimmed] = useState(false);
   const [optionTargetId, setOptionTargetId] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +94,7 @@ export default function NotificationDropdown({ onClose }: Props) {
           "💥 알림 불러오기 실패:",
           err.response?.data || err.message
         );
-        alert("알림을 불러오는 데 실패했습니다. 다시 시도해주세요.");
+        toast.error("알림을 불러오는 데 실패했습니다. 다시 시도해주세요.");
       }
     }
 
@@ -120,7 +121,7 @@ export default function NotificationDropdown({ onClose }: Props) {
       })
       .catch((err) => {
         // console.error("💥 FCM 수신 실패:", err);
-        alert("알림 수신에 실패했습니다. 다시 시도해주세요.");
+        toast.error("알림 수신에 실패했습니다. 다시 시도해주세요.");
       });
   }, []);
 
@@ -131,7 +132,7 @@ export default function NotificationDropdown({ onClose }: Props) {
       // console.log(`🗑️ 알림 ${id} 삭제 완료`);
     } catch (err) {
       // console.error("❌ 알림 삭제 실패", err);
-      alert("알림 삭제에 실패했습니다. 다시 시도해주세요.");
+      toast.error("알림 삭제에 실패했습니다. 다시 시도해주세요.");
     }
     setOptionTargetId(null);
   };

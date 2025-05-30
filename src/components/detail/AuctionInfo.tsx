@@ -1,7 +1,7 @@
 "use client";
 
 import { Bookmark, Timer } from "lucide-react";
-import { AuctionBidData, Product } from "@/types/productData";
+import { AuctionBidData, Product, Status } from "@/types/productData";
 import { formatTime } from "@/lib/util/detailpage";
 interface AuctionInfoProps {
   product: Product;
@@ -12,7 +12,7 @@ interface AuctionInfoProps {
   isLoggedIn: boolean;
   currentPrice: number;
   remainTime: number;
-  isBeforeStart: boolean;
+  auctionState: Status;
 }
 
 export function AuctionInfo({
@@ -24,7 +24,7 @@ export function AuctionInfo({
   isLoggedIn,
   currentPrice,
   remainTime,
-  isBeforeStart,
+  auctionState,
 }: AuctionInfoProps) {
   const { basePrice } = product;
   const bidCount = auctionBidData?.totalBid ?? 0;
@@ -35,18 +35,18 @@ export function AuctionInfo({
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-sm text-black">
-            {currentPrice === basePrice ? "경매시작가" : product.status === "completed" ? "낙찰가" : "현재가"}
+            {currentPrice === basePrice ? "경매시작가" : auctionState === "completed" ? "낙찰가" : "현재가"}
           </p>
           <p className="text-xl font-bold text-main">
             ₩{(currentPrice).toLocaleString()}
           </p>
         </div>
-        {product.status !== "completed" && (
+        {auctionState !== "completed" && (
           <div className="w-1/2">
             <p className="text-sm text-black">
-              {isBeforeStart ? "시작까지 남은 시간" : "종료까지 남은 시간"}
+              {auctionState === "pending" ? "시작까지 남은 시간" : "종료까지 남은 시간"}
             </p>
-            <p className="flex items-center gap-1 text-xl font-bold text-blue-600">
+            <p className={`flex items-center gap-1 text-xl font-bold ${remainTime <= 10 ? "text-red" : "text-blue-600"}`}>
               <Timer className="w-5 h-5" />
               {formatTime(remainTime)}
             </p>

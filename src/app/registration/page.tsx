@@ -143,7 +143,8 @@ export default function Registration() {
       );
       toast.success("경매 물품 등록이 완료되었습니다!");
       setIsModalOpen(false);
-      router.push("/");
+      console.log(res.data);
+      router.push(`/detail/${res?.data?.data?.auctionId}`);
     } catch (error: any) {
       console.error("등록 실패", error);
       if (error.response) {

@@ -45,6 +45,7 @@ export default function RootLayout({
           toastOptions={{
             style: {
               zIndex: 9999,
+              padding: '20px',
             },
           }}
         />

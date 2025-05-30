@@ -1,6 +1,10 @@
+// components/home/AuctionSoonItem.tsx
 "use client";
 
 import { useEffect, useState } from "react";
+import { parseLeftTimeStringToMs } from "@/lib/util/time";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export type AuctionSoonItemProps = {
   auctionId: number;
@@ -29,12 +33,8 @@ const itemConditionLabel: Record<
   damaged: "고장/파손 상품",
 };
 
-function parseLeftTimeStringToMs(timeStr: string) {
-  const [h, m, s] = timeStr.split(":").map(Number);
-  return ((h ?? 0) * 3600 + (m ?? 0) * 60 + (s ?? 0)) * 1000;
-}
-
 export default function AuctionSoonItem({
+  auctionId,
   title,
   description,
   scrapCount,
@@ -44,8 +44,13 @@ export default function AuctionSoonItem({
   leftTime,
 }: AuctionSoonItemProps) {
   const [displayTime, setDisplayTime] = useState(leftTime);
-
   const [isStarted, setIsStarted] = useState(false);
+  const router = useRouter();
+
+  const handleParticipateClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/detail/${auctionId}`);
+  };
 
   useEffect(() => {
     const deadline = Date.now() + parseLeftTimeStringToMs(leftTime);
@@ -74,36 +79,43 @@ export default function AuctionSoonItem({
   }, [leftTime]);
 
   return (
-    <div className="w-[1260px] h-[480px] rounded border overflow-hidden shadow-sm bg-white">
-      <img
-        src={thumbnailUrl}
-        alt="상품 이미지"
-        className="w-full h-[240px] object-cover"
-      />
+    <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm bg-white cursor-pointer">
+      <div className="relative w-full h-[240px]">
+        <Image
+          src={`http://localhost:8080${thumbnailUrl}`}
+          alt="썸네일"
+          fill
+          className="object-cover"
+        />
+      </div>
 
       <div className="p-4">
         <p className="text-[13px] font-semibold text-gray-500 text-center mb-2">
           {isStarted ? "경매 시작" : `시작까지 남은 시간 ${displayTime}`}
         </p>
-        <p className="text-[14px] font-semibold truncate mb-1">{title}</p>
-        <p className="text-[14px] text-gray-600">
+        <p className="text-[14px] font-semibold truncate mb-1 ">{title}</p>
+        <p className="text-[14px] text-gray-600 justify-end flex">
           {itemConditionLabel[itemCondition]}
         </p>
 
-        <p className=" text-sky-500 mt-1 text-[16px] font-semibold">
+        <p className=" text-sky-500 mt-1 text-[16px] font-semibold justify-end flex">
           스크랩 수 {scrapCount}
         </p>
 
-        <div className="mt-3 text-xs text-gray-500 truncate">{description}</div>
-        <p className="text-sm font-semibold mt-1">
+        <div className="mt-3 text-xs text-gray-500 truncate justify-end flex">
+          {description}
+        </div>
+        <p className="text-sm font-semibold mt-1 justify-end flex">
           시작가 {basePrice.toLocaleString()}원
         </p>
 
-        <button className="mt-3 w-full py-1.5 text-sm rounded bg-gray-200 text-gray-400 cursor-not-allowed">
+        <button
+          onClick={handleParticipateClick}
+          className="mt-3 w-full py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-400 hover:text-gray-600 transition"
+        >
           지금 참여하기
         </button>
       </div>
     </div>
   );
 }
-// 유틸 함수 분리하기

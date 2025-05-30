@@ -8,7 +8,7 @@ export type TopBidItemProps = {
   thumbnailUrl: string;
   basePrice: number;
   itemPrice: number;
-  isCurrentUserBuyer: string;
+  buyer: string;
 };
 export default function TopBidCard({
   auctionId,
@@ -17,7 +17,7 @@ export default function TopBidCard({
   thumbnailUrl,
   basePrice,
   itemPrice,
-  isCurrentUserBuyer,
+  buyer,
 }: TopBidItemProps) {
   const router = useRouter();
 
@@ -54,9 +54,7 @@ export default function TopBidCard({
           </span>
         </div>
 
-        <p className="text-[11px] text-gray-400">
-          낙찰자: {isCurrentUserBuyer}
-        </p>
+        <p className="text-[11px] text-gray-400">낙찰자: {buyer}</p>
 
         <div className="flex items-center gap-1 text-[12px] text-gray-600">
           입찰수 <span className="font-semibold ">({bidCount})</span>

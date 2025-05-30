@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import TopBidCard from "./TopBidCard";
 import { TopBidItem } from "@/lib/api/home";
 

@@ -1,23 +1,7 @@
 "use client";
 
-import { useState } from "react";
-
-interface AuctionRankingItem {
-  auctionId: number;
-  title: string;
-  description: string;
-  bidCount: number;
-  scrapCount: number;
-  thumbnailUrl: string;
-  itemCondition:
-    | "brand_new"
-    | "like_new"
-    | "gently_used"
-    | "heavily_used"
-    | "damaged";
-  status: "active" | "upcoming"; // 경매 상태
-  rank: number;
-}
+import { useEffect, useState } from "react";
+import { AuctionRankingItem } from "@/lib/api/home";
 
 const itemConditionLabel: Record<AuctionRankingItem["itemCondition"], string> =
   {
@@ -28,92 +12,18 @@ const itemConditionLabel: Record<AuctionRankingItem["itemCondition"], string> =
     damaged: "고장/파손 상품",
   };
 
-// 더미 데이터
-const dummyData: AuctionRankingItem[] = [
-  {
-    auctionId: 101,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/자전거.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 1,
-  },
+interface RealTimeRankingPanelProps {
+  realTimeRankingItemActive: AuctionRankingItem[];
+  realTimeRankingItemPending: AuctionRankingItem[];
+}
 
-  {
-    auctionId: 102,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/nike.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 2,
-  },
-  {
-    auctionId: 103,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/맥.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 3,
-  },
-  {
-    auctionId: 104,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/라이젠.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 4,
-  },
-  {
-    auctionId: 105,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/아이폰.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 5,
-  },
-  {
-    auctionId: 106,
-    title: "아이폰 14 미개봉",
-    description: "거의 사용 안했고 배터리 성능 90퍼예요.",
-    bidCount: 14,
-    scrapCount: 6,
-    thumbnailUrl: "images/adidas.jpg",
-    itemCondition: "brand_new",
-    status: "active",
-    rank: 6,
-  },
-  {
-    auctionId: 107,
-    title: "허먼밀러 의자",
-    description: "정품 헤드레스트 포함, 상태 좋음, 사용감 거의 없음,테스트",
-    bidCount: 0,
-    scrapCount: 11,
-    thumbnailUrl: "images/자전거.jpg",
-    itemCondition: "like_new",
-    status: "upcoming",
-    rank: 1,
-  },
-];
-
-export default function RealTimeRankingPanel() {
+export default function RealTimeRankingPanel({
+  realTimeRankingItemActive,
+  realTimeRankingItemPending,
+}: RealTimeRankingPanelProps) {
   const [tab, setTab] = useState<"active" | "upcoming">("active");
-
-  const filteredData = dummyData.filter((item) => item.status === tab);
+  const currentTimeRankingData =
+    tab === "active" ? realTimeRankingItemActive : realTimeRankingItemPending;
 
   return (
     <div className="w-[435px] bg-white p-4">
@@ -140,10 +50,16 @@ export default function RealTimeRankingPanel() {
       </div>
 
       {/* 랭킹 리스트 */}
-      <div className="space-y-4 ">
-        {filteredData.map((item) => (
-          <div key={item.auctionId} className="flex gap-3 pt-3 items-start">
-            <div className="text-lg font-bold text-gray-600">{item.rank}</div>
+      <div className="space-y-4">
+        {currentTimeRankingData.map((item) => (
+          <div
+            key={item.auctionId}
+            className="flex gap-3 pt-3 items-start cursor-pointer rounded px-2"
+            onClick={() => (window.location.href = `/detail/${item.auctionId}`)}
+          >
+            <div className="text-lg font-bold text-gray-600">
+              {item.rankNum}
+            </div>
             <div className="flex-1">
               <div className="text-sm font-semibold truncate max-w-[200px]">
                 {item.title}
@@ -161,9 +77,9 @@ export default function RealTimeRankingPanel() {
               </div>
             </div>
             <img
-              src={item.thumbnailUrl}
+              src={`http://localhost:8080${item.thumbnailUrl}`}
               alt="썸네일"
-              className="w-[160PX] h-[80PX] rounded object-cover border"
+              className="w-[160px] h-[80px] rounded object-cover border"
             />
           </div>
         ))}

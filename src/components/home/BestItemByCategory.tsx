@@ -5,7 +5,7 @@ import { Flame, ChevronLeft, ChevronRight } from "lucide-react";
 import { BestCategoryGroup } from "@/lib/api/home";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
+import EmptyState from "./EmptyState";
 interface BestByCategoryProps {
   bestByCategory: BestCategoryGroup[];
 }
@@ -130,18 +130,7 @@ export default function BestByCategory({
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-400 text-sm pt-20 pb-[240px]">
-          <Image
-            src={"/icons/SearchEmpty.svg"}
-            alt="검색 결과 없음"
-            width={100}
-            height={100}
-            className="mx-auto mb-4"
-          />
-          <p className="text-lg font-semibold">
-            해당 카테고리에 등록된 상품이 없습니다.
-          </p>
-        </div>
+        <EmptyState message="해당 카테고리에 등록된 상품이 없습니다." />
       )}
     </div>
   );

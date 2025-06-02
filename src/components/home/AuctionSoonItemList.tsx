@@ -3,6 +3,7 @@
 
 import { AuctionSoonItem } from "@/lib/api/home";
 import AuctionSoonList from "./AuctionSoonList";
+import EmptyState from "@/components/home/EmptyState";
 
 interface AuctionSoomItemListProps {
   auctionSoonItemList: AuctionSoonItem[];
@@ -14,6 +15,15 @@ export default function AuctionSoonItemList({
   const limited = Array.isArray(auctionSoonItemList)
     ? auctionSoonItemList.slice(0, 3)
     : [];
+
+  if (limited.length === 0) {
+    return (
+      <EmptyState
+        message="곧 시작할 경매 물품이 없습니다."
+        className="pt-20 pb-20"
+      />
+    );
+  }
 
   return (
     <div className="flex justify-center gap-6">

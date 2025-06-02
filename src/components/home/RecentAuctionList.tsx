@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
 import { AuctionItem } from "@/lib/api/home";
+import EmptyState from "@/components/home/EmptyState";
 
 interface RecentAuctionListProps {
   recentAuctionList: AuctionItem[];
@@ -12,8 +12,12 @@ interface RecentAuctionListProps {
 export default function RecentAuctionList({
   recentAuctionList,
 }: RecentAuctionListProps) {
+  if (recentAuctionList.length === 0) {
+    return <EmptyState message="최근 등록된 경매 물품이 없습니다." />;
+  }
+
   return (
-    <div className="">
+    <div>
       <div className="grid grid-cols-3 gap-4">
         {recentAuctionList.map((item) => (
           <Link href={`/detail/${item.auctionId}`} key={item.auctionId}>

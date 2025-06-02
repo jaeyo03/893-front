@@ -1,7 +1,7 @@
 import { AuctionCategory } from "@/types/productData";
 import { BaseResponse, SearchListResponse } from "@/types/response.types";
 
-function makeSearchParams(
+export function makeQueryString(
   searchParams: Record<string, string | string[] | undefined>
 ): string {
   const urlSearchParams = new URLSearchParams();
@@ -10,35 +10,39 @@ function makeSearchParams(
   Object.entries(searchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       // 배열인 경우 각 항목을 같은 키로 추가
+      const includedItem: Record<string, boolean> = {};
       value.forEach((item) => {
-        if (item) urlSearchParams.append(key, item);
+        if (item) {
+          if (!includedItem[item]) {
+            urlSearchParams.append(key, item);
+            includedItem[item] = true;
+          }
+        }
       });
-    } else if (value !== undefined) {
-      // 단일 값인 경우 추가
+    } else if (value !== undefined && value !== '' && key !== '') {
       urlSearchParams.append(key, value);
     }
   });
-  return urlSearchParams.toString();
-}
 
-export async function getSearchProducts(
-  searchParams: Record<string, string | string[] | undefined>,
-  cookieHeader: string
-): Promise<BaseResponse<SearchListResponse>> {
-  let queryString = makeSearchParams(searchParams);
+  let queryString = urlSearchParams.toString();
 
   if (queryString.length > 0) {
     queryString = `?${queryString}`;
   }
+
+  return queryString;
+}
+
+export async function getSearchProducts(
+  searchParams: Record<string, string | string[] | undefined>
+): Promise<BaseResponse<SearchListResponse>> {
+  const queryString = makeQueryString(searchParams);
 
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/search${queryString}`,
       {
         cache: "no-store",
-        headers: {
-          Cookie: cookieHeader,
-        },
       }
     );
 
@@ -53,56 +57,60 @@ export async function getSearchProducts(
         totalAuctionsCount: 0,
         auctionList: [],
       },
-      message: "Failed to fetch products",
+      message: error instanceof Error ? error.message : "Unknown error",
       code: 500,
     };
   }
 }
 
-export async function getRelatedWords(
+export function makeKeywordQueryString(
   searchParams: Record<string, string | string[] | undefined>,
-  cookieHeader: string
-): Promise<BaseResponse<string[]>> {
+): string {
   let keyword = "";
 
   if (searchParams.keyword) {
     keyword = searchParams.keyword as string;
   } else {
-    return {
-      data: [],
-      message: "검색어가 없습니다.",
-      code: 400,
-    };
+    return "";
   }
 
+  let encodedKeyword = encodeURIComponent(keyword);
+
+  if (encodedKeyword.length > 0) {
+    encodedKeyword = `?keyword=${encodedKeyword}`;
+  }
+
+  return encodedKeyword;
+}
+
+export async function getRelatedWords(
+  searchParams: Record<string, string | string[] | undefined>,
+): Promise<BaseResponse<string[]>> {
+  const encodedKeyword = makeKeywordQueryString(searchParams);
+
   try {
-    const encodedKeyword = encodeURIComponent(keyword);
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions?keyword=${encodedKeyword}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions${encodedKeyword}`,
       {
         cache: "no-store",
-        headers: {
-          Cookie: cookieHeader,
-        },
       }
     );
     if (!response.ok) {
-      throw new Error("Failed to fetch related woSSrds");
+      throw new Error("Failed to fetch related words");
     }
     return response.json();
   } catch (error) {
     console.error("Error fetching related words:", error);
     return {
       data: [],
-      message: "Failed to fetch related words",
+      message: error instanceof Error ? error.message : "Unknown error",
       code: 500,
     };
   }
 }
 
-export async function getCategoryList(): Promise<
-  BaseResponse<AuctionCategory[] | null>
-> {
+export async function getCategoryList():
+Promise<BaseResponse<AuctionCategory[] | null>> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/category`
@@ -115,7 +123,7 @@ export async function getCategoryList(): Promise<
     console.error("Error fetching category list:", error);
     return {
       data: null,
-      message: "Failed to fetch category list",
+      message: error instanceof Error ? error.message : "Unknown error",
       code: 500,
     };
   }

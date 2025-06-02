@@ -46,7 +46,7 @@ export default function AuctionCard({product, isLoggedIn}: AuctionCardProps) {
   return (
     <div 
       onClick={handleCardClick}
-      className="p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white cursor-pointer hover:drop-shadow-md">
+      className="auction-card p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white cursor-pointer hover:drop-shadow-md">
       <div className="grid grid-cols-1 grid-rows-1">
         <img
           src={`http://localhost:8080${product.thumbnailUrl}` || '/placeholder.jpg'}

@@ -23,7 +23,6 @@ type Props = {
   onChange: (value: CategoryValue) => void;
 };
 
-// ✅ 트리 구조 생성
 function buildCategoryTree(categories: Category[]): CategoryTree[] {
   const map = new Map<number, CategoryTree>();
   const roots: CategoryTree[] = [];
@@ -42,7 +41,6 @@ function buildCategoryTree(categories: Category[]): CategoryTree[] {
   return roots;
 }
 
-// ✅ ID로 트리에서 노드 찾기
 function findById(
   tree: CategoryTree[],
   id: number | null | undefined
@@ -67,7 +65,6 @@ export default function CategorySelector({ value, onChange }: Props) {
     setTree(buildCategoryTree(allCategories));
   }, []);
 
-  // ✅ ID로 정확한 경로 추적
   useEffect(() => {
     if (value.id && tree.length > 0) {
       const step3Node = findById(tree, value.id);
@@ -80,8 +77,6 @@ export default function CategorySelector({ value, onChange }: Props) {
     }
   }, [value.id, tree]);
 
-  // ✅ 선택 완료 시 onChange
-  // ✅ mainCategory 또는 subCategory가 바뀔 때도 반응하게
   useEffect(() => {
     if (step1 && !step2 && !step3) {
       onChange({

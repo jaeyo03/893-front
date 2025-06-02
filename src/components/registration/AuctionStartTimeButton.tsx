@@ -23,10 +23,10 @@ interface AuctionStartTimeButtonProps {
 }
 
 export default function AuctionStartTimeButton({
-                                                 value,
-                                                 onChange,
-                                                 disabled = false,
-                                               }: AuctionStartTimeButtonProps) {
+  value,
+  onChange,
+  disabled = false,
+}: AuctionStartTimeButtonProps) {
   const [open, setOpen] = useState(false);
   const [tempHour, setTempHour] = useState(value.hour);
   const [tempMinute, setTempMinute] = useState(value.minute);
@@ -38,8 +38,8 @@ export default function AuctionStartTimeButton({
     value.hour === 0 && value.minute === 0
       ? "경매 시작 시간 (최대 24시간)"
       : `${value.hour.toString().padStart(2, "0")} 시간 ${value.minute
-        .toString()
-        .padStart(2, "0")} 분 후 경매가 시작됩니다.`;
+          .toString()
+          .padStart(2, "0")} 분 후 경매가 시작됩니다.`;
 
   useEffect(() => {
     if (disabled) {
@@ -68,7 +68,7 @@ export default function AuctionStartTimeButton({
         <Button
           disabled={disabled}
           onClick={() => setOpen(true)}
-          className="w-[560px] h-[50px] bg-white border border-registerline text-resgistertext text-[16px] font-thin rounded-[6px] px-[16px] shadow-none text-left hover:bg-divider"
+          className="w-[560px] h-[50px] bg-white border border-registerline text-resgistertext text-[16px] font-normal rounded-[6px] px-[16px] shadow-none text-left hover:bg-divider"
         >
           {formattedTime}
         </Button>

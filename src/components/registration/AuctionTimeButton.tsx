@@ -23,9 +23,9 @@ interface AuctionTimeButtonProps {
 }
 
 export default function AuctionTimeButton({
-                                            value,
-                                            onChange,
-                                          }: AuctionTimeButtonProps) {
+  value,
+  onChange,
+}: AuctionTimeButtonProps) {
   const [open, setOpen] = useState(false);
   const [tempHour, setTempHour] = useState(value.hour);
   const [tempMinute, setTempMinute] = useState(value.minute);
@@ -34,8 +34,8 @@ export default function AuctionTimeButton({
     value.hour === 0 && value.minute === 0
       ? "경매 소요 시간 선택 (10분 ~ 24시간)"
       : `${value.hour.toString().padStart(2, "0")} 시간 ${value.minute
-        .toString()
-        .padStart(2, "0")} 분 동안 경매가 진행됩니다.`;
+          .toString()
+          .padStart(2, "0")} 분 동안 경매가 진행됩니다.`;
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
@@ -71,7 +71,7 @@ export default function AuctionTimeButton({
       <DialogTrigger asChild>
         <Button
           onClick={() => setOpen(true)}
-          className="w-[560px] h-[50px] bg-white border border-registerline text-resgistertext text-[16px] font-thin rounded-[6px] px-[16px] shadow-none text-left hover:bg-divider"
+          className="w-[560px] h-[50px] bg-white border border-registerline text-resgistertext text-[16px] font-normal rounded-[6px] px-[16px] shadow-none text-left hover:bg-divider"
         >
           {formattedTime}
         </Button>

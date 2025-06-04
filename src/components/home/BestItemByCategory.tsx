@@ -14,7 +14,7 @@ export default function BestByCategory({
   bestByCategory,
 }: BestByCategoryProps) {
   const [selectedTab, setSelectedTab] = useState<number | null>(
-    bestByCategory[0].subCategoryId
+    bestByCategory[0]?.subCategoryId
   );
 
   const selectedCategory = bestByCategory.find(
@@ -96,9 +96,11 @@ export default function BestByCategory({
               className="border rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition"
             >
               <div className="relative">
-                <img
+                <Image
                   src={`http://localhost:8080${item.thumbnailUrl}`}
                   alt={item.title}
+                  width={390}
+                  height={320}
                   className="w-[390px] h-[320px] object-cover"
                 />
                 <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">

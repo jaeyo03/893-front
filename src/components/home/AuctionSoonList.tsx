@@ -1,4 +1,3 @@
-// components/home/AuctionSoonItem.tsx
 "use client";
 
 import { useEffect, useState } from "react";

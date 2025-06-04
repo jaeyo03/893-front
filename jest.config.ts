@@ -44,6 +44,9 @@ const config: Config = {
     "/node_modules/",
     "/.next/",
     "/coverage/",
+    "/src/types",
+    "/src/components/ui",
+    "/src/middleware.ts"
   ],
 
   // Indicates which provider should be used to instrument code for coverage

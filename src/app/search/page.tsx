@@ -24,9 +24,9 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 	const currentPage = searchParams.page ? parseInt(searchParams.page as string) : 1;
 
 	const [products, relatedWords, categoryList] = await Promise.all([
-			productsData,
-			relatedWordsData,
-			categoryListData,
+		productsData,
+		relatedWordsData,
+		categoryListData,
 	]);
 
 	const { min: lowestPrice, max: highestPrice } = products?.data?.auctionList.reduce(

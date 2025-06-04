@@ -1,4 +1,3 @@
-// components/home/AuctionSoonItemList.tsx
 "use client";
 
 import { AuctionSoonItem } from "@/lib/api/home";

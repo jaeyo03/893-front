@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AuctionRankingItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
+import { useRouter } from "next/navigation";
 
 const itemConditionLabel: Record<AuctionRankingItem["itemCondition"], string> =
   {
@@ -26,7 +27,7 @@ export default function RealTimeRankingPanel({
 
   const currentTimeRankingData =
     tab === "active" ? realTimeRankingItemActive : realTimeRankingItemPending;
-
+  const router = useRouter();
   return (
     <div className="w-[435px] bg-white p-4">
       <h2 className="text-xl font-bold mb-4">실시간 랭킹</h2>
@@ -67,9 +68,7 @@ export default function RealTimeRankingPanel({
             <div
               key={item.auctionId}
               className="flex gap-3 pt-3 items-start cursor-pointer rounded px-2"
-              onClick={() =>
-                (window.location.href = `/detail/${item.auctionId}`)
-              }
+              onClick={() => router.push(`/detail/${item.auctionId}`)}
             >
               <div className="text-lg font-bold text-gray-600">
                 {item.rankNum}

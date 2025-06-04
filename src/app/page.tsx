@@ -95,6 +95,7 @@ export default async function Home() {
             <SearchInput isLoggedIn={isLoggedIn} />
           </QueryProvider>
         </div>
+
         {/*  */}
         <div className="flex items-start gap-6 w-full max-w-screen-xl  px-4 mt-6">
           {/* 좌 */}

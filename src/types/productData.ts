@@ -51,6 +51,7 @@ export interface Bid {
 
 export interface AuctionBidData {
   auctionId: number;
+  currentPrice: number;
   totalBid: number;
   totalBidder: number;
   recentUserBid : Bid;

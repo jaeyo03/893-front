@@ -10,7 +10,7 @@ export default function BidHistory({ bidData, cancelData }: BidHistoryProps) {
     <div className="mb-6">
       <h2
         className={`pr-4 mb-2 pt-1 pb-1 text-lg text-end font-semibold tracking-wide rounded-[3px] ${
-          isCancelled ? 'bg-cancel' : 'bg-detailbid'
+          isCancelled ? 'text-rose-500' : ''
         }`}
       >
         {title}

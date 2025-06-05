@@ -34,7 +34,7 @@ export default function DetailPageClient({
   const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   const [bidData, setBidData] = useState<AuctionBidData>(initialBidData);
-  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.bids[0]?.bidPrice || product.basePrice);
+  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.currentPrice || product.basePrice);
 
   // 남은 시간과 시작 여부
   const { startTime, endTime } = product;
@@ -81,8 +81,8 @@ export default function DetailPageClient({
       } else {
         setAuctionState("completed");
         router.refresh();
+        // TODO 결제하기 연동 때문에 넣었는데 추후 수정 필요
       }
-      console.log(auctionState);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -173,6 +173,7 @@ export default function DetailPageClient({
     };
 
     return () => {
+      console.log('언 마운트 되며 SSE 정리')
       eventSource.close();
     };
   }, [product.auctionId]);

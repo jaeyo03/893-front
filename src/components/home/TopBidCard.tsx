@@ -40,8 +40,8 @@ export default function TopBidCard({
 
       <div className="px-3 py-2 space-y-1">
         <div className="flex justify-between">
-          <p className="text-[13px] text-main font-bold">낙찰가:</p>
-          <p className="text-[13px] text-main font-bold">
+          <p className="text-[13px] text-sky-500 font-bold">낙찰가:</p>
+          <p className="text-[13px] text-sky-500 font-bold">
             {itemPrice.toLocaleString()}원
           </p>
         </div>

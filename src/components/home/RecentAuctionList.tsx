@@ -22,7 +22,15 @@ export default function RecentAuctionList({
         {recentAuctionList.map((item) => (
           <Link href={`/detail/${item.auctionId}`} key={item.auctionId}>
             <div className="relative overflow-hidden transition border-none rounded-lg cursor-pointer">
-              <div className="p-2 mb-1 bg-white rounded-xl">
+              <div className="absolute p-4 right-1 top-24">
+                <div
+                  className={`flex justify-center tracking-[0.5px] items-center rounded text-[10px] text-white w-[48px] h-[18px] mb-2
+                  ${item.status === "active" ? "bg-main" : "bg-gray-400"}`}
+                >
+                  {item.status === "active" ? "경매중" : "경매예정"}
+                </div>
+              </div>
+              <div className="p-2  bg-white rounded-xl">
                 <Image
                   src={`http://localhost:8080${item.thumbnailUrl}`}
                   alt={item.title}
@@ -32,20 +40,17 @@ export default function RecentAuctionList({
                 />
               </div>
 
-              {item.isScraped && (
+              {/* {item.isScraped && (
                 <div className="absolute p-1 rounded-full top-3 right-3">
                   <Bookmark
                     className="w-6 h-6 text-white"
                     aria-label="스크랩 아이콘"
                   />
                 </div>
-              )}
+              )} */}
 
               <div className="p-2">
-                <div className="flex justify-center items-center rounded text-[10px] text-gray-500 bg-gray-100 w-[48px] h-[18px] mb-2">
-                  {item.status === "active" ? "경매중" : "경매예정"}
-                </div>
-                <h3 className="pb-2 mt-1 text-[16px] font-bold truncate text-main line-clamp-1">
+                <h3 className="pb-[3.2px] text-[16px] font-bold truncate text-sky-500 line-clamp-1">
                   {item.title}
                 </h3>
                 <p className="text-[16px] text-gray-600 line-clamp-1">

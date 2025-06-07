@@ -78,7 +78,7 @@ export default function AuctionSoonItem({
   }, [leftTime]);
 
   return (
-    <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm bg-white cursor-pointer">
+    <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm bg-white">
       <div className="relative w-full h-[240px]">
         <Image
           src={`http://localhost:8080${thumbnailUrl}`}
@@ -92,25 +92,25 @@ export default function AuctionSoonItem({
         <p className="text-[13px] font-semibold text-gray-500 text-center mb-2">
           {isStarted ? "경매 시작" : `시작까지 남은 시간 ${displayTime}`}
         </p>
-        <p className="text-[14px] font-semibold truncate mb-1 ">{title}</p>
-        <p className="text-[14px] text-gray-600 justify-end flex">
+        <p className="pl-2 text-[20px] font-semibold truncate mb-1 ">{title}</p>
+        <p className="pr-2 text-[14px] text-gray-600 justify-end flex">
           {itemConditionLabel[itemCondition]}
         </p>
 
-        <p className=" text-sky-500 mt-1 text-[16px] font-semibold justify-end flex">
+        <p className="pr-2 text-sky-500 mt-1 text-[16px] font-semibold justify-end flex">
           스크랩 수 {scrapCount}
         </p>
 
-        <div className="mt-3 text-xs text-gray-500 truncate justify-end flex">
+        <div className="pr-2 mt-3 text-xs text-gray-500 truncate justify-end flex">
           {description}
         </div>
-        <p className="text-sm font-semibold mt-1 justify-end flex">
+        <p className="pr-2 text-sm font-semibold mt-1 justify-end flex">
           시작가 {basePrice.toLocaleString()}원
         </p>
 
         <button
           onClick={handleParticipateClick}
-          className="mt-3 w-full py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-400 hover:text-gray-600 transition"
+          className="mt-3 w-full py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-400 hover:text-gray-600 transition cursor-pointer"
         >
           지금 참여하기
         </button>

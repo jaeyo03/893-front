@@ -20,7 +20,7 @@ export default function BidHistory({ bidData, cancelData }: BidHistoryProps) {
           <thead className="text-gray-600 border-b sticky top-0 bg-white z-10">
             <tr>
               <th className="w-[10%] px-1 py-2 font-semibold tracking-wide">순위</th>
-              <th className="w-[40%] px-1 py-2 font-semibold tracking-wide">이메일</th>
+              <th className="w-[40%] px-1 py-2 font-semibold tracking-wide">입찰자</th>
               <th className="w-[20%] px-1 py-2 font-semibold tracking-wide">입찰가</th>
               <th className="w-[30%] px-1 py-2 font-semibold tracking-wide">시간</th>
             </tr>

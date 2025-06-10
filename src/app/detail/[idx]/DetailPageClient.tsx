@@ -134,7 +134,10 @@ export default function DetailPageClient({
 
       const updatedBids = prev.bids.filter((bid) => bid.bidId !== bidId);
       const updatedCancelledBids = [bidToCancel, ...prev.cancelledBids];
+      
+      const newCurrentPrice = updatedBids.length > 0 ? updatedBids[0].bidPrice : product.basePrice;
 
+      setCurrentPrice(newCurrentPrice);
       return {
         ...prev,
         bids: updatedBids,
@@ -275,7 +278,9 @@ export default function DetailPageClient({
           <QueryProvider>
             {Array.isArray(relatedItem) && relatedItem.length > 0 ? (
               relatedItem.map((item) => (
-                <AuctionCard key={item.id} product={item} isLoggedIn={isLoggedIn} />
+                <div key={item.id} className="min-w-[231px]">
+                  <AuctionCard product={item} isLoggedIn={isLoggedIn} />
+                </div>
               ))
             ) : (
               <div className="grid items-center h-40 w-full gap-2 justify-center">

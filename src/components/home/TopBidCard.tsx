@@ -28,7 +28,7 @@ export default function TopBidCard({
   return (
     <div
       onClick={handleClick}
-      className="w-full rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm transition cursor-pointer"
+      className="w-[250px] rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm transition cursor-pointer"
     >
       <div className="relative">
         <img

@@ -50,9 +50,10 @@ export default function BestByCategory({
 
   return (
     <div className="p-4 overflow-x-auto">
-      <div className="relative mb-6">
+      <div className="relative mb-6" role="tablist" data-testid="category-tabs">
         <button
           onClick={() => handleScroll("left")}
+          aria-label="왼쪽 스크롤"
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
         >
           <ChevronLeft size={20} />
@@ -64,6 +65,8 @@ export default function BestByCategory({
           {bestByCategory.map((cat) => (
             <button
               key={cat.subCategoryId}
+              role="tab"
+              aria-selected={selectedTab === cat.subCategoryId}
               ref={(el) => {
                 if (el) buttonRefs.current.set(cat.subCategoryId, el);
               }}
@@ -81,6 +84,7 @@ export default function BestByCategory({
 
         <button
           onClick={() => handleScroll("right")}
+          aria-label="오른쪽 스크롤"
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
         >
           <ChevronRight size={20} />

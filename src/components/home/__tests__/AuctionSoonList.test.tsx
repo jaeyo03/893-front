@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import AuctionSoonList from "../AuctionSoonList";
 import { useRouter } from "next/navigation";
 import "@testing-library/jest-dom";
-import { act } from "react"; // ⬅️ react에서 가져오기
+import { act } from "react";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),

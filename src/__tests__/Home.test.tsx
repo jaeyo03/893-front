@@ -1,7 +1,9 @@
 // ImageCarousel 컴포넌트는 실제 UI 대신 텍스트로 대체
-jest.mock("@/components/home/ImageCarousel", () => () => (
-  <div>Mocked ImageCarousel</div>
-));
+jest.mock("@/components/home/ImageCarousel", () => {
+  return function DummyImageCarousel() {
+    return <div>Mocked ImageCarousel</div>;
+  };
+});
 
 // next/navigation 모듈에서 useRouter, useSearchParams를 목 처리
 jest.mock("next/navigation", () => ({
@@ -42,7 +44,7 @@ jest.mock("@/lib/api/home", () => ({
 
 // 테스트 도구 import
 import { render, screen } from "@testing-library/react";
-import Home from "../page"; // 서버 컴포넌트
+import Home from "../app/page"; // 서버 컴포넌트
 import "@testing-library/jest-dom";
 
 // Home 페이지의 주요 제목들이 정상적으로 렌더링되는지 확인하는 테스트

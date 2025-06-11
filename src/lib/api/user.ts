@@ -1,6 +1,7 @@
 // src/api/users.ts
 
 import axios from "axios";
+import { DeliveryAddress } from "@/types/userData";
 
 const API_URL = "http://localhost:8080/api/users";
 
@@ -18,7 +19,7 @@ export const getAddresses = async () => {
 };
 
 // 배송지 추가 함수
-export const addAddress = async (newAddress: any) => {
+export const addAddress = async (newAddress: DeliveryAddress) => {
   try {
     const response = await axios.post(`${API_URL}/addresses`, newAddress,{
       withCredentials: true,

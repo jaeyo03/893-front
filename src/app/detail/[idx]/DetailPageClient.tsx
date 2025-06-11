@@ -183,7 +183,7 @@ export default function DetailPageClient({
 
   return (
     <>
-      <div className="flex justify-between p-2">
+      <div className="flex justify-between p-2 w-[1280px] mx-auto">
         <div className="flex-1 mr-6 flex flex-col gap-6">
           <ImageSlider
             key={product.auctionId}
@@ -272,7 +272,7 @@ export default function DetailPageClient({
         </div>
       </div>
       <hr />
-      <div className="p-5">
+      <div className="p-5 w-[1280px] mx-auto">
         <h2 className="pl-4 mb-2 text-xl font-bold">관련 상품</h2>
         <div className="flex gap-6 pl-4 overflow-x-auto scrollbar-hide">
           <QueryProvider>

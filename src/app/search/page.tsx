@@ -51,51 +51,55 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 						<SearchInput isLoggedIn={isLoggedIn}/>
 					</QueryProvider>
 				</div>
-				{relatedWords.data.length > 0 ? (
-					<ProductRelated relatedWords={relatedWords.data}/>
-				) : (
-					<div className="w-full h-2"></div>
-				)}
-				<div className="bg-graybg h-auto p-4 flex gap-4">
-					<div className="bg-white rounded-[12px] py-2 w-1/5 sticky top-16">
-						<div className="flex justify-between items-center px-4 py-2">
-							<div className="font-bold text-xl">검색 필터</div>
-							<FilterRefreshButton/>
-						</div>
-						<div className="border-b-[1.5px] border-divider my-2"></div>
-						<CategoryFilter categoryList={categoryList?.data}/>
-						<div className="border-b-[1.5px] border-divider my-2"></div>
-						<PriceFilter
-							minPrice={lowestPrice}
-							maxPrice={highestPrice}
-						/>
-						<div className="border-b-[1.5px] border-divider my-2"></div>
-						<AuctionStatusFilter/>
-						<div className="border-b-[1.5px] border-divider my-2"></div>
-						<ProductStatusFilter/>
-					</div>
-					<div className="w-4/5">
-						<ProductSort/>
-						{products?.data?.auctionList?.length > 0 ? (
-							<>
-								<QueryProvider>
-									<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
-										{products.data.auctionList.map((product) => (
-											<AuctionCard key={product.id} product={product} isLoggedIn={isLoggedIn}/>
-										))}
-									</div>
-								</QueryProvider>
-								<SearchPagination
-									totalPages={Math.ceil(products.data.totalAuctionsCount / 12)}
-									currentPage={currentPage}
-								/>
-							</>
-						) : (
-							<div className="flex flex-col items-center h-96 gap-2 justify-center">
-								<Image src="/icons/SearchEmpty.svg" alt="검색 결과가 없습니다." width={121} height={99}/>
-								<div className="text-center text-gray-500">검색 결과가 없습니다.</div>
+				<div className="w-[1280px] mx-auto">
+					{relatedWords.data.length > 0 ? (
+						<ProductRelated relatedWords={relatedWords.data}/>
+					) : (
+						<div className="w-full h-2"></div>
+					)}
+				</div>
+				<div className="bg-graybg">
+					<div className="w-[1280px] mx-auto h-auto p-4 flex gap-4">
+						<div className="bg-white rounded-[12px] py-2 w-1/5 sticky top-16">
+							<div className="flex justify-between items-center px-4 py-2">
+								<div className="font-bold text-xl">검색 필터</div>
+								<FilterRefreshButton/>
 							</div>
-						)}
+							<div className="border-b-[1.5px] border-divider my-2"></div>
+							<CategoryFilter categoryList={categoryList?.data}/>
+							<div className="border-b-[1.5px] border-divider my-2"></div>
+							<PriceFilter
+								minPrice={lowestPrice}
+								maxPrice={highestPrice}
+							/>
+							<div className="border-b-[1.5px] border-divider my-2"></div>
+							<AuctionStatusFilter/>
+							<div className="border-b-[1.5px] border-divider my-2"></div>
+							<ProductStatusFilter/>
+						</div>
+						<div className="w-4/5">
+							<ProductSort/>
+							{products?.data?.auctionList?.length > 0 ? (
+								<>
+									<QueryProvider>
+										<div className="grid grid-cols-4 grid-rows-3 gap-4 mt-4 h-[1022px]">
+											{products.data.auctionList.map((product) => (
+												<AuctionCard key={product.id} product={product} isLoggedIn={isLoggedIn}/>
+											))}
+										</div>
+									</QueryProvider>
+									<SearchPagination
+										totalPages={Math.ceil(products.data.totalAuctionsCount / 12)}
+										currentPage={currentPage}
+									/>
+								</>
+							) : (
+								<div className="flex flex-col items-center h-96 gap-2 justify-center">
+									<Image src="/icons/SearchEmpty.svg" alt="검색 결과가 없습니다." width={121} height={99}/>
+									<div className="text-center text-gray-500">검색 결과가 없습니다.</div>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

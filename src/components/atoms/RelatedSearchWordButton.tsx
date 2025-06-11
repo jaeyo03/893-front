@@ -11,6 +11,8 @@ interface RelatedSearchWordButtonProps {
 export default function RelatedSearchWordButton({ searchKeyword, isLast, handleClickWordButton, handleAddSearch } : RelatedSearchWordButtonProps) {
   return (
   <div
+    role="button"
+    aria-label={`연관 검색어 검색 ${searchKeyword} 버튼`}
     onClick={(e) => {handleClickWordButton(e, searchKeyword)}}
     className={`
     group hover:bg-[#EFF2F4]

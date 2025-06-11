@@ -34,7 +34,7 @@ export default function DetailPageClient({
   const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   const [bidData, setBidData] = useState<AuctionBidData>(initialBidData);
-  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.bids[0]?.bidPrice || product.basePrice);
+  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.currentPrice || product.basePrice);
 
   // 남은 시간과 시작 여부
   const { startTime, endTime } = product;
@@ -81,8 +81,8 @@ export default function DetailPageClient({
       } else {
         setAuctionState("completed");
         router.refresh();
+        // TODO 결제하기 연동 때문에 넣었는데 추후 수정 필요
       }
-      console.log(auctionState);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -134,7 +134,10 @@ export default function DetailPageClient({
 
       const updatedBids = prev.bids.filter((bid) => bid.bidId !== bidId);
       const updatedCancelledBids = [bidToCancel, ...prev.cancelledBids];
+      
+      const newCurrentPrice = updatedBids.length > 0 ? updatedBids[0].bidPrice : product.basePrice;
 
+      setCurrentPrice(newCurrentPrice);
       return {
         ...prev,
         bids: updatedBids,
@@ -173,6 +176,7 @@ export default function DetailPageClient({
     };
 
     return () => {
+      console.log('언 마운트 되며 SSE 정리')
       eventSource.close();
     };
   }, [product.auctionId]);
@@ -274,7 +278,9 @@ export default function DetailPageClient({
           <QueryProvider>
             {Array.isArray(relatedItem) && relatedItem.length > 0 ? (
               relatedItem.map((item) => (
-                <AuctionCard key={item.id} product={item} isLoggedIn={isLoggedIn} />
+                <div key={item.id} className="min-w-[231px]">
+                  <AuctionCard product={item} isLoggedIn={isLoggedIn} />
+                </div>
               ))
             ) : (
               <div className="grid items-center h-40 w-full gap-2 justify-center">

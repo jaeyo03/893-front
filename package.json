@@ -9,7 +9,10 @@
     "lint": "next lint",
     "prepare": "husky",
     "commit": "git-cz",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:coverage:open": "jest --coverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.13",

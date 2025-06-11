@@ -9,7 +9,7 @@ interface RelatedSearchContentProps {
 
 export default function RelatedSearchContent({ relatedWords, handleClickWordButton, handleAddSearch } : RelatedSearchContentProps) {
   return (
-    <div className="absolute z-10 rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
+    <div className="absolute z-30 rounded-b-[12px] w-full -ml-[1.5px] bg-white grid gap-4 border-l-[1.5px] border-r-[1.5px] border-b-[1.5px] border-main" style={{ width: 'calc(100% + 3px)' }}>
       <div className="border-t border-t-[#E5E9EC]">
         {relatedWords.length === 0 ? (
           <div className="text-center text-sm text-gray-500 py-2">연관 검색어가 없습니다.</div>

@@ -33,8 +33,8 @@ export default function SellerAgreementCheckbox({
 
       <label
         htmlFor="agree"
-        className={`w-5 h-5 flex items-center justify-center cursor-pointer 
-          rounded-[6px] 
+        className={`w-5 h-5 flex items-center justify-center cursor-pointer  
+          border-2 rounded-md border-resgistersubtext 
           ${agreed ? "text-main" : "text-transparent"}
         `}
       >

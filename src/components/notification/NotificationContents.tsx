@@ -53,7 +53,7 @@ export default function NotificationContents({
       // 경매 상세 페이지로 이동
       if (auctionId) router.push(`/auction/${auctionId}`);
     } catch (err) {
-      // console.error("알림 클릭 실패:", err);
+      console.error("알림 클릭 실패:", err);
       toast.error("알림 클릭 처리에 실패했습니다.");
     }
   };
@@ -107,7 +107,7 @@ export default function NotificationContents({
 
       {/* 알림 내용 */}
       <div className="text-[14px] text-[#303038] font-normal mt-[12px]">
-        "{content}"
+        {content}
       </div>
     </div>
   );

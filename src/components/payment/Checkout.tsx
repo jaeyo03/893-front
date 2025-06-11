@@ -127,7 +127,7 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
                   failUrl: "http://localhost:3000/payment/fail"
                 });
               } catch (error) {
-                // TODO: 에러 처리
+                console.error("결제 실패:", error);
               }
             }}
           >

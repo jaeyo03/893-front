@@ -5,6 +5,7 @@ import {loadTossPayments, ANONYMOUS, TossPaymentsWidgets} from "@tosspayments/to
 import { OrderResponse } from "@/types/response.types";
 import {postPaymentInfo} from "@/lib/api/order";
 import {TossPaymentRequest} from "@/types/payment.types";
+import toast from "react-hot-toast";
 
 interface CheckoutPageProps {
   auctionId : string;
@@ -113,7 +114,7 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
                 const customerEmail = response?.data?.customerEmail;
 
                 if (!orderId || !orderName || !customerName || !customerEmail) {
-                  alert("결제 정보를 가져오는데 실패했습니다.");
+                  toast.error("결제 정보를 가져오는데 실패했습니다.");
                   return;
                 }
 
@@ -126,7 +127,7 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
                   failUrl: "http://localhost:3000/payment/fail"
                 });
               } catch (error) {
-                // TODO: 에러 처리
+                console.error("결제 실패:", error);
               }
             }}
           >

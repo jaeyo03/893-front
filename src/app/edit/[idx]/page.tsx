@@ -16,6 +16,7 @@ import SellerAgreementCheckbox from "@/components/registration/SellerAgreementCh
 import SellButton from "@/components/registration/SellButton";
 import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeButton";
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
+import toast from "react-hot-toast";
 
 import {
   productConditions,
@@ -37,7 +38,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   const router = useRouter();
   const auctionId = params.idx;
 
-  // ✅ 입력 값 상태
   const [images, setImages] = useState<File[]>([]);
   const [serverImages, setServerImages] = useState<ServerImage[]>([]);
   const [category, setCategory] = useState<CategoryValue>({
@@ -57,10 +57,8 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ✅ 에러 상태
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // ✅ 각 필드별 ref (스크롤 이동용)
   const refs = {
     images: useRef<HTMLDivElement>(null),
     title: useRef<HTMLDivElement>(null),
@@ -147,7 +145,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     return true;
   };
 
-  // ✅ 모달 열기 전 유효성 검사
   const handleValidationAndOpenModal = () => {
     if (validateForm()) {
       setIsModalOpen(true);
@@ -156,13 +153,12 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   const handleCategoryChange = (value: CategoryValue) => {
     setCategory(value); // 전달된 값을 그대로 반영
 
-    // ✅ 소분류까지 선택됐을 때만 에러 제거
     if (value.id && errors.category) {
-      const { category: _, ...rest } = errors;
-      setErrors(rest);
+      const tempErrors = { ...errors };
+      delete tempErrors.category;
+      setErrors(tempErrors);
     }
   };
-  // ✅ 수정 제출
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -211,12 +207,12 @@ export default function EditRegistration({ params }: AuctionIdProps) {
           withCredentials: true,
         }
       );
-      alert("경매 수정이 완료되었습니다!");
-      router.push(`/detail/${auctionId}`);
+      toast.success("경매 수정이 완료되었습니다!");
+      router.push(`/detail/${auctionId}?refresh=${Date.now()}`);
       setIsModalOpen(false);
     } catch (err) {
       console.error("❌ PATCH 실패", err);
-      alert("수정 중 오류가 발생했습니다.");
+      toast.error("수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -235,7 +231,9 @@ export default function EditRegistration({ params }: AuctionIdProps) {
             onDeleteServerImage={(i) =>
               setServerImages((prev) => prev.filter((_, idx) => idx !== i))
             }
-            onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
+            onEmptyImage={() =>
+              toast.error("최소 1장의 이미지를 등록해주세요.")
+            }
             mainImageIndex={mainImageIndex}
             onChangeMainImageIndex={setMainImageIndex}
           />

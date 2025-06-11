@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { categories as allCategories } from "@/lib/categories";
+import { getCategoryList } from "@/lib/api/search";
 
 type Category = {
   id: number;
-  parent_id: number | null;
   name: string;
+  parent_id: number | null;
 };
 
 type CategoryTree = Category & { children: CategoryTree[] };
@@ -23,7 +23,6 @@ type Props = {
   onChange: (value: CategoryValue) => void;
 };
 
-// ✅ 트리 구조 생성
 function buildCategoryTree(categories: Category[]): CategoryTree[] {
   const map = new Map<number, CategoryTree>();
   const roots: CategoryTree[] = [];
@@ -42,7 +41,6 @@ function buildCategoryTree(categories: Category[]): CategoryTree[] {
   return roots;
 }
 
-// ✅ ID로 트리에서 노드 찾기
 function findById(
   tree: CategoryTree[],
   id: number | null | undefined
@@ -64,10 +62,22 @@ export default function CategorySelector({ value, onChange }: Props) {
   const [step3, setStep3] = useState<CategoryTree | null>(null);
 
   useEffect(() => {
-    setTree(buildCategoryTree(allCategories));
+    const fetchCategories = async () => {
+      const res = await getCategoryList();
+      if (res.code === 200 && res.data) {
+        const converted: Category[] = res.data.map((c) => ({
+          id: c.id,
+          name: c.name,
+          parent_id: c.parentId,
+        }));
+        setTree(buildCategoryTree(converted));
+      } else {
+        console.error("카테고리 불러오기 실패:", res.message);
+      }
+    };
+    fetchCategories();
   }, []);
 
-  // ✅ ID로 정확한 경로 추적
   useEffect(() => {
     if (value.id && tree.length > 0) {
       const step3Node = findById(tree, value.id);
@@ -80,8 +90,6 @@ export default function CategorySelector({ value, onChange }: Props) {
     }
   }, [value.id, tree]);
 
-  // ✅ 선택 완료 시 onChange
-  // ✅ mainCategory 또는 subCategory가 바뀔 때도 반응하게
   useEffect(() => {
     if (step1 && !step2 && !step3) {
       onChange({

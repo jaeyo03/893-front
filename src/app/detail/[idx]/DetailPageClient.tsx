@@ -5,7 +5,7 @@ import ImageSlider from "@/components/detail/ImageSlider";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import BidHistory from "@/components/detail/Bid/BidHistory";
 import BidInteraction from "@/components/detail/BidInteraction";
-import { Product, AuctionBidData, Bid } from "@/types/productData";
+import { Product, AuctionBidData, Bid, Status } from "@/types/productData";
 import { useEffect, useState } from "react";
 import ProductHeader from "@/components/detail/ProductHeader";
 import { AuctionInfo } from "@/components/detail/AuctionInfo";
@@ -34,14 +34,24 @@ export default function DetailPageClient({
   const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
   const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
   const [bidData, setBidData] = useState<AuctionBidData>(initialBidData);
-  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.bids[0]?.bidPrice || product.basePrice);
-  const [remainTime, setRemainTime] = useState<number>(getRemainTime(product.endTime));
-  const { startTime, endTime } = product;
+  const [currentPrice, setCurrentPrice] = useState<number>(initialBidData.currentPrice || product.basePrice);
 
   // 남은 시간과 시작 여부
+  const { startTime, endTime } = product;
   const start = new Date(startTime).getTime();
   const end = new Date(endTime).getTime();
-  const isBeforeStart = Date.now() < start;
+  let currentAuctionState: Status = "pending";
+
+  if (Date.now() < start) {
+    currentAuctionState = "pending";
+  } else if (Date.now() < end) {
+    currentAuctionState = "active";
+  } else {
+    currentAuctionState = "completed";
+  }
+
+  const [auctionState, setAuctionState] = useState<Status>(currentAuctionState);
+  const [remainTime, setRemainTime] = useState<number>(auctionState === "pending" ? getRemainTime(product.startTime) : getRemainTime(product.endTime));
 
   // 시간 계산 useEffect
   useEffect(() => {
@@ -52,12 +62,31 @@ export default function DetailPageClient({
 
     const interval = setInterval(() => {
       const now = Date.now();
-      const diff = isBeforeStart ? start - now : end - now;
-      setRemainTime(Math.max(Math.floor(diff / 1000), 0));
+      let timeDiff;
+
+      if (auctionState === "pending") {
+        timeDiff = start - now;
+      } else if (auctionState === "active") {
+        timeDiff = end - now;
+      } else {
+        timeDiff = 0;
+      }
+
+      setRemainTime(Math.max(Math.floor(timeDiff / 1000), 0));
+
+      if (now < start) {
+        setAuctionState("pending");
+      } else if (start <= now && now < end) {
+        setAuctionState("active");
+      } else {
+        setAuctionState("completed");
+        router.refresh();
+        // TODO 결제하기 연동 때문에 넣었는데 추후 수정 필요
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [auctionState, end, endTime, start, startTime]);
 
   const {mutate: addScrapMutation} = useAddScrap();
   const {mutate: removeScrapMutation} = useDeleteScrap();
@@ -105,7 +134,10 @@ export default function DetailPageClient({
 
       const updatedBids = prev.bids.filter((bid) => bid.bidId !== bidId);
       const updatedCancelledBids = [bidToCancel, ...prev.cancelledBids];
+      
+      const newCurrentPrice = updatedBids.length > 0 ? updatedBids[0].bidPrice : product.basePrice;
 
+      setCurrentPrice(newCurrentPrice);
       return {
         ...prev,
         bids: updatedBids,
@@ -144,6 +176,7 @@ export default function DetailPageClient({
     };
 
     return () => {
+      console.log('언 마운트 되며 SSE 정리')
       eventSource.close();
     };
   }, [product.auctionId]);
@@ -155,7 +188,7 @@ export default function DetailPageClient({
           <ImageSlider
             key={product.auctionId}
             images={product.images}
-            product={product}
+            auctionState={auctionState}
           />
           <GoodsInfo
             description={product.description}
@@ -180,18 +213,18 @@ export default function DetailPageClient({
                   handleScrapToggle={handleScrapToggle}
                   isLoggedIn={isLoggedIn}
                   remainTime={remainTime}
-                  isBeforeStart={isBeforeStart}
+                  auctionState={auctionState}
                 />
               </div>
               
-              {!isLoggedIn && (
+              {!isLoggedIn && auctionState === "active" && (
                 <>
                   <hr className="border-gray-300 my-4" />
                   <div className="text-center text-gray-500">로그인 후 입찰 가능합니다.</div>
                 </>
               )}
 
-              {isLoggedIn && !product.isSeller && product.status === "active" && (
+              {isLoggedIn && !product.isSeller && auctionState === "active" && (
                 <>
                   <hr className="border-gray-300 my-4" />
                   <BidInteraction
@@ -201,6 +234,7 @@ export default function DetailPageClient({
                     isLoggedIn={isLoggedIn}
                     currentPrice={currentPrice}
                     remainTime={remainTime}
+                    auctionState={auctionState}
                   />
                 </>
               )}
@@ -211,6 +245,20 @@ export default function DetailPageClient({
                   <button className="w-[72px] h-[32px] text-sm text-white rounded bg-green-500 hover:bg-green-600" onClick={handlePayment}>
                     결제하기
                   </button>
+                </>
+              )}
+
+              {product.hasBeenPaid && (
+                <>
+                  <hr className="border-gray-300 my-4" />
+                  <div className="text-center text-gray-500">결제가 완료된 경매입니다.</div>
+                </>
+              )}
+
+              {bidData.bids.length === 0 && auctionState === "completed" && (
+                <>
+                  <hr className="border-gray-300 my-4" />
+                  <div className="text-center text-gray-500">유찰된 경매입니다.</div>
                 </>
               )}
             </div>
@@ -230,7 +278,9 @@ export default function DetailPageClient({
           <QueryProvider>
             {Array.isArray(relatedItem) && relatedItem.length > 0 ? (
               relatedItem.map((item) => (
-                <AuctionCard key={item.id} product={item} isLoggedIn={isLoggedIn} />
+                <div key={item.id} className="min-w-[231px]">
+                  <AuctionCard product={item} isLoggedIn={isLoggedIn} />
+                </div>
               ))
             ) : (
               <div className="grid items-center h-40 w-full gap-2 justify-center">

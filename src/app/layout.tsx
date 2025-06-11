@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Header } from "@/components/Header";
-import GlobalFCMSetup from "@/components/GlobalFCMSetup";
 import { cookies } from "next/headers";
 import { Toaster } from "react-hot-toast";
 
@@ -45,6 +44,7 @@ export default function RootLayout({
           toastOptions={{
             style: {
               zIndex: 9999,
+              padding: '20px',
             },
           }}
         />

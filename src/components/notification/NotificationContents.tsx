@@ -1,6 +1,7 @@
 import { EllipsisVertical, Dot } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 // 부모로부터 전달받는 props 타입
 type NotificationProps = {
@@ -52,8 +53,8 @@ export default function NotificationContents({
       // 경매 상세 페이지로 이동
       if (auctionId) router.push(`/auction/${auctionId}`);
     } catch (err) {
-      // console.error("알림 클릭 실패:", err);
-      alert("알림 클릭 처리에 실패했습니다.");
+      console.error("알림 클릭 실패:", err);
+      toast.error("알림 클릭 처리에 실패했습니다.");
     }
   };
 
@@ -106,7 +107,7 @@ export default function NotificationContents({
 
       {/* 알림 내용 */}
       <div className="text-[14px] text-[#303038] font-normal mt-[12px]">
-        "{content}"
+        {content}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import DetailPageClient from "./DetailPageClient";
 import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
 import { notFound } from "next/navigation";
 import QueryProvider from "@/components/QueryProvider";
+import { AuctionBidData } from "@/types/productData";
 
 interface PageProps {
   params: { idx : string };
@@ -29,10 +30,10 @@ export default async function Page({ params }: PageProps) {
 	console.log(productData);
 	console.log(relatedItemData);
 	if (!productData) return notFound();
-	
+
   return (
     <QueryProvider>
-      <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={initialBidData} product={productData} relatedItem={relatedItemData} />
+      <DetailPageClient isLoggedIn={isLoggedIn} initialBidData={initialBidData as AuctionBidData} product={productData} relatedItem={relatedItemData.data || null} />
     </QueryProvider>
   );
 }

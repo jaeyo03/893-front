@@ -8,6 +8,7 @@ import { getAuctionStatus } from './constants/MyPageProduct';
 import { useEffect, useState } from 'react';
 import { getRemainingTime } from './TimeCalculator';
 import { deleteAuction } from '@/lib/api/auction';
+import toast from "react-hot-toast";
 
 interface Props {
   auctions: MyAuctionsProduct;
@@ -42,10 +43,10 @@ export default function MyAuctionsProductCard({ auctions,onDelete }: Props) {
 
     try {
       await deleteAuction(auctions.auctionId);
-      alert('삭제되었습니다.');
+      toast.success('삭제되었습니다.');
       onDelete(auctions.auctionId);
     } catch (error) {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
       console.error('삭제 실패:', error);
     }
   };

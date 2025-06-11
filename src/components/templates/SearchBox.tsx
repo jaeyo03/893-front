@@ -8,6 +8,8 @@ import RecentSearchContent from "../molecules/searchinput/RecentSearchContent";
 import RelatedSearchContent from "../molecules/searchinput/RelatedSearchContent";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAddSearchHistory, useDeleteSearchHistory, useRelatedWords, useSearchHistory } from "@/hooks/useSearchBox";
+import toast from "react-hot-toast";
+
 type SearchStatus = 'CLOSED' | 'RECENT_RECOMMENDED' | 'RELATED';
 
 interface SearchBoxProps {
@@ -65,11 +67,11 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     
-    if (value.length < 30) {
+    if (value.length <= 30) {
       setInputValue(value);
       setSearchStatus(value.length > 0 ? 'RELATED' : 'RECENT_RECOMMENDED');
     } else {
-      alert("검색어는 30자 이하로 입력해주세요.");
+      toast.error("검색어는 30자 이하로 입력해주세요.");
     }
   }
 
@@ -83,7 +85,7 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
     if (inputValue.trim() === "") {
-      alert("검색어를 입력해주세요.");
+      toast.error("검색어를 입력해주세요.");
       return;
     }
 
@@ -146,11 +148,11 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
         />
         <div className="flex items-center gap-2">
           {inputValue.length > 0 && (
-            <button type="button" onClick={handleDeleteCurrentSearch} className="rounded-full bg-[#EFF2F4] flex items-center justify-center">
+            <button aria-label="현재 입력 검색어 삭제" type="button" onClick={handleDeleteCurrentSearch} className="rounded-full bg-[#EFF2F4] flex items-center justify-center">
               <X size={16} color="#898989"/>
             </button>
           )}
-          <button type="button" onClick={handleInputClick}>
+          <button aria-label="검색 관련 창 토글" type="button" onClick={handleInputClick}>
             {isRecentSearchContentOpen || isRelatedSearchContentOpen ? (
               <ChevronUp size={22} />
             ) : (
@@ -158,7 +160,7 @@ export default function SearchBox({ isLoggedIn }: SearchBoxProps) {
             )}
           </button>
           <div className="h-3 border-gray-300 border-[0.5px]"/>
-          <button type="submit">
+          <button aria-label="검색" type="submit">
             <Search size={22} />
           </button>
         </div>

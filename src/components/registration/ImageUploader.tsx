@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Camera, X } from "lucide-react";
-
-// Type definitions
+import toast from "react-hot-toast";
 
 type ServerImage = {
   url: string;
@@ -31,6 +30,39 @@ export default function ImageUploader({
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const localImagePreviews = useMemo(() => {
+    return value.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+  }, [value]);
+
+  useEffect(() => {
+    return () => {
+      localImagePreviews.forEach(({ url }) => URL.revokeObjectURL(url));
+    };
+  }, [localImagePreviews]);
+
+  const combinedImages = useMemo(() => {
+    const all = [
+      ...serverImages.map((img, i) => ({
+        url: img.url,
+        index: i,
+        isServer: true,
+      })),
+      ...localImagePreviews.map(({ url }, i) => ({
+        url,
+        index: i + serverImages.length,
+        isServer: false,
+      })),
+    ];
+    return all.sort((a, b) => {
+      if (a.index === mainImageIndex) return -1;
+      if (b.index === mainImageIndex) return 1;
+      return 0;
+    });
+  }, [serverImages, localImagePreviews, mainImageIndex]);
+
   const handleRepresentClick = (index: number) => {
     onChangeMainImageIndex(index);
 
@@ -48,7 +80,7 @@ export default function ImageUploader({
 
     const total = serverImages.length + value.length + files.length;
     if (total > 10) {
-      alert("최대 10장까지 업로드할 수 있습니다.");
+      toast.error("최대 10장까지 업로드할 수 있습니다.");
       return;
     }
 
@@ -92,52 +124,40 @@ export default function ImageUploader({
     return [main, ...files.filter((_, i) => i !== representFileIndex)];
   };
 
-  const combined = [...serverImages, ...value];
-  const imageCount = combined.length;
+  const imageCount = serverImages.length + value.length;
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-4">
-        {combined
-          .map((item, index) => {
-            const isServer = "url" in item && typeof item.url === "string";
-            const url = isServer ? item.url : URL.createObjectURL(item as File);
-            return { index, url };
-          })
-          .sort((a, b) => {
-            if (a.index === mainImageIndex) return -1;
-            if (b.index === mainImageIndex) return 1;
-            return 0;
-          })
-          .map(({ index, url }) => (
-            <div
-              key={`preview-${index}-${url}`}
-              onClick={() => handleRepresentClick(index)}
-              className={`relative w-[144px] h-[144px] rounded-md overflow-hidden border-4 cursor-pointer ${
-                index === mainImageIndex ? "border-main" : "border-transparent"
-              }`}
+        {combinedImages.map(({ index, url }) => (
+          <div
+            key={`preview-${index}-${url}`}
+            onClick={() => handleRepresentClick(index)}
+            className={`relative w-[144px] h-[144px] rounded-md overflow-hidden border-4 cursor-pointer ${
+              index === mainImageIndex ? "border-main" : "border-transparent"
+            }`}
+          >
+            <img
+              src={url}
+              alt={`preview-${index}`}
+              className="object-cover w-full h-full"
+            />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteImage(index);
+              }}
+              className="absolute p-1 rounded-full top-1 right-1 bg-white/80 hover:bg-white"
             >
-              <img
-                src={url}
-                alt={`preview-${index}`}
-                className="object-cover w-full h-full"
-              />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteImage(index);
-                }}
-                className="absolute p-1 rounded-full top-1 right-1 bg-white/80 hover:bg-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              {index === mainImageIndex && (
-                <span className="absolute px-2 py-1 text-xs rounded-md bottom-1 left-1 bg-white/80">
-                  대표 이미지
-                </span>
-              )}
-            </div>
-          ))}
+              <X className="w-4 h-4" />
+            </button>
+            {index === mainImageIndex && (
+              <span className="absolute px-2 py-1 text-xs rounded-md bottom-1 left-1 bg-white/80">
+                대표 이미지
+              </span>
+            )}
+          </div>
+        ))}
 
         {imageCount < 10 && (
           <label

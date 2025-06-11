@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 
 import ImageUploader from "@/components/registration/ImageUploader";
@@ -16,6 +16,7 @@ import SellerAgreementCheckbox from "@/components/registration/SellerAgreementCh
 import SellButton from "@/components/registration/SellButton";
 import AuctionStartTimeButton from "@/components/registration/AuctionStartTimeButton";
 import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
+import toast from "react-hot-toast";
 
 import {
   productConditions,
@@ -140,14 +141,14 @@ export default function Registration() {
           withCredentials: true,
         }
       );
-      alert("경매 물품 등록이 완료되었습니다!");
+      toast.success("경매 물품 등록이 완료되었습니다!");
       setIsModalOpen(false);
-      router.push("/");
-    } catch (error: any) {
-      console.error("등록 실패", error);
-      if (error.response) {
-        console.error("서버 응답 내용:", error.response.data);
-        alert("등록에 실패했습니다. 다시 시도해주세요.");
+      console.log(res.data);
+      router.push(`/detail/${res?.data?.data?.auctionId}`);
+    } catch (error : unknown) {
+      toast.error("등록에 실패했습니다. 다시 시도해주세요.");
+      if (error instanceof AxiosError) {
+        console.error("서버 응답 내용:", error.response?.data);
       }
     }
   };
@@ -162,7 +163,7 @@ export default function Registration() {
           <ImageUploader
             value={images}
             onChange={setImages}
-            onEmptyImage={() => alert("최소 1장의 이미지를 등록해주세요.")}
+            onEmptyImage={() => toast.error("최소 1장의 이미지를 등록해주세요.")}
             mainImageIndex={mainImageIndex}
             onChangeMainImageIndex={setMainImageIndex}
           />

@@ -12,7 +12,7 @@ interface RecentSearchWordButtonProps {
 
 export default function RecentSearchWordButton({ searchKeyword, createdAt, updatedAt, id, handleDeleteSearch, handleClickWordButton } : RecentSearchWordButtonProps) {
   return (
-    <div onClick={(e) => {handleClickWordButton(e, searchKeyword)}} className="group hover:bg-[#EFF2F4] h-10 w-full cursor-pointer flex items-center justify-between p-4">
+    <div role="button" aria-label={`최근 검색어 검색 ${searchKeyword} 버튼`} onClick={(e) => {handleClickWordButton(e, searchKeyword)}} className="group hover:bg-[#EFF2F4] h-10 w-full cursor-pointer flex items-center justify-between p-4">
 			<div className="flex items-center justify-center gap-2">
 				<div className="rounded-3xl bg-[#EFF2F4] h-7 w-7 flex items-center justify-center">
 					<Clock size={16} />

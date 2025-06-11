@@ -16,22 +16,18 @@ import SearchPagination from "@/components/molecules/searchpage/SearchPagination
 export default async function SearchPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
 	const cookieStore = cookies();
 	const accessToken = cookieStore.get('accessToken')?.value;
-	const cookieHeader = accessToken ? `accessToken=${accessToken}` : '';
 	const isLoggedIn = accessToken ? true : false;
 
-	const productsData = getSearchProducts(searchParams, cookieHeader);
-	const relatedWordsData = getRelatedWords(searchParams, cookieHeader);
+	const productsData = getSearchProducts(searchParams);
+	const relatedWordsData = getRelatedWords(searchParams);
 	const categoryListData = getCategoryList();
 	const currentPage = searchParams.page ? parseInt(searchParams.page as string) : 1;
 
 	const [products, relatedWords, categoryList] = await Promise.all([
-			productsData,
-			relatedWordsData,
-			categoryListData,
+		productsData,
+		relatedWordsData,
+		categoryListData,
 	]);
-
-	console.log(categoryList);
-	console.log(products);
 
 	const { min: lowestPrice, max: highestPrice } = products?.data?.auctionList.reduce(
 		(accumulator, product) => ({
@@ -43,9 +39,6 @@ export default async function SearchPage({ searchParams }: { searchParams: { [ke
 			max: products?.data?.auctionList[0]?.basePrice,
 		}
 	);
-
-	console.log('최저가:', lowestPrice);
-	console.log('최고가:', highestPrice);
 	
 	return (
 		<>

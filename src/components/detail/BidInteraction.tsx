@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from "react";
-import { Product, AuctionBidData } from "@/types/productData";
+import { useEffect, useState } from "react";
+import { Product, AuctionBidData, Status } from "@/types/productData";
 import {
   cancelBid,
   postBid,
@@ -17,6 +17,7 @@ interface BidInteractionProps {
   isLoggedIn: boolean;
   currentPrice: number;
   remainTime: number;
+  auctionState: Status;
 }
 
 export default function BidInteraction({
@@ -26,8 +27,9 @@ export default function BidInteraction({
   isLoggedIn,
   currentPrice,
   remainTime,
+  auctionState,
 }: BidInteractionProps) {
-  const myBidIdRef = useRef<number>(0);
+  const [myBidId, setMyBidId] = useState<number | null>(window.sessionStorage.getItem("bidId") ? Number(window.sessionStorage.getItem("bidId")) : null);
   const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : product.basePrice);
   const [show, setShow] = useState(false);
   const [isCancelable, setIsCancelable] = useState(auctionBidData.canCancelBid);
@@ -36,7 +38,7 @@ export default function BidInteraction({
   const [cancelTimer, setCancelTimer] = useState<number>(getRemainTime(cancelAvailableDate?.toISOString() || ""));
   const [isLoading, setIsLoading] = useState(false);
 
-  const isBidAvailable = !product.hasBeenPaid && remainTime > 0 && !product.isSeller && product.status === "active";
+  const isBidAvailable = !product.hasBeenPaid && remainTime > 0 && !product.isSeller && auctionState === "active";
 
   const handleBid = async () => {
     const isInitialBid = bidAmount === product.basePrice;
@@ -65,7 +67,8 @@ export default function BidInteraction({
 
       if (response) {
         const bidResponse = response.data;
-        myBidIdRef.current = bidResponse.bid.bidId;
+        window.sessionStorage.setItem("bidId", bidResponse.bid.bidId.toString());
+        setMyBidId(bidResponse.bid.bidId);
 
         const createdDate = new Date(bidResponse.bid.createdAt);
         const cancelDate = new Date(createdDate.getTime() + 60 * 1000);
@@ -99,15 +102,23 @@ export default function BidInteraction({
     if (isLoading) return;
     setIsLoading(true);
     try {
+      if(!myBidId) {
+        toast.error("입찰 정보가 없습니다. 입찰 취소에 실패했습니다.");
+        return;
+      }
+
       const response = await cancelBid({
         auctionId: product.auctionId,
-        bidId: myBidIdRef.current,
+        bidId: myBidId,
       });
 
       if (response) {
         setCancelTimer(0);
-        removeBidData(myBidIdRef.current);
+        removeBidData(myBidId);
+        window.sessionStorage.removeItem("bidId");
+        setMyBidId(null);
       }
+
       toast.success("입찰이 취소되었습니다.");
     } catch (error: unknown) {
       if (error instanceof AxiosError) {

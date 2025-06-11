@@ -89,7 +89,7 @@ export const getRelatedItem = async (auctionId:number, cookieHeader: string) : P
       },
     });
     const data = await response.json();
-    return data?.data;
+    return data;
   } catch (error) {
     console.error('Failed to fetch related item:', error);
     throw error;

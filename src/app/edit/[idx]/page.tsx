@@ -211,7 +211,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
       router.push(`/detail/${auctionId}?refresh=${Date.now()}`);
       setIsModalOpen(false);
     } catch (err) {
-      console.error("❌ PATCH 실패", err);
+      console.error("PATCH 실패", err);
       toast.error("수정 중 오류가 발생했습니다.");
     }
   };

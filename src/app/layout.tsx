@@ -15,6 +15,9 @@ const pretendard = localFont({
 export const metadata: Metadata = {
   title: "팔구삼 893",
   description: "중고 경매 사이트",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -28,15 +31,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${pretendard.variable} font-pretendard grid justify-center`}
+        className={`${pretendard.variable} font-pretendard`}
       >
-        {/* {isLoggedIn && <GlobalFCMSetup />} */}
-        <header className="sticky top-0 z-50 w-full border-b bg-background">
-          <div className="container flex h-16 items-center">
+        <header className="sticky top-0 z-50 border-b bg-background">
+          <div className="flex h-16 items-center px-32">
             <Header isLoggedIn={isLoggedIn} />
           </div>
         </header>
-        <div className="w-[1280px]">{children}</div>
+        {children}
 
         {/* Toaster 컴포넌트 추가 */}
         <Toaster

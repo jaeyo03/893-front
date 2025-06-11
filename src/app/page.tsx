@@ -85,53 +85,60 @@ export default async function Home() {
   return (
     <>
       <div className="w-full mt-6 px-4">
-        <HomeTitle>
-          <SpinningWord />
+        {/* 1. 메인 타이틀 */}
+        <HomeTitle data-testid="home-title">
+          <SpinningWord data-testid="spinning-word" />
           <span>&nbsp;경매에 참여해보세요</span>
         </HomeTitle>
 
         <div className="flex justify-center w-full mt-4">
           <QueryProvider>
-            <SearchInput isLoggedIn={isLoggedIn} />
+            {/* 2. 검색창 */}
+            <SearchInput isLoggedIn={isLoggedIn} data-testid="search-input" />
           </QueryProvider>
         </div>
 
-        {/*  */}
         <div className="flex items-start gap-6 w-full max-w-screen-xl  px-4 mt-6">
-          {/* 좌 */}
+          {/* 좌측 */}
           <div className="flex-1 max-w-[780px]">
-            <DashboardStats dashboardStats={dashboardStats} />
-            <div className="mt-10">
+            {/* 3. 대시보드 통계 */}
+            <div data-testid="dashboard-stats">
+              <DashboardStats dashboardStats={dashboardStats} />
+            </div>
+            {/* 4. 이미지 캐러셀 */}
+            <div className="mt-10" data-testid="image-carousel">
               <ImageCarousel slides={slides} />
             </div>
-            <div className="mt-10">
+            {/* 5. 최근 입찰 리스트 */}
+            <div className="mt-10" data-testid="recent-auction-list">
               <RecentAuctionList recentAuctionList={recentAuctionList} />
             </div>
           </div>
 
-          {/* 우 */}
-          <div className="w-[300px] shrink-0">
+          {/* 6. 실시간 랭킹 (우측) */}
+          <div className="w-[300px] shrink-0" data-testid="real-time-ranking">
             <RealTimeRankingItem
               realTimeRankingItemActive={realTimeRankingItemActive}
               realTimeRankingItemPending={realTimeRankingItemPending}
             />
           </div>
         </div>
-        <div className="pt-20">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
-            경매 임박 물품
-          </h2>
+        {/* 7. 경매 임박 물품 */}
+        <section className="pt-20" data-testid="auction-soon-list">
+          <h2 className="text-2xl font-bold …">경매 임박 물품</h2>
           <AuctionSoonItemList auctionSoonItemList={auctionSoonItemList} />
-        </div>
+        </section>
 
-        <div className="pt-20">
+        {/* 8. 최근 7일 최고 낙찰가 TOP 5 */}
+        <section className="pt-20" data-testid="top-bid-card-list">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
             최근 7일 최고 낙찰가 TOP 5
           </h2>
           <TopBidCardList topBidCardList={topBidCardList} />
-        </div>
+        </section>
 
-        <div className="pt-20 pb-32">
+        {/* 9. 카테고리별 베스트 TOP3 */}
+        <div className="pt-20 pb-32" data-testid="best-by-category">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
             카테고리별 베스트 TOP3
           </h2>

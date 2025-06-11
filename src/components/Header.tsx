@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Home, Gavel, User, Menu, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import NotificationDropdown from "@/components/notification/NotificationDropdown";
+// import NotificationDropdown from "@/components/notification/NotificationDropdown";
 
 export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
@@ -100,11 +100,11 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
                   {route.label}
                 </button>
 
-                {isNotificationOpen && (
+                {/* {isNotificationOpen && (
                   <NotificationDropdown
                     onClose={() => setIsNotificationOpen((prev) => !prev)}
                   />
-                )}
+                )} */}
               </div>
             ) : (
               <Link

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 
 import ImageUploader from "@/components/registration/ImageUploader";
@@ -145,11 +145,10 @@ export default function Registration() {
       setIsModalOpen(false);
       console.log(res.data);
       router.push(`/detail/${res?.data?.data?.auctionId}`);
-    } catch (error: any) {
-      console.error("등록 실패", error);
-      if (error.response) {
-        console.error("서버 응답 내용:", error.response.data);
-        toast.error("등록에 실패했습니다. 다시 시도해주세요.");
+    } catch (error : unknown) {
+      toast.error("등록에 실패했습니다. 다시 시도해주세요.");
+      if (error instanceof AxiosError) {
+        console.error("서버 응답 내용:", error.response?.data);
       }
     }
   };

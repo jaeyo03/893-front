@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Bookmark } from "lucide-react";
 import { AuctionItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
 

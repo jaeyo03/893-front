@@ -154,8 +154,9 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     setCategory(value); // 전달된 값을 그대로 반영
 
     if (value.id && errors.category) {
-      const { category: _, ...rest } = errors;
-      setErrors(rest);
+      const tempErrors = { ...errors };
+      delete tempErrors.category;
+      setErrors(tempErrors);
     }
   };
   const handleSubmit = async () => {

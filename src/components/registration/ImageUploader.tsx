@@ -180,6 +180,7 @@ export default function ImageUploader({
         ref={fileInputRef}
         onChange={handleFileChange}
         multiple
+        data-testid="image-uploader-input"
       />
     </div>
   );

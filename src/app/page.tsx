@@ -84,7 +84,7 @@ export default async function Home() {
 
   return (
     <>
-      <div className="w-full mt-6 px-4">
+      <div className="w-[1280px] mt-6 px-4 mx-auto">
         {/* 1. 메인 타이틀 */}
         <HomeTitle data-testid="home-title">
           <SpinningWord data-testid="spinning-word" />

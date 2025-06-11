@@ -23,6 +23,7 @@ export default function DaumPostcodeEmbed({
 
   useEffect(() => {
     const loadDaumPostcode = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { daum } = window as any;
       new daum.postcode.Postcode({
         oncomplete: onComplete,
@@ -31,6 +32,7 @@ export default function DaumPostcodeEmbed({
       }).embed(containerRef.current);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (typeof window !== "undefined" && !(window as any).daum) {
       const script = document.createElement("script");
       script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";

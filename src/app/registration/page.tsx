@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-
+import { getPresignedUrl, uploadToS3 } from "@/lib/api/s3Upload";
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
 import PaymentInput from "@/components/registration/PaymentInput";
@@ -55,58 +55,6 @@ export default function Registration() {
     durationTime: useRef<HTMLDivElement>(null),
     agreed: useRef<HTMLDivElement>(null),
   };
-  // Presigned URL 요청 함수
-  const getPresignedUrl = async (file: File) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/s3/presigned-url`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-        }),
-        credentials: "include",
-      }
-    );
-
-    if (!res.ok) throw new Error("Presigned URL 요청 실패");
-
-    const data = await res.json();
-    console.log("[🟢 Presigned URL 응답]", {
-      fileName: file.name,
-      contentType: file.type,
-      presignedUrl: data.presignedUrl,
-      storeName: data.storeName,
-    });
-    return data;
-  };
-
-  // S3에 실제 이미지 업로드 함수
-  const uploadToS3 = async (file: File, url: string) => {
-    console.log("[🟡 S3 업로드 요청]", {
-      fileName: file.name,
-      contentType: file.type,
-      url,
-    });
-
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": file.type || "application/octet-stream",
-      },
-      body: file,
-    });
-
-    console.log("[🟣 S3 업로드 응답]", {
-      status: res.status,
-      ok: res.ok,
-      statusText: res.statusText,
-    });
-
-    if (!res.ok) throw new Error("S3 업로드 실패");
-  };
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -162,18 +110,11 @@ export default function Registration() {
 
       // presigned URL 요청 및 S3 업로드
       for (const file of reorderedImages) {
-        console.log("[📦 업로드 대상 파일]", {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-        });
-
         const { presignedUrl, storeName } = await getPresignedUrl(file);
         await uploadToS3(file, presignedUrl);
         uploadedStoreNames.push(storeName);
       }
 
-      // ✅ 서버 요구 구조에 맞게 payload 구성
       const payload = {
         title,
         description: detail,
@@ -196,9 +137,6 @@ export default function Registration() {
         })),
       };
 
-      // ✅ 콘솔 확인
-      console.log("✅ 최종 payload", payload);
-
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auctions`,
         payload,
@@ -211,9 +149,9 @@ export default function Registration() {
     } catch (error) {
       toast.error("등록에 실패했습니다. 다시 시도해주세요.");
       if (error instanceof AxiosError) {
-        console.error("❌ 서버 응답 내용:", error.response?.data);
+        console.error("서버 응답 내용:", error.response?.data);
       } else {
-        console.error("❌ 기타 에러:", error);
+        console.error("기타 에러:", error);
       }
     }
   };

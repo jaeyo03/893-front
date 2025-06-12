@@ -32,7 +32,7 @@ export default function TopBidCard({
     >
       <div className="relative">
         <img
-          src={`http://localhost:8080${thumbnailUrl}`}
+          src={thumbnailUrl}
           alt="썸네일"
           className="w-full h-[130px] object-cover"
         />

@@ -90,7 +90,7 @@ export default function RealTimeRankingPanel({
                 </div>
               </div>
               <img
-                src={`http://localhost:8080${item.thumbnailUrl}`}
+                src={item.thumbnailUrl}
                 alt="썸네일"
                 className="w-[160px] h-[80px] rounded object-cover border"
               />

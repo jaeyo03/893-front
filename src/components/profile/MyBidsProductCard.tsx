@@ -7,6 +7,7 @@ import { Bookmark } from "lucide-react";
 import { getAuctionStatus } from "./constants/MyPageProduct";
 import { MyBidProduct } from "@/types/userData";
 import { getRemainingTime } from "./TimeCalculator";
+import Image from "next/image";
 
 interface Props {
   myBidProduct: MyBidProduct;
@@ -46,9 +47,11 @@ export default function MyBidsProductCard({ myBidProduct }: Props) {
         className="p-4 mb-4 w-full !h-[156px] border-width: 1.2px; border-checkbox cursor-pointer shadow-none"
       >
         <div className="flex items-center h-full">
-          <img
+          <Image
             src={myBidProduct.mainImageUrl}
             alt={myBidProduct.title}
+            width={128}
+            height={128}
             className="w-32 h-32 object-cover mr-4"
           />
           <div className="flex-1">

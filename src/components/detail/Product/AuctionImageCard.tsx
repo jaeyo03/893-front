@@ -1,5 +1,6 @@
 import { Status } from "@/types/productData";
 import { Auction } from "@/types/response.types";
+import Image from "next/image";
 
 interface AuctionImageCardProps {
   imageUrl: string;
@@ -25,12 +26,12 @@ export default function AuctionImageCard({
     <div className="p-5">
       <div className="relative border rounded-lg overflow-hidden w-[600px] h-[600px] bg-white">
         {/* 이미지 */}
-        <img
+        <Image
           src={imageUrl || "/placeholder.jpg"}
           alt="Auction item"
           width={600}
           height={600}
-          className="object-cover "
+          className="object-cover"
         />
         {/* 경매 상태 뱃지 */}
         <div

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { getRemainingTime } from "./TimeCalculator";
 import { deleteAuction } from "@/lib/api/auction";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 interface Props {
   auctions: MyAuctionsProduct;
@@ -58,9 +59,11 @@ export default function MyAuctionsProductCard({ auctions, onDelete }: Props) {
         className="p-4 mb-4 w-full !h-[156px] border-width: 1.2px; border-checkbox cursor-pointer shadow-none"
       >
         <div className="flex items-center h-full">
-          <img
+          <Image
             src={auctions.mainImageUrl || "/placeholder.jpg"}
             alt={auctions.title}
+            width={128}
+            height={128}
             className="w-32 h-32 object-cover rounded mr-4 bg-gray-100"
           />
           <div className="flex-1">

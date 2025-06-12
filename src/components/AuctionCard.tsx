@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Auction } from "@/types/response.types";
 import { useRouter } from "next/navigation";
 import { useAddScrap, useDeleteScrap } from "@/hooks/useScarp";
+import Image from "next/image";
 
 interface AuctionCardProps {
   product: Auction;
@@ -54,7 +55,7 @@ export default function AuctionCard({ product, isLoggedIn }: AuctionCardProps) {
       className="auction-card p-2 rounded-xl shadow border h-[330px] w-[231px] bg-white cursor-pointer hover:drop-shadow-md"
     >
       <div className="grid grid-cols-1 grid-rows-1">
-        <img
+        <Image
           src={product.thumbnailUrl || "/placeholder.jpg"}
           alt={product.title}
           width={231}

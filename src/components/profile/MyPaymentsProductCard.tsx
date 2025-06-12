@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { MyPaymentsProduct } from "@/types/userData";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -22,9 +23,11 @@ export default function MyPaymentsProductCard({ payments }: Props) {
         className="p-4 mb-4 w-full h-[166px] border-2 border-checkbox"
       >
         <div className="flex items-center h-full">
-          <img
+          <Image
             src={payments.mainImageUrl || "/placeholder.jpg"}
             alt={payments.title}
+            width={96}
+            height={96}
             className="w-24 h-24 object-cover mr-4"
           />
           <div className="flex-1">

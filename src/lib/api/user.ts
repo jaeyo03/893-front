@@ -7,7 +7,7 @@ import { DeliveryAddress } from "@/types/userData";
 export const getAddresses = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/addresses`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/addresses`,
       { withCredentials: true }
     );
     return response.data.data;
@@ -21,7 +21,7 @@ export const getAddresses = async () => {
 export const addAddress = async (newAddress: DeliveryAddress) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/addresses`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/addresses`,
       newAddress,
       {
         withCredentials: true,
@@ -37,9 +37,12 @@ export const addAddress = async (newAddress: DeliveryAddress) => {
 // 배송지 삭제 함수
 export const deleteAddress = async (id: number) => {
   try {
-    await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/addresses/${id}`, {
-      withCredentials: true,
-    });
+    await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/addresses/${id}`,
+      {
+        withCredentials: true,
+      }
+    );
   } catch (error) {
     console.error("배송지 삭제 실패:", error);
     throw error;
@@ -50,7 +53,7 @@ export const deleteAddress = async (id: number) => {
 export const updateAddress = async (id: number) => {
   try {
     const response = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/addresses/${id}/default`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/addresses/${id}/default`,
       {},
       { withCredentials: true }
     );
@@ -64,7 +67,7 @@ export const updateAddress = async (id: number) => {
 export const getUserInfo = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/user-info`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/user-info`,
       {
         withCredentials: true,
       }
@@ -79,7 +82,7 @@ export const getUserInfo = async () => {
 export const getMyBidsProduct = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/bids`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/bids`,
       {
         withCredentials: true,
       }
@@ -94,7 +97,7 @@ export const getMyBidsProduct = async () => {
 export const getMyAuctionsProduct = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/auctions`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/auctions`,
       {
         withCredentials: true,
       }
@@ -109,7 +112,7 @@ export const getMyAuctionsProduct = async () => {
 export const getMyScrapsProduct = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/scraps`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/scraps`,
       {
         withCredentials: true,
       }
@@ -124,7 +127,7 @@ export const getMyScrapsProduct = async () => {
 export const getMyPaymentsProduct = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}}/payments`,
+      `${process.env.NEXT_PUBLIC_API_URL}}/api/users/payments`,
       {
         withCredentials: true,
       }

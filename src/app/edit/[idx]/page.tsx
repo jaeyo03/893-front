@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import { getPresignedUrl, uploadToS3 } from "@/lib/api/s3Upload";
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
 import PaymentInput from "@/components/registration/PaymentInput";
@@ -25,6 +25,7 @@ import {
 } from "@/components/registration/constants/productConditions";
 
 type ServerImage = {
+  imageId: number;
   url: string;
   originalName: string;
   storeName: string;
@@ -73,19 +74,18 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     (async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/update`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}`,
           { withCredentials: true }
         );
-        const data = res?.data?.data;
+        const data = res.data.data;
 
-        setServerImages(
-          (data.images ?? []).map((img: ServerImage) => ({
-            ...img,
-            url: img.url.startsWith("http")
-              ? img.url
-              : `${process.env.NEXT_PUBLIC_API_URL}${img.url}`,
-          }))
-        );
+        const loaded: ServerImage[] = (data.images ?? []).map((img: any) => ({
+          imageId: img.imageId,
+          url: img.url,
+          originalName: img.originalName,
+          storeName: img.storeName,
+        }));
+        setServerImages(loaded);
 
         setCategory({
           id: data.category.id,
@@ -93,15 +93,13 @@ export default function EditRegistration({ params }: AuctionIdProps) {
           subCategory: data.category.subCategory,
           detailCategory: data.category.detailCategory,
         });
-
         setTitle(data.title);
         setPrice(data.basePrice);
         setDetail(data.description);
-
         const statusLabel = convertServerValueToLabel(data.itemCondition);
         setProductStatus(productConditions.findIndex((l) => l === statusLabel));
       } catch (err) {
-        console.error("기존 경매 데이터 로딩 실패", err);
+        console.error("경매 상세 조회 실패", err);
       }
     })();
   }, [auctionId]);
@@ -137,65 +135,41 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     return true;
   };
 
-  const getPresignedUrl = async (file: File) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/s3/presigned-url`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-        }),
-        credentials: "include",
-      }
-    );
-    if (!res.ok) throw new Error("Presigned URL 요청 실패");
-    return res.json();
-  };
-
-  const uploadToS3 = async (file: File, url: string) => {
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": file.type || "application/octet-stream",
-      },
-      body: file,
-    });
-    if (!res.ok) throw new Error("S3 업로드 실패");
-  };
-
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
     try {
+      // S3 업로드
       const uploadedStoreNames: { storeName: string; originalName: string }[] =
         [];
-
       for (const file of images) {
         const { presignedUrl, storeName } = await getPresignedUrl(file);
         await uploadToS3(file, presignedUrl);
         uploadedStoreNames.push({ storeName, originalName: file.name });
       }
 
-      const combined = [
-        ...serverImages.map((img) => ({
-          storeName: img.storeName,
-          originalName: img.originalName,
-        })),
-        ...uploadedStoreNames,
-      ];
+      // 기존 + 신규 합치기
+      const existing = serverImages.map((img) => ({ imageId: img.imageId }));
+      const combined = [...existing, ...uploadedStoreNames];
+      console.log("[handleSubmit] combined array:", combined);
 
+      // 메인 이미지 기준 재배치
       const reordered = [
         combined[mainImageIndex],
         ...combined.filter((_, i) => i !== mainImageIndex),
       ];
 
-      const imagePayload = reordered.map((img, idx) => ({
-        storeName: img.storeName,
-        originalName: img.originalName,
-        imageSeq: idx,
-      }));
+      // 이미지 페이로드 생성
+      const imagePayload = reordered.map((img, idx) => {
+        if ("imageId" in img) {
+          return { imageId: img.imageId, imageSeq: idx };
+        }
+        return {
+          storeName: img.storeName,
+          originalName: img.originalName,
+          imageSeq: idx,
+        };
+      });
 
       const payload = {
         title,
@@ -221,24 +195,24 @@ export default function EditRegistration({ params }: AuctionIdProps) {
       router.push(`/detail/${auctionId}?refresh=${Date.now()}`);
       setIsModalOpen(false);
     } catch (err) {
-      console.error("❌ PATCH 실패", err);
+      console.error("PATCH 실패", err);
       toast.error("수정 중 오류가 발생했습니다.");
     }
   };
-  const handleCategoryChange = (value: CategoryValue) => {
-    setCategory(value); // 전달된 값을 그대로 반영
 
+  const handleCategoryChange = (value: CategoryValue) => {
+    setCategory(value);
     if (value.id && errors.category) {
-      const tempErrors = { ...errors };
-      delete tempErrors.category;
-      setErrors(tempErrors);
+      const temp = { ...errors };
+      delete temp.category;
+      setErrors(temp);
     }
   };
+
   const handleValidationAndOpenModal = () => {
-    if (validateForm()) {
-      setIsModalOpen(true);
-    }
+    if (validateForm()) setIsModalOpen(true);
   };
+
   return (
     <div className="max-w-[1280px] p-8 mx-auto">
       <form

@@ -23,6 +23,7 @@ import {
   convertLabelToServerValue,
   convertServerValueToLabel,
 } from "@/components/registration/constants/productConditions";
+import { getProductData } from "@/lib/api/auction";
 
 type ServerImage = {
   imageId: number;
@@ -73,20 +74,10 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}`,
-          { withCredentials: true }
-        );
-        const data = res.data.data;
+        const response = await getProductData(auctionId,"");
+        if (!response) return;
 
-        const rawImages = data.images as Array<{
-          imageId: number;
-          url: string;
-          originalName: string;
-          storeName: string;
-        }>;
-
-        const loaded: ServerImage[] = rawImages.map((img) => ({
+        const loaded: ServerImage[] = response.images.map((img) => ({
           imageId: img.imageId,
           url: img.url,
           originalName: img.originalName,
@@ -95,15 +86,15 @@ export default function EditRegistration({ params }: AuctionIdProps) {
         setServerImages(loaded);
 
         setCategory({
-          id: data.category.id,
-          mainCategory: data.category.mainCategory,
-          subCategory: data.category.subCategory,
-          detailCategory: data.category.detailCategory,
+          id: response.category.id,
+          mainCategory: response.category.mainCategory,
+          subCategory: response.category.subCategory,
+          detailCategory: response.category.detailCategory,
         });
-        setTitle(data.title);
-        setPrice(data.basePrice);
-        setDetail(data.description);
-        const statusLabel = convertServerValueToLabel(data.itemCondition);
+        setTitle(response.title);
+        setPrice(response.basePrice);
+        setDetail(response.description);
+        const statusLabel = convertServerValueToLabel(response.itemCondition);
         setProductStatus(productConditions.findIndex((l) => l === statusLabel));
       } catch (err) {
         console.error("경매 상세 조회 실패", err);

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import { getPresignedUrl, uploadToS3 } from "@/lib/api/s3Upload";
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
 import PaymentInput from "@/components/registration/PaymentInput";
@@ -25,6 +25,7 @@ import {
 } from "@/components/registration/constants/productConditions";
 
 type ServerImage = {
+  imageId: number;
   url: string;
   originalName: string;
   storeName: string;
@@ -48,7 +49,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   });
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number | null>(null);
-
   const [detail, setDetail] = useState<string>("");
   const [productStatus, setProductStatus] = useState<number | null>(null);
   const [startTime, setStartTime] = useState({ hour: 0, minute: 0 });
@@ -56,7 +56,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   const [agreed, setAgreed] = useState<boolean>(false);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const refs = {
@@ -75,23 +74,18 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     (async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/auctions/${auctionId}/update`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}`,
           { withCredentials: true }
         );
-        const data = res?.data?.data;
-        if (!data) {
-          console.error("데이터 없음");
-          return;
-        }
+        const data = res.data.data;
 
-        setServerImages(
-          (data.images ?? []).map((img: ServerImage) => ({
-            ...img,
-            url: img.url.startsWith("http")
-              ? img.url
-              : `http://localhost:8080${img.url}`,
-          }))
-        );
+        const loaded: ServerImage[] = (data.images ?? []).map((img: any) => ({
+          imageId: img.imageId,
+          url: img.url,
+          originalName: img.originalName,
+          storeName: img.storeName,
+        }));
+        setServerImages(loaded);
 
         setCategory({
           id: data.category.id,
@@ -102,11 +96,10 @@ export default function EditRegistration({ params }: AuctionIdProps) {
         setTitle(data.title);
         setPrice(data.basePrice);
         setDetail(data.description);
-
         const statusLabel = convertServerValueToLabel(data.itemCondition);
         setProductStatus(productConditions.findIndex((l) => l === statusLabel));
       } catch (err) {
-        console.error("기존 경매 데이터 로딩 실패", err);
+        console.error("경매 상세 조회 실패", err);
       }
     })();
   }, [auctionId]);
@@ -117,12 +110,9 @@ export default function EditRegistration({ params }: AuctionIdProps) {
 
     if (total === 0) newErrors.images = "최소 1장의 이미지를 등록해주세요.";
     if (!title.trim()) newErrors.title = "경매 제목을 입력해주세요.";
-    if (!category.id) {
-      newErrors.category = "카테고리를 선택해주세요.";
-    }
-    if (price == null || isNaN(price) || price < 0) {
+    if (!category.id) newErrors.category = "카테고리를 선택해주세요.";
+    if (price == null || isNaN(price) || price < 0)
       newErrors.price = "시작 가격을 입력해주세요.";
-    }
     if (!detail.trim()) newErrors.detail = "상세 설명을 입력해주세요.";
     if (productStatus === null)
       newErrors.productStatus = "상품 상태를 선택해주세요.";
@@ -145,75 +135,82 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     return true;
   };
 
-  const handleValidationAndOpenModal = () => {
-    if (validateForm()) {
-      setIsModalOpen(true);
-    }
-  };
-  const handleCategoryChange = (value: CategoryValue) => {
-    setCategory(value); // 전달된 값을 그대로 반영
-
-    if (value.id && errors.category) {
-      const tempErrors = { ...errors };
-      delete tempErrors.category;
-      setErrors(tempErrors);
-    }
-  };
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    const itemCondition = convertLabelToServerValue(
-      productConditions[productStatus!]
-    );
-
-    const all = [...serverImages, ...images];
-    const reordered = [
-      all[mainImageIndex],
-      ...all.filter((_, i) => i !== mainImageIndex),
-    ];
-    const imagesPayload = reordered.map((img, idx) => ({
-      imageId:
-        "imageId" in img && typeof img.imageId === "number"
-          ? img.imageId
-          : null,
-      imageSeq: idx,
-    }));
-
-    const payload = {
-      title,
-      description: detail,
-      itemCondition,
-      basePrice: price,
-      startDelay: startTime.hour * 60 + startTime.minute,
-      durationTime: durationTime.hour * 60 + durationTime.minute,
-      mainImageIndex: 0,
-      category,
-      images: imagesPayload,
-    };
-
-    const formData = new FormData();
-    images.forEach((img) => formData.append("images", img));
-    formData.append(
-      "request",
-      new Blob([JSON.stringify(payload)], { type: "application/json" })
-    );
-
     try {
-      await axios.patch(
-        `http://localhost:8080/api/auctions/${auctionId}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
+      // S3 업로드
+      const uploadedStoreNames: { storeName: string; originalName: string }[] =
+        [];
+      for (const file of images) {
+        const { presignedUrl, storeName } = await getPresignedUrl(file);
+        await uploadToS3(file, presignedUrl);
+        uploadedStoreNames.push({ storeName, originalName: file.name });
+      }
+
+      // 기존 + 신규 합치기
+      const existing = serverImages.map((img) => ({ imageId: img.imageId }));
+      const combined = [...existing, ...uploadedStoreNames];
+      console.log("[handleSubmit] combined array:", combined);
+
+      // 메인 이미지 기준 재배치
+      const reordered = [
+        combined[mainImageIndex],
+        ...combined.filter((_, i) => i !== mainImageIndex),
+      ];
+
+      // 이미지 페이로드 생성
+      const imagePayload = reordered.map((img, idx) => {
+        if ("imageId" in img) {
+          return { imageId: img.imageId, imageSeq: idx };
         }
+        return {
+          storeName: img.storeName,
+          originalName: img.originalName,
+          imageSeq: idx,
+        };
+      });
+
+      const payload = {
+        title,
+        description: detail,
+        itemCondition: convertLabelToServerValue(
+          productConditions[productStatus!]
+        ),
+        basePrice: price,
+        startDelay: startTime.hour * 60 + startTime.minute,
+        durationTime: durationTime.hour * 60 + durationTime.minute,
+        mainImageIndex: 0,
+        category,
+        images: imagePayload,
+      };
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}`,
+        payload,
+        { withCredentials: true }
       );
+
       toast.success("경매 수정이 완료되었습니다!");
       router.push(`/detail/${auctionId}?refresh=${Date.now()}`);
       setIsModalOpen(false);
     } catch (err) {
-      console.error("❌ PATCH 실패", err);
+      console.error("PATCH 실패", err);
       toast.error("수정 중 오류가 발생했습니다.");
     }
+  };
+
+  const handleCategoryChange = (value: CategoryValue) => {
+    setCategory(value);
+    if (value.id && errors.category) {
+      const temp = { ...errors };
+      delete temp.category;
+      setErrors(temp);
+    }
+  };
+
+  const handleValidationAndOpenModal = () => {
+    if (validateForm()) setIsModalOpen(true);
   };
 
   return (

@@ -80,12 +80,7 @@ export default function AuctionSoonItem({
   return (
     <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm bg-white">
       <div className="relative w-full h-[240px]">
-        <Image
-          src={`http://localhost:8080${thumbnailUrl}`}
-          alt="썸네일"
-          fill
-          className="object-cover"
-        />
+        <Image src={thumbnailUrl} alt="썸네일" fill className="object-cover" />
       </div>
 
       <div className="p-4">

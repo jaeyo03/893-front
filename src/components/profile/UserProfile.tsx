@@ -57,7 +57,6 @@ export default function UserProfile() {
 
           // 대표 주소가 있다면 userInfo에 반영
           const mainAddress = addressData.find((addr) => addr.isDefault);
-          console.log("유저 정보", userData);
           if (mainAddress) {
             setUserInfo(() => ({
               address: `${mainAddress.addressLine1} ${mainAddress.addressLine2}`,

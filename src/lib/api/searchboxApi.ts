@@ -4,7 +4,6 @@ import { axiosInstance } from "@/lib/axios";
 export async function getUserSearchHistory() : Promise<BaseResponse<SearchHistory[]>> {
   try {
     const response = await axiosInstance.get('/api/search');
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching user search history:', error);

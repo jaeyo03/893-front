@@ -92,7 +92,7 @@ export default function BestByCategory({
       </div>
 
       {selectedCategory && selectedCategory.items.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-4 gap-6">
           {selectedCategory.items.map((item) => (
             <div
               key={item.auctionId}
@@ -104,8 +104,8 @@ export default function BestByCategory({
                   src={item.thumbnailUrl}
                   alt={item.title}
                   width={390}
-                  height={320}
-                  className="w-[390px] h-[320px] object-cover"
+                  height={222}
+                  className="w-[390px] h-[222px] object-cover"
                 />
                 <span className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                   {item.rankNum}

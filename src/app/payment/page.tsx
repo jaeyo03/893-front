@@ -15,8 +15,6 @@ export default async function Payment({ searchParams } : { searchParams : { [key
 
   const userOrderData = await getUserOrderInfoForServer(auctionId as string, cookieHeader);
 
-  console.log(userOrderData);
-
   const isErrorResponse = "type" in userOrderData;
   const isDataResponse = "data" in userOrderData;
 

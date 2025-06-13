@@ -22,8 +22,6 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
     currency: "KRW",
     value: finalPrice, // TODO 추후 예외처리 필요
   };
-  
-  console.log(userOrderInfo);
 
   const finalPaymentInfo : TossPaymentRequest = {
     recipientName: userOrderInfo?.customerName ?? "",
@@ -107,7 +105,6 @@ export function Checkout({ auctionId, userOrderInfo } : CheckoutPageProps) {
                  * @docs https://docs.tosspayments.com/sdk/v2/js#widgetsrequestpayment
                  */
                 const response = await postPaymentInfo(auctionId, finalPaymentInfo);
-                console.log(response);
                 const orderId = response?.data?.orderId;
                 const orderName = response?.data?.orderName;
                 const customerName = response?.data?.customerName;

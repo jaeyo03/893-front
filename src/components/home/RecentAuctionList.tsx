@@ -31,7 +31,7 @@ export default function RecentAuctionList({
               </div>
               <div className="p-2  bg-white rounded-xl">
                 <Image
-                  src={`http://localhost:8080${item.thumbnailUrl}`}
+                  src={item.thumbnailUrl}
                   alt={item.title}
                   width={500}
                   height={300}

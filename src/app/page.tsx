@@ -84,7 +84,7 @@ export default async function Home() {
 
   return (
     <>
-      <div className="w-full mt-6 px-4">
+      <div className="w-[1280px] mt-6 px-4 mx-auto">
         {/* 1. 메인 타이틀 */}
         <HomeTitle data-testid="home-title">
           <SpinningWord data-testid="spinning-word" />
@@ -140,7 +140,7 @@ export default async function Home() {
         {/* 9. 카테고리별 베스트 TOP3 */}
         <div className="pt-20 pb-32" data-testid="best-by-category">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-start">
-            카테고리별 베스트 TOP3
+            카테고리별 베스트 TOP 50
           </h2>
           <div className="flex gap-4">
             <BestByCategory bestByCategory={bestByCategory} />

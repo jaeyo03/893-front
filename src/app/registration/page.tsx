@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-
+import { getPresignedUrl, uploadToS3 } from "@/lib/api/s3Upload";
 import ImageUploader from "@/components/registration/ImageUploader";
 import AuctionTitleInput from "@/components/registration/AuctionTitleInput";
 import PaymentInput from "@/components/registration/PaymentInput";
@@ -19,14 +19,13 @@ import AuctionTimeButton from "@/components/registration/AuctionTimeButton";
 import toast from "react-hot-toast";
 
 import {
-  productConditions,
   convertLabelToServerValue,
+  productConditions,
 } from "@/components/registration/constants/productConditions";
 
 export default function Registration() {
   const router = useRouter();
 
-  // ✅ 입력 값 상태들
   const [images, setImages] = useState<File[]>([]);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
@@ -45,7 +44,6 @@ export default function Registration() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // ✅ 각 필드에 대한 ref 생성 (스크롤 이동용)
   const refs = {
     images: useRef<HTMLDivElement>(null),
     title: useRef<HTMLDivElement>(null),
@@ -57,7 +55,6 @@ export default function Registration() {
     durationTime: useRef<HTMLDivElement>(null),
     agreed: useRef<HTMLDivElement>(null),
   };
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -102,53 +99,59 @@ export default function Registration() {
     const startDelay = startTime.hour * 60 + startTime.minute;
     const duration = durationTime.hour * 60 + durationTime.minute;
 
+    // 대표 이미지를 가장 앞으로 재정렬
     const reorderedImages = [
       images[mainImageIndex],
       ...images.filter((_, i) => i !== mainImageIndex),
     ];
 
-    const payload = {
-      title,
-      description: detail,
-      basePrice: Number(price),
-      itemCondition: convertLabelToServerValue(
-        productConditions[productStatus!]
-      ),
-      startDelay,
-      durationTime: duration,
-      mainImageIndex: 0,
-      category: {
-        id: category.id,
-        mainCategory: category.mainCategory,
-        subCategory: category.subCategory,
-        detailCategory: category.detailCategory,
-      },
-    };
-
-    const formData = new FormData();
-    reorderedImages.forEach((image) => formData.append("images", image));
-    const jsonBlob = new Blob([JSON.stringify(payload)], {
-      type: "application/json",
-    });
-    formData.append("request", jsonBlob);
-
     try {
+      const uploadedStoreNames: string[] = [];
+
+      // presigned URL 요청 및 S3 업로드
+      for (const file of reorderedImages) {
+        const { presignedUrl, storeName } = await getPresignedUrl(file);
+        await uploadToS3(file, presignedUrl);
+        uploadedStoreNames.push(storeName);
+      }
+
+      const payload = {
+        title,
+        description: detail,
+        basePrice: Number(price),
+        itemCondition: convertLabelToServerValue(
+          productConditions[productStatus!]
+        ),
+        startDelay,
+        durationTime: duration,
+        category: {
+          id: category.id,
+          mainCategory: category.mainCategory,
+          subCategory: category.subCategory,
+          detailCategory: category.detailCategory,
+        },
+        images: uploadedStoreNames.map((storeName, index) => ({
+          storeName,
+          originalName: reorderedImages[index].name,
+          imageSeq: index,
+        })),
+      };
+
       const res = await axios.post(
-        "http://localhost:8080/api/auctions",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        }
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auctions`,
+        payload,
+        { withCredentials: true }
       );
+
       toast.success("경매 물품 등록이 완료되었습니다!");
       setIsModalOpen(false);
-      console.log(res.data);
       router.push(`/detail/${res?.data?.data?.auctionId}`);
     } catch (error: unknown) {
       toast.error("등록에 실패했습니다. 다시 시도해주세요.");
       if (error instanceof AxiosError) {
         console.error("서버 응답 내용:", error.response?.data);
+      } else {
+        console.error("기타 에러:", error);
       }
     }
   };

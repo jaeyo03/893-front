@@ -1,5 +1,6 @@
 // import { Smile } from "lucide-react";
 import { calculateIncreaseRate } from "@/lib/util/priceUtils";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 export type TopBidItemProps = {
   auctionId: number;
@@ -31,9 +32,11 @@ export default function TopBidCard({
       className="w-[250px] rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm transition cursor-pointer"
     >
       <div className="relative">
-        <img
-          src={`http://localhost:8080${thumbnailUrl}`}
+        <Image
+          src={thumbnailUrl}
           alt="썸네일"
+          height={130}
+          width={130}
           className="w-full h-[130px] object-cover"
         />
       </div>

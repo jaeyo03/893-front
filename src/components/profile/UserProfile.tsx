@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,19 @@ import {
   DialogTrigger,
   DialogTitle,
   DialogFooter,
-  DialogHeader
+  DialogHeader,
 } from "@/components/ui/dialog";
 
 import DeliveryAddressCard from "@/components/profile/Address/DeliveryAddressCard";
 import AddressModal from "./Address/AddressModal";
 import { DeliveryAddress } from "@/types/userData";
-import { getAddresses, getUserInfo,updateAddress, deleteAddress } from "@/lib/api/user";
+import {
+  getAddresses,
+  getUserInfo,
+  updateAddress,
+  deleteAddress,
+} from "@/lib/api/user";
+import Image from "next/image";
 
 export default function UserProfile() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -26,11 +32,11 @@ export default function UserProfile() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   const [userInfo, setUserInfo] = useState({
-    name: '',
-    email: '',
-    address: '',
-    phone: '',
-    imageUrl: '',
+    name: "",
+    email: "",
+    address: "",
+    phone: "",
+    imageUrl: "",
   });
 
   // 초기값을 빈 배열로 설정하여 undefined 방어
@@ -42,22 +48,21 @@ export default function UserProfile() {
         // 두 API를 병렬로 호출
         const [addressData, userData] = await Promise.all([
           getAddresses(),
-          getUserInfo()
+          getUserInfo(),
         ]);
-  
+
         // 주소 데이터 처리
         if (Array.isArray(addressData)) {
           setAddresses(addressData);
-  
+
           // 대표 주소가 있다면 userInfo에 반영
           const mainAddress = addressData.find((addr) => addr.isDefault);
-          console.log("유저 정보",userData);
           if (mainAddress) {
             setUserInfo(() => ({
               address: `${mainAddress.addressLine1} ${mainAddress.addressLine2}`,
               phone: mainAddress.phoneNumber,
-              name: userData.name,          // ✅ 유저 기본정보도 업데이트
-              email: userData.email,        // 예: 유저 이메일이 있다면
+              name: userData.name, // ✅ 유저 기본정보도 업데이트
+              email: userData.email, // 예: 유저 이메일이 있다면
               imageUrl: userData.profileUrl,
             }));
           } else if (userData) {
@@ -77,11 +82,9 @@ export default function UserProfile() {
       }
     };
 
-  
     fetchData();
   }, []);
-  
-  
+
   // 기본 배송지 업데이트
   const updateUserInfoFromMainAddress = () => {
     if (!addresses) return; // addresses가 null 또는 undefined일 때 처리
@@ -98,17 +101,17 @@ export default function UserProfile() {
   const handleSetMain = async (index: number) => {
     const selectedAddress = addresses?.[index];
     if (!selectedAddress) return;
-  
+
     try {
       // ✅ 서버에 대표 배송지 요청
       await updateAddress(selectedAddress.id);
-  
+
       // ✅ 성공 시 상태 업데이트
       const updatedAddresses = addresses.map((addr, i) => ({
         ...addr,
         isDefault: i === index,
       }));
-  
+
       setAddresses(updatedAddresses);
       updateUserInfoFromMainAddress();
     } catch (error) {
@@ -158,7 +161,6 @@ export default function UserProfile() {
     }
   };
 
-
   const handleAddAddress = (newAddress: DeliveryAddress) => {
     setAddresses((prev) => {
       const updated = newAddress.isDefault
@@ -181,16 +183,20 @@ export default function UserProfile() {
         <div className="mr-12 flex flex-col items-center w-24">
           <div className="ml-6 w-24 h-24 rounded-full border flex items-center justify-center text-3xl mr-6 overflow-hidden">
             {userInfo.imageUrl ? (
-              <img
+              <Image
                 src={userInfo.imageUrl}
-                alt= {userInfo.name}
+                alt={userInfo.name}
+                width={94}
+                height={94}
                 className="w-full h-full object-cover"
               />
             ) : (
               <User size={40} className="text-gray-500" />
             )}
           </div>
-          <div className="mt-2 text-sm font-semibold text-center">{userInfo.name}</div>
+          <div className="mt-2 text-sm font-semibold text-center">
+            {userInfo.name}
+          </div>
         </div>
 
         {/* 우측 정보 */}
@@ -247,7 +253,10 @@ export default function UserProfile() {
                 <p>배송지가 없습니다.</p>
               )}
 
-              <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+              <Dialog
+                open={deleteConfirmOpen}
+                onOpenChange={setDeleteConfirmOpen}
+              >
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>배송지를 삭제하시겠습니까?</DialogTitle>
@@ -256,7 +265,10 @@ export default function UserProfile() {
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setDeleteConfirmOpen(false)}
+                    >
                       취소
                     </Button>
                     <Button

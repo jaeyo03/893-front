@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Camera, X } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 type ServerImage = {
   url: string;
@@ -97,7 +98,7 @@ export default function ImageUploader({
       } else if (mainImageIndex > index) {
         onChangeMainImageIndex(mainImageIndex - 1);
       }
-      console.log("🧹 서버 이미지 삭제:", index);
+
       onDeleteServerImage?.(index);
     } else {
       const localIndex = index - serverCount;
@@ -110,7 +111,6 @@ export default function ImageUploader({
         onChangeMainImageIndex(mainImageIndex - 1);
       }
 
-      console.log("🧹 로컬 이미지 삭제:", localIndex);
       onChange(newFiles);
 
       if (newFiles.length === 0 && serverImages.length === 0) {
@@ -137,9 +137,11 @@ export default function ImageUploader({
               index === mainImageIndex ? "border-main" : "border-transparent"
             }`}
           >
-            <img
+            <Image
               src={url}
               alt={`preview-${index}`}
+              width={144}
+              height={144}
               className="object-cover w-full h-full"
             />
             <button

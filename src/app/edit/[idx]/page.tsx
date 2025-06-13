@@ -79,7 +79,14 @@ export default function EditRegistration({ params }: AuctionIdProps) {
         );
         const data = res.data.data;
 
-        const loaded: ServerImage[] = (data.images ?? []).map((img: any) => ({
+        const rawImages = data.images as Array<{
+          imageId: number;
+          url: string;
+          originalName: string;
+          storeName: string;
+        }>;
+
+        const loaded: ServerImage[] = rawImages.map((img) => ({
           imageId: img.imageId,
           url: img.url,
           originalName: img.originalName,

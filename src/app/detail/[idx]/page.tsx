@@ -27,8 +27,6 @@ export default async function Page({ params }: PageProps) {
 		getRelatedItem(auctionId, cookieHeader)
 	]);
 
-	console.log(productData);
-	console.log(relatedItemData);
 	if (!productData) return notFound();
 
   return (

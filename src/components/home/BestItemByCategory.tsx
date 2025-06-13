@@ -101,7 +101,7 @@ export default function BestByCategory({
             >
               <div className="relative">
                 <Image
-                  src={`http://localhost:8080${item.thumbnailUrl}`}
+                  src={item.thumbnailUrl}
                   alt={item.title}
                   width={390}
                   height={320}

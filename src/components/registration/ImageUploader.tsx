@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Camera, X } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 type ServerImage = {
   url: string;
@@ -137,9 +138,11 @@ export default function ImageUploader({
               index === mainImageIndex ? "border-main" : "border-transparent"
             }`}
           >
-            <img
+            <Image
               src={url}
               alt={`preview-${index}`}
+              width={144}
+              height={144}
               className="object-cover w-full h-full"
             />
             <button

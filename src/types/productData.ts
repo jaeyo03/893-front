@@ -19,6 +19,7 @@ export interface Product {
 }
 
 export interface Image {
+  imageId: number;
   originalName: string;
   storeName: string;
   url: string;

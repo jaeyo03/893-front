@@ -2,6 +2,7 @@ import { EllipsisVertical, Dot } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 // 부모로부터 전달받는 props 타입
 type NotificationProps = {
@@ -67,9 +68,11 @@ export default function NotificationContents({
     >
       <div className="flex flex-row items-center justify-between w-full">
         {/* 알림 썸네일 이미지 */}
-        <img
+        <Image
           src={image}
           alt=""
+          width={26}
+          height={26}
           className="w-[26px] h-[26px] rounded-2xl object-cover"
         />
 

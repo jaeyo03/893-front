@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AuctionRankingItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const itemConditionLabel: Record<AuctionRankingItem["itemCondition"], string> =
   {
@@ -89,9 +90,11 @@ export default function RealTimeRankingPanel({
                     : `스크랩 ${item.scrapCount}`}
                 </div>
               </div>
-              <img
-                src={`http://localhost:8080${item.thumbnailUrl}`}
+              <Image
+                src={item.thumbnailUrl}
                 alt="썸네일"
+                height={80}
+                width={160}
                 className="w-[160px] h-[80px] rounded object-cover border"
               />
             </div>

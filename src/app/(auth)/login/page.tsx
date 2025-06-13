@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 
@@ -8,17 +8,22 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold">로그인</h1>
-          <p className="mt-2 text-sm text-muted-foreground">팔구삼 중고 경매 플랫폼에 오신 것을 환영합니다</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            팔구삼 중고 경매 플랫폼에 오신 것을 환영합니다
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex flex-col items-center justify-center space-y-4">
-            <p className="text-center text-sm text-muted-foreground mb-2">구글 계정으로 간편하게 로그인하세요</p>
+            <p className="text-center text-sm text-muted-foreground mb-2">
+              구글 계정으로 간편하게 로그인하세요
+            </p>
 
-            <Link href="http://localhost:8080/oauth2/authorization/google" className="w-full">
-              <button
-                className="flex items-center justify-center w-full py-2.5 px-4 border rounded-md hover:bg-gray-50 transition-colors"
-              >
+            <Link
+              href={`${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/google`}
+              className="w-full"
+            >
+              <button className="flex items-center justify-center w-full py-2.5 px-4 border rounded-md hover:bg-gray-50 transition-colors">
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
@@ -52,5 +57,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

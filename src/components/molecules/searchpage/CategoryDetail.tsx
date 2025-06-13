@@ -16,7 +16,6 @@ export default function CategoryDetail({ categoryList }: { categoryList: Auction
   const currentCategory = searchParams.get('detailCategoryId') || ""
   const currentCategorySub = searchParams.get('subCategoryId') || ""
   const detailCategoryList = categoryList?.filter((category) => category.parentId === parseInt(currentCategorySub || "0"))
-  console.log(detailCategoryList)
 
   // 카테고리 값 변경 시 URL 업데이트
   const handleCategoryChange = useCallback((value: string) => {

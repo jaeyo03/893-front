@@ -20,9 +20,6 @@ export default function MyTabs() {
     if (selectedTab === 'bids' && bids.length === 0) {
       getMyBidsProduct()
         .then((data) => {
-          // 콘솔로 반환값 확인
-          console.log('bids data:', data);
-          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
           setBids(Array.isArray(data) ? data : []);
         })
         .catch(console.error);
@@ -30,9 +27,6 @@ export default function MyTabs() {
     if (selectedTab === 'auctions' && auctions.length === 0) {
       getMyAuctionsProduct()
         .then((data) => {
-          // 콘솔로 반환값 확인
-          console.log('auctions data:', data);
-          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
           setAuctions(Array.isArray(data) ? data : []);
         })
         .catch(console.error);
@@ -40,9 +34,6 @@ export default function MyTabs() {
     if (selectedTab === 'scraps' && scraps.length === 0) {
       getMyScrapsProduct()
         .then((data) => {
-          // 콘솔로 반환값 확인
-          console.log('scraps data:', data);
-          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
           setScraps(Array.isArray(data) ? data : []);
         })
         .catch(console.error);
@@ -50,9 +41,6 @@ export default function MyTabs() {
     if (selectedTab === 'payments' && payments.length === 0) {
       getMyPaymentsProduct()
         .then((data) => {
-          // 콘솔로 반환값 확인
-          console.log('payments data:', data);
-          // 배열이면 set, 아니면 빈 배열로 초기화 (방어 코드)
           setPayments(Array.isArray(data) ? data : []);
         })
         .catch(console.error);

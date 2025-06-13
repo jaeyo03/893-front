@@ -149,7 +149,6 @@ export default function EditRegistration({ params }: AuctionIdProps) {
       // 기존 + 신규 합치기
       const existing = serverImages.map((img) => ({ imageId: img.imageId }));
       const combined = [...existing, ...uploadedStoreNames];
-      console.log("[handleSubmit] combined array:", combined);
 
       // 메인 이미지 기준 재배치
       const reordered = [

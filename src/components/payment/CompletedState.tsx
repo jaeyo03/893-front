@@ -14,8 +14,6 @@ function formatCurrency(amount: number): string {
 }
 
 export default function CompletedState({ paymentData }: { paymentData: TossPaymentConfirmResponse }) {
-  console.log(paymentData);
-
   return (
     <div className="space-y-8 grid items-center justify-center">
       <div className="flex flex-col items-center text-center">

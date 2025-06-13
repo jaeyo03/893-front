@@ -24,8 +24,6 @@ export default async function PaySuccessPage({ searchParams } : { searchParams :
     paymentType,
   }, cookieHeader);
 
-  console.log(response);
-
   const isErrorResponse = "type" in response;
   
   return (

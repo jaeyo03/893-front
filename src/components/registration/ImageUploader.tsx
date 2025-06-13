@@ -98,7 +98,7 @@ export default function ImageUploader({
       } else if (mainImageIndex > index) {
         onChangeMainImageIndex(mainImageIndex - 1);
       }
-      console.log("🧹 서버 이미지 삭제:", index);
+
       onDeleteServerImage?.(index);
     } else {
       const localIndex = index - serverCount;
@@ -111,7 +111,6 @@ export default function ImageUploader({
         onChangeMainImageIndex(mainImageIndex - 1);
       }
 
-      console.log("🧹 로컬 이미지 삭제:", localIndex);
       onChange(newFiles);
 
       if (newFiles.length === 0 && serverImages.length === 0) {

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
+import type { Swiper } from "swiper";
 
 test.describe("상품 수정 E2E", () => {
   test("기존 값을 불러오고 일부 수정 후 정상적으로 저장", async ({
@@ -45,8 +46,8 @@ test.describe("상품 수정 E2E", () => {
     await page.getByText("경매 시작 시간").click();
     await page.evaluate(() => {
       const swipers = document.querySelectorAll(".swiper");
-      (swipers[0] as unknown as { swiper: any }).swiper.slideToLoop(0);
-      (swipers[1] as unknown as { swiper: any }).swiper.slideToLoop(2); // 2분
+      (swipers[0] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(0);
+      (swipers[1] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(2);
     });
     await page.getByText("적용").click();
 
@@ -54,8 +55,8 @@ test.describe("상품 수정 E2E", () => {
     await page.getByText("경매 소요 시간 선택").click();
     await page.evaluate(() => {
       const swipers = document.querySelectorAll(".swiper");
-      (swipers[0] as unknown as { swiper: any }).swiper.slideToLoop(0);
-      (swipers[1] as unknown as { swiper: any }).swiper.slideToLoop(15); // 15분
+      (swipers[0] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(0);
+      (swipers[1] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(15);
     });
     await page.getByText("적용").click();
 

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
-
+import type { Swiper } from "swiper";
 test.describe("상품 등록 E2E", () => {
   test("모든 입력값을 입력하고 정상적으로 등록", async ({ context, page }) => {
     const filePath = path.resolve(__dirname, "../e2e/assets/test.png");
@@ -51,8 +51,8 @@ test.describe("상품 등록 E2E", () => {
 
     await page.evaluate(() => {
       const swipers = document.querySelectorAll(".swiper");
-      (swipers[0] as unknown as { swiper: any }).swiper.slideToLoop(0);
-      (swipers[1] as unknown as { swiper: any }).swiper.slideToLoop(1);
+      (swipers[0] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(0);
+      (swipers[1] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(1);
     });
 
     await page.getByText("적용").click();
@@ -62,8 +62,8 @@ test.describe("상품 등록 E2E", () => {
 
     await page.evaluate(() => {
       const swipers = document.querySelectorAll(".swiper");
-      (swipers[0] as unknown as { swiper: any }).swiper.slideToLoop(0);
-      (swipers[1] as unknown as { swiper: any }).swiper.slideToLoop(10);
+      (swipers[0] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(0);
+      (swipers[1] as HTMLElement & { swiper: Swiper }).swiper.slideToLoop(10);
     });
 
     await page.getByText("적용").click();

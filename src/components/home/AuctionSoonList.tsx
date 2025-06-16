@@ -78,7 +78,7 @@ export default function AuctionSoonItem({
   }, [leftTime]);
 
   return (
-    <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm bg-white">
+    <div className="w-full max-w-[400px] rounded border overflow-hidden shadow-sm">
       <div className="relative w-full h-[240px]">
         <Image src={thumbnailUrl} alt="썸네일" fill className="object-cover" />
       </div>
@@ -105,7 +105,7 @@ export default function AuctionSoonItem({
 
         <button
           onClick={handleParticipateClick}
-          className="mt-3 w-full py-1.5 text-sm rounded bg-gray-200 text-gray-400 hover:bg-gray-400 hover:text-gray-600 transition cursor-pointer"
+          className="mt-3 w-full py-1.5 text-sm rounded bg-main text-white hover:bg-blue-800 hover:text-white transition cursor-pointer"
         >
           지금 참여하기
         </button>

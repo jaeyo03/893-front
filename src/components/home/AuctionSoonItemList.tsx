@@ -25,7 +25,7 @@ export default function AuctionSoonItemList({
   }
 
   return (
-    <div className="flex justify-center gap-6">
+    <div className="flex justify-start gap-6">
       {limited.map((item) => (
         <AuctionSoonList key={item.auctionId} {...item} />
       ))}

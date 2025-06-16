@@ -37,6 +37,7 @@ export default function SellerAgreementCheckbox({
           border-2 rounded-md border-resgistersubtext 
           ${agreed ? "text-main" : "text-transparent"}
         `}
+        data-testid="seller-agreement-check"
       >
         <Check
           className={`w-4 h-4 ${agreed ? "text-main" : "text-transparent"}`}

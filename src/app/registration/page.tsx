@@ -25,7 +25,7 @@ import {
 
 export default function Registration() {
   const router = useRouter();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
@@ -96,6 +96,10 @@ export default function Registration() {
   };
 
   const handleSubmit = async () => {
+    // 이미 제출 중이면 무시
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const startDelay = startTime.hour * 60 + startTime.minute;
     const duration = durationTime.hour * 60 + durationTime.minute;
 
@@ -285,6 +289,7 @@ export default function Registration() {
             onClick={handleValidationAndOpenModal}
             onModalClose={() => setIsModalOpen(false)}
             onConfirm={handleSubmit}
+            confirmDisabled={isSubmitting}
             data-testid="register-submit-button"
           />
         </div>

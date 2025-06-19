@@ -113,7 +113,11 @@ export async function getCategoryList():
 Promise<BaseResponse<AuctionCategory[] | null>> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/category`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/category`, {
+        next : {
+          revalidate : 86400,
+        }
+      }
     );
     if (!response.ok) {
       throw new Error("Failed to fetch category list");

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Product, AuctionBidData, Status } from "@/types/productData";
 import {
@@ -137,7 +139,7 @@ export default function BidInteraction({
   }, [currentPrice]);
 
   useEffect(() => {
-    if (cancelTimer && cancelTimer > 0) {
+    if (isCancelable && cancelTimer && cancelTimer > 0) {
       const interval = setInterval(() => {
         setCancelTimer((prev) => {
           if (prev && prev <= 1) {

@@ -2,16 +2,15 @@
 
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Image, Status } from "@/types/productData";
+import { Image } from "@/types/productData";
 
 import AuctionImageCard from "./Product/AuctionImageCard"
 
 interface ImageSliderProps{
   images: Image[];
-  auctionState: Status;
 }
 
-export default function ImageSlider({images, auctionState} : ImageSliderProps){
+function ImageSlider({images} : ImageSliderProps){
   const initialIndex = Array.isArray(images)
   ? images.findIndex(image => image.imageSeq === 0) : -1;
   const [currentIndex, setCurrentIndex] = useState(initialIndex >= 0 ? initialIndex : 0);
@@ -22,10 +21,11 @@ export default function ImageSlider({images, auctionState} : ImageSliderProps){
   const goToPrev = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
+  
   return (
     <div className="relative flex flex-col">
       <div className="relative w-[600px] h-[600px] group">
-        <AuctionImageCard imageUrl={images[currentIndex]?.url || ''} label={auctionState}/>
+        <AuctionImageCard imageUrl={images[currentIndex]?.url || ''}/>
         <div
           className="absolute top-0 left-0 h-full w-[150px] z-20 cursor-pointer flex items-center justify-start bg-transparent">
         <ChevronLeft
@@ -55,3 +55,5 @@ export default function ImageSlider({images, auctionState} : ImageSliderProps){
     </div>
   );
 }
+
+export default ImageSlider;

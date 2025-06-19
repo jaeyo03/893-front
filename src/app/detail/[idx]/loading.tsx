@@ -8,9 +8,6 @@ export default function Loading() {
       <div className="grid text-muted-foreground text-center max-w-md">
         <p>잠시만 기다려주세요</p>
       </div>
-      <div className="mt-8 w-full max-w-md bg-muted rounded-full h-2">
-        <div className="bg-main h-2 rounded-full animate-progress"></div>
-      </div>
     </div>
   );
 }

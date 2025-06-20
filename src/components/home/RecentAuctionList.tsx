@@ -1,16 +1,16 @@
-"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { AuctionItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
-
+import { getRecentAuctions } from "@/lib/api/home";
 interface RecentAuctionListProps {
   recentAuctionList: AuctionItem[];
 }
 
-export default function RecentAuctionList({
-  recentAuctionList,
-}: RecentAuctionListProps) {
+export default async function RecentAuctionList() {
+  const { data: recentAuctionList }: { data: AuctionItem[] } = await getRecentAuctions();
+
   if (recentAuctionList.length === 0) {
     return <EmptyState message="최근 등록된 경매 물품이 없습니다." />;
   }

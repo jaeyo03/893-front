@@ -6,10 +6,10 @@ import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
 import QueryProvider from "@/components/QueryProvider";
 import {cookies} from "next/headers";
-import ProductRelatedWrapper from "@/components/wrappers/ProductRelatedWrapper";
+import ProductRelatedWrapper from "@/components/wrappers/search/ProductRelatedWrapper";
 import { Suspense } from "react";
-import CategoryFilterWrapper from "@/components/wrappers/CategoryFilterWrapper";
-import ProductResultWrapper from "@/components/wrappers/ProductResultWrapper";
+import CategoryFilterWrapper from "@/components/wrappers/search/CategoryFilterWrapper";
+import ProductResultWrapper from "@/components/wrappers/search/ProductResultWrapper";
 import Loading from "../detail/[idx]/loading";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ index?: string }> }) {
@@ -19,17 +19,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 	
 	const search = await searchParams;
   const key = new URLSearchParams(search).toString();
-
-	// const { min: lowestPrice, max: highestPrice } = products?.data?.auctionList.reduce(
-	// 	(accumulator, product) => ({
-	// 		min: Math.min(accumulator.min, product.basePrice),
-	// 		max: Math.max(accumulator.max, product.basePrice),
-	// 	}),
-	// 	{
-	// 		min: products?.data?.auctionList[0]?.basePrice,
-	// 		max: products?.data?.auctionList[0]?.basePrice,
-	// 	}
-	// );
 	
 	return (
 		<>
@@ -42,9 +31,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 						<SearchInput isLoggedIn={isLoggedIn}/>
 					</QueryProvider>
 				</div>
-				<Suspense key={key} fallback={<div className="flex w-[1280px] h-[33px] mx-auto font-bold items-center">연관</div>}>
-					<ProductRelatedWrapper searchParams={search}/>
-				</Suspense>
+				<ProductRelatedWrapper searchParams={search}/>
 				<div className="bg-graybg">
 					<div className="w-[1280px] mx-auto h-auto p-4 flex gap-4">
 						<div className="bg-white rounded-[12px] py-2 w-1/5 sticky top-16">

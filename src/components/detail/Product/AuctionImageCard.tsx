@@ -15,6 +15,7 @@ export default function AuctionImageCard({
           alt="Auction item"
           width={600}
           height={600}
+          priority
           className="object-cover"
         />
       </div>

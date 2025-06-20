@@ -1,7 +1,7 @@
 import { getSearchProducts } from "@/lib/api/search";
-import QueryProvider from "../QueryProvider";
-import AuctionCard from "../AuctionCard";
-import SearchPagination from "../molecules/searchpage/SearchPagination";
+import QueryProvider from "@/components/QueryProvider";
+import AuctionCard from "@/components/AuctionCard";
+import SearchPagination from "@/components/molecules/searchpage/SearchPagination";
 import Image from "next/image";
 
 export default async function ProductResultWrapper({ searchParams, isLoggedIn }: { searchParams: { [key: string]: string | string[] | undefined }, isLoggedIn: boolean }) {

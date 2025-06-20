@@ -1,4 +1,4 @@
-import CategoryFilter from "../templates/searchpage/CategoryFilter";
+import CategoryFilter from "@/components/templates/searchpage/CategoryFilter";
 import { getCategoryList } from "@/lib/api/search";
 
 export default async function CategoryFilterWrapper() {

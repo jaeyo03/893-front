@@ -1,5 +1,5 @@
 import { getRelatedWords } from "@/lib/api/search";
-import ProductRelated from "../molecules/searchpage/ProductRelated";
+import ProductRelated from "@/components/molecules/searchpage/ProductRelated";
 
 export default async function ProductRelatedWrapper({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const relatedWords = await getRelatedWords(searchParams);

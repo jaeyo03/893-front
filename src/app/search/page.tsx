@@ -10,7 +10,7 @@ import ProductRelatedWrapper from "@/components/wrappers/search/ProductRelatedWr
 import { Suspense } from "react";
 import CategoryFilterWrapper from "@/components/wrappers/search/CategoryFilterWrapper";
 import ProductResultWrapper from "@/components/wrappers/search/ProductResultWrapper";
-import Loading from "../detail/[idx]/loading";
+import SearchLoading from "@/components/SearchLoading";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ index?: string }> }) {
 	const cookieStore = cookies();
@@ -54,7 +54,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 						</div>
 						<div className="w-4/5">
 							<ProductSort/>
-							<Suspense key={key} fallback={<div className="w-[985px] h-[1209px] flex justify-center items-center"><Loading/></div>}>
+							<Suspense key={key} fallback={<div className="w-[985px] h-[1209px] flex justify-center items-center"><SearchLoading/></div>}>
 								<ProductResultWrapper searchParams={search} isLoggedIn={isLoggedIn}/>
 							</Suspense>
 						</div>

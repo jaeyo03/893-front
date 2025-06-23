@@ -4,9 +4,6 @@ import Image from "next/image";
 import { AuctionItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
 import { getRecentAuctions } from "@/lib/api/home";
-interface RecentAuctionListProps {
-  recentAuctionList: AuctionItem[];
-}
 
 export default async function RecentAuctionList() {
   const { data: recentAuctionList }: { data: AuctionItem[] } = await getRecentAuctions();

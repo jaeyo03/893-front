@@ -1,7 +1,5 @@
-import { useRef } from "react";
 import { Button } from "../ui/button";
 import { ConfirmModal } from "./modal/ConfirmModal";
-import { debounce } from "@/lib/util/debounce";
 interface SellButtonProps {
   label?: string;
   isModalOpen: boolean;
@@ -21,11 +19,7 @@ export default function SellButton({
   disabledRegister = false,
   confirmDisabled = false,
 }: SellButtonProps) {
-  const debouncedClick = useRef(
-    debounce(() => {
-      onClick();
-    }, 500)
-  ).current;
+
   return (
     <div>
       <Button

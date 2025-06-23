@@ -1,14 +1,12 @@
-"use client";
-
 import TopBidCard from "./TopBidCard";
-import { TopBidItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
+import { getTopBidItems } from "@/lib/api/home";
+import type { TopBidItem } from "@/lib/api/home";
 
-interface TopBidCardProps {
-  topBidCardList: TopBidItem[];
-}
+export default async function TopBidCardList() {
 
-export default function TopBidCardList({ topBidCardList }: TopBidCardProps) {
+  const { data: topBidCardList }: { data: TopBidItem[] } = await getTopBidItems();
+
   if (topBidCardList.length === 0) {
     return (
       <EmptyState
@@ -19,10 +17,10 @@ export default function TopBidCardList({ topBidCardList }: TopBidCardProps) {
   }
 
   return (
-    <div className="flex gap-4">
-      {topBidCardList.map((item) => (
-        <TopBidCard key={item.auctionId} {...item} />
-      ))}
-    </div>
+      <div className="flex gap-4">
+        {topBidCardList.map((item) => (
+          <TopBidCard key={item.auctionId} {...item} />
+        ))}
+      </div>
   );
 }

@@ -1,16 +1,13 @@
-"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { AuctionItem } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
+import { getRecentAuctions } from "@/lib/api/home";
 
-interface RecentAuctionListProps {
-  recentAuctionList: AuctionItem[];
-}
+export default async function RecentAuctionList() {
+  const { data: recentAuctionList }: { data: AuctionItem[] } = await getRecentAuctions();
 
-export default function RecentAuctionList({
-  recentAuctionList,
-}: RecentAuctionListProps) {
   if (recentAuctionList.length === 0) {
     return <EmptyState message="최근 등록된 경매 물품이 없습니다." />;
   }
@@ -38,16 +35,6 @@ export default function RecentAuctionList({
                   className="rounded-xl object-cover w-full h-[130px]"
                 />
               </div>
-
-              {/* {item.isScraped && (
-                <div className="absolute p-1 rounded-full top-3 right-3">
-                  <Bookmark
-                    className="w-6 h-6 text-white"
-                    aria-label="스크랩 아이콘"
-                  />
-                </div>
-              )} */}
-
               <div className="p-2">
                 <h3 className="pb-[3.2px] text-[16px] font-bold truncate text-sky-500 line-clamp-1">
                   {item.title}

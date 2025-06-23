@@ -1,11 +1,7 @@
-"use client";
+// components/home/DashboardStats.tsx
 
-import { DashboardStatsResponse } from "@/lib/api/home";
-
-interface DashboardStatsProps {
-  dashboardStats: DashboardStatsResponse;
-}
-
+import type { DashboardStatsResponse } from "@/lib/api/home";
+import { getDashboardStats } from "@/lib/api/home";
 interface StatCardProps {
   label: string;
   value: number;
@@ -20,9 +16,9 @@ function StatCard({ label, value }: StatCardProps) {
   );
 }
 
-export default function DashboardStats({
-  dashboardStats,
-}: DashboardStatsProps) {
+export default async function DashboardStats() {
+  const { data: dashboardStats }: { data: DashboardStatsResponse } = await getDashboardStats();
+
   const statDataList: StatCardProps[] = [
     { label: "현재 이용자 수", value: dashboardStats?.totalUserCount },
     { label: "현재 등록된 경매 수", value: dashboardStats?.totalAuctionCount },

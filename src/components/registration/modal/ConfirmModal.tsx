@@ -3,12 +3,14 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  confirmDisabled?: boolean;
 }
 
 export const ConfirmModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  confirmDisabled = false,
 }) => {
   if (!isOpen) return null; // 모달이 열리지 않으면 아무것도 렌더링 x
 
@@ -34,6 +36,7 @@ export const ConfirmModal: React.FC<ModalProps> = ({
           <Button
             className="w-[80px] h-[50px] bg-white text-main font-medium text-[20px] rounded-sm border-2 border-main hover:bg-main/90 hover:text-white"
             onClick={onConfirm}
+            disabled={confirmDisabled}
           >
             확인
           </Button>

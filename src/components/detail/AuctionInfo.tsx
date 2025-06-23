@@ -3,12 +3,12 @@
 import { Bookmark, Timer } from "lucide-react";
 import { AuctionBidData, Product, Status } from "@/types/productData";
 import { formatTime } from "@/lib/util/detailpage";
+import ProductStatus from "./ProductStatus";
+import { useAddScrap, useDeleteScrap } from "@/hooks/useScarp";
+import { useState } from "react";
 interface AuctionInfoProps {
   product: Product;
   auctionBidData: AuctionBidData;
-  isScraped: boolean;
-  scrapCount: number;
-  handleScrapToggle: (e: React.MouseEvent) => void;
   isLoggedIn: boolean;
   currentPrice: number;
   remainTime: number;
@@ -18,20 +18,35 @@ interface AuctionInfoProps {
 export function AuctionInfo({
   product,
   auctionBidData,
-  isScraped,
-  scrapCount,
-  handleScrapToggle,
   isLoggedIn,
   currentPrice,
   remainTime,
   auctionState,
 }: AuctionInfoProps) {
+  const [isScraped, setIsScraped] = useState<boolean>(product.isScraped ?? false);
+  const [scrapCount, setScrapCount] = useState<number>(product.scrapCount);
+  
+  const {mutate: addScrapMutation} = useAddScrap();
+  const {mutate: removeScrapMutation} = useDeleteScrap();
+  
+  const handleScrapToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsScraped((prev) => !prev);
+    setScrapCount((prev) => (isScraped ? prev - 1 : prev + 1));
+    if (isScraped) {
+      removeScrapMutation(product.auctionId);
+    } else {
+      addScrapMutation(product.auctionId);
+    }
+  };
+
   const { basePrice } = product;
   const bidCount = auctionBidData?.totalBid ?? 0;
   const bidderCount = auctionBidData?.totalBidder ?? 0;
 
   return (
     <div>
+      <ProductStatus label={auctionState} />
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-sm text-black">

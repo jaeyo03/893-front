@@ -25,7 +25,7 @@ import {
 
 export default function Registration() {
   const router = useRouter();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [mainImageIndex, setMainImageIndex] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
@@ -96,6 +96,10 @@ export default function Registration() {
   };
 
   const handleSubmit = async () => {
+    // 이미 제출 중이면 무시
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const startDelay = startTime.hour * 60 + startTime.minute;
     const duration = durationTime.hour * 60 + durationTime.minute;
 
@@ -146,7 +150,7 @@ export default function Registration() {
       toast.success("경매 물품 등록이 완료되었습니다!");
       setIsModalOpen(false);
       router.push(`/detail/${res?.data?.data?.auctionId}`);
-    } catch (error) {
+    } catch (error: unknown) {
       toast.error("등록에 실패했습니다. 다시 시도해주세요.");
       if (error instanceof AxiosError) {
         console.error("서버 응답 내용:", error.response?.data);
@@ -171,6 +175,7 @@ export default function Registration() {
             }
             mainImageIndex={mainImageIndex}
             onChangeMainImageIndex={setMainImageIndex}
+            data-testid="image-uploader"
           />
           {errors.images && (
             <p className="text-warningkeword text-sm">{errors.images}</p>
@@ -178,35 +183,60 @@ export default function Registration() {
         </div>
 
         <div ref={refs.title} className="flex flex-col pb-[39px]">
-          <AuctionTitleInput value={title} onChange={setTitle} />
+          <AuctionTitleInput
+            value={title}
+            onChange={setTitle}
+            data-testid="auction-title"
+          />
+
           {errors.title && (
             <p className="text-warningkeword text-sm">{errors.title}</p>
           )}
         </div>
 
         <div ref={refs.category} className="flex flex-col pb-[20px]">
-          <CategorySelector value={category} onChange={setCategory} />
+          <CategorySelector
+            value={category}
+            onChange={setCategory}
+            data-testid="category-selector"
+          />
+
           {errors.category && (
             <p className="text-warningkeword text-sm">{errors.category}</p>
           )}
         </div>
 
         <div ref={refs.price} className="flex flex-col pb-[20px]">
-          <PaymentInput value={price} onChange={setPrice} />
+          <PaymentInput
+            value={price}
+            onChange={setPrice}
+            data-testid="payment-input"
+          />
+
           {errors.price && (
             <p className="text-warningkeword text-sm">{errors.price}</p>
           )}
         </div>
 
         <div ref={refs.detail} className="flex flex-col pb-[38px]">
-          <DetailedInput value={detail} onChange={setDetail} />
+          <DetailedInput
+            value={detail}
+            onChange={setDetail}
+            data-testid="description"
+          />
+
           {errors.detail && (
             <p className="text-warningkeword text-sm">{errors.detail}</p>
           )}
         </div>
 
         <div ref={refs.productStatus} className="flex flex-col pb-[75px]">
-          <ProductStatus value={productStatus} onChange={setProductStatus} />
+          <ProductStatus
+            value={productStatus}
+            onChange={setProductStatus}
+            data-testid="product-status"
+          />
+
           {errors.productStatus && (
             <p className="text-warningkeword text-sm">{errors.productStatus}</p>
           )}
@@ -214,7 +244,11 @@ export default function Registration() {
 
         <div className="flex justify-center flex-nowrap pb-[240px] gap-10">
           <div ref={refs.startTime} className="flex flex-col items-center">
-            <AuctionStartTimeButton value={startTime} onChange={setStartTime} />
+            <AuctionStartTimeButton
+              value={startTime}
+              onChange={setStartTime}
+              data-testid="start-time"
+            />
             {errors.startTime && (
               <p className="text-warningkeword text-sm mt-1">
                 {errors.startTime}
@@ -226,6 +260,7 @@ export default function Registration() {
             <AuctionTimeButton
               value={durationTime}
               onChange={setDurationTime}
+              data-testid="duration-time"
             />
             {errors.durationTime && (
               <p className="text-warningkeword text-sm mt-1">
@@ -236,7 +271,10 @@ export default function Registration() {
         </div>
 
         <div ref={refs.agreed} className="flex justify-center">
-          <SellerAgreementCheckbox onChange={setAgreed} />
+          <SellerAgreementCheckbox
+            onChange={setAgreed}
+            data-testid="agreement-checkbox"
+          />
         </div>
         {errors.agreed && (
           <p className="text-warningkeword text-sm text-center">
@@ -251,6 +289,8 @@ export default function Registration() {
             onClick={handleValidationAndOpenModal}
             onModalClose={() => setIsModalOpen(false)}
             onConfirm={handleSubmit}
+            confirmDisabled={isSubmitting}
+            data-testid="register-submit-button"
           />
         </div>
       </form>

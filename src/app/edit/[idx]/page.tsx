@@ -39,7 +39,7 @@ interface AuctionIdProps {
 export default function EditRegistration({ params }: AuctionIdProps) {
   const router = useRouter();
   const auctionId = params.idx;
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [serverImages, setServerImages] = useState<ServerImage[]>([]);
   const [category, setCategory] = useState<CategoryValue>({
@@ -74,7 +74,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   useEffect(() => {
     (async () => {
       try {
-        const response = await getProductData(auctionId,"");
+        const response = await getProductData(auctionId, "");
         if (!response) return;
 
         const loaded: ServerImage[] = response.images.map((img) => ({
@@ -134,6 +134,8 @@ export default function EditRegistration({ params }: AuctionIdProps) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     if (!validateForm()) return;
 
     try {
@@ -194,6 +196,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
     } catch (err) {
       console.error("PATCH 실패", err);
       toast.error("수정 중 오류가 발생했습니다.");
+      setIsSubmitting(false);
     }
   };
 
@@ -317,6 +320,7 @@ export default function EditRegistration({ params }: AuctionIdProps) {
             onClick={handleValidationAndOpenModal}
             onModalClose={() => setIsModalOpen(false)}
             onConfirm={handleSubmit}
+            confirmDisabled={isSubmitting}
           />
         </div>
       </form>

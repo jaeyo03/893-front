@@ -1,3 +1,6 @@
 {
+  "ignorePatterns": [
+    "**/__tests__/**"
+  ],
   "extends": ["next/core-web-vitals", "next/typescript"]
 }

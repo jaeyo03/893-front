@@ -15,7 +15,7 @@ import "swiper/css/free-mode";
 import "swiper/css/mousewheel";
 import { useState, useEffect } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-// ✅ props 기반 구조
+// props 기반 구조
 interface AuctionStartTimeButtonProps {
   value: { hour: number; minute: number };
   onChange: (value: { hour: number; minute: number }) => void;

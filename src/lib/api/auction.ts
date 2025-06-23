@@ -4,13 +4,10 @@ import { AuctionBidData, Product, BidPostResponse } from "@/types/productData";
 import { axiosInstance } from "../axios";
 import { Auction, BaseResponse } from "@/types/response.types";
 
-export async function getBidData(auctionId: number, cookieHeader: string): Promise<AuctionBidData | null> {
+export async function getBidData(auctionId: number): Promise<AuctionBidData | null> {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/bids`,{
       method: "GET",
-      headers: {
-        Cookie: cookieHeader,
-      },
     });
     const data = await response.json();
     return data?.data;
@@ -20,13 +17,10 @@ export async function getBidData(auctionId: number, cookieHeader: string): Promi
   }
 }
 
-export const getProductData = async (auctionId: number, cookieHeader: string): Promise<Product | null> => {
+export const getProductData = async (auctionId: number): Promise<Product | null> => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}`,{
       method: "GET",
-      headers: {
-        Cookie: cookieHeader,
-      },
     });
     const data = await response.json();
     return data?.data;
@@ -80,13 +74,10 @@ export const cancelBid = async ({
 };
 
 
-export const getRelatedItem = async (auctionId:number, cookieHeader: string) : Promise<BaseResponse<Auction[]>> => {
+export const getRelatedItem = async (auctionId:number) : Promise<BaseResponse<Auction[]>> => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${auctionId}/related`,{
       method: "GET",
-      headers: {
-        Cookie: cookieHeader,
-      },
     });
     const data = await response.json();
     return data;

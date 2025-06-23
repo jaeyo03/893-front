@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Product, AuctionBidData, Status } from "@/types/productData";
 import {
@@ -29,7 +31,12 @@ export default function BidInteraction({
   remainTime,
   auctionState,
 }: BidInteractionProps) {
-  const [myBidId, setMyBidId] = useState<number | null>(window.sessionStorage.getItem("bidId") ? Number(window.sessionStorage.getItem("bidId")) : null);
+  const [myBidId, setMyBidId] = useState<number | null>(
+    () => {
+      const v = window.sessionStorage.getItem("bidId");
+      return v ? Number(v) : null;
+    }
+  );
   const [bidAmount, setBidAmount] = useState<number>(Number.isFinite(currentPrice) ? currentPrice + 100 : product.basePrice);
   const [show, setShow] = useState(false);
   const [isCancelable, setIsCancelable] = useState(auctionBidData.canCancelBid);
@@ -137,7 +144,7 @@ export default function BidInteraction({
   }, [currentPrice]);
 
   useEffect(() => {
-    if (cancelTimer && cancelTimer > 0) {
+    if (isCancelable && cancelTimer && cancelTimer > 0) {
       const interval = setInterval(() => {
         setCancelTimer((prev) => {
           if (prev && prev <= 1) {

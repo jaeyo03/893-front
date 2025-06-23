@@ -14,7 +14,7 @@ test.describe("HomePage E2E 전체 흐름", () => {
     await expect(stats.locator("div.border")).toHaveCount(3);
   });
 
-  // 4. 최근 등록 리스트 클릭 시 상세 페이지 이동
+  // 2. 최근 등록 리스트 클릭 시 상세 페이지 이동
   test("최근 등록 리스트 카드 클릭 시 상세 페이지로 이동해야 한다", async ({
     page,
   }) => {
@@ -29,7 +29,7 @@ test.describe("HomePage E2E 전체 흐름", () => {
     await expect(page).toHaveURL(/\/detail\/\d+/);
   });
 
-  // 5. 실시간 랭킹 탭 전환 & 상세 이동
+  // 3. 실시간 랭킹 탭 전환 & 상세 이동
   test("실시간 랭킹 탭 전환 후 아이템 클릭 시 상세 페이지로 이동해야 한다", async ({
     page,
   }) => {
@@ -46,7 +46,7 @@ test.describe("HomePage E2E 전체 흐름", () => {
     await expect(page).toHaveURL(/\/detail\/\d+/);
   });
 
-  // 6. 경매 임박 물품 '지금 참여하기' 버튼 클릭
+  // 4. 경매 임박 물품 '지금 참여하기' 버튼 클릭
   test('경매 임박 물품에서 "지금 참여하기" 클릭 시 상세 페이지로 이동해야 한다', async ({
     page,
   }) => {
@@ -62,7 +62,7 @@ test.describe("HomePage E2E 전체 흐름", () => {
     await expect(page).toHaveURL(/\/detail\/\d+/);
   });
 
-  // 7. 최근 7일 최고 낙찰가 TOP5 클릭 시 상세 이동
+  // 5. 최근 7일 최고 낙찰가 TOP5 클릭 시 상세 이동
   test("최근 7일 최고 낙찰가 TOP5 카드 클릭 시 상세 페이지로 이동해야 한다", async ({
     page,
   }) => {
@@ -75,7 +75,7 @@ test.describe("HomePage E2E 전체 흐름", () => {
     await expect(page).toHaveURL(/\/detail\/\d+/);
   });
 
-  // 8. 카테고리별 베스트 TOP3: 탭 전환, 스크롤, 카드 클릭
+  // 6. 카테고리별 베스트 TOP3: 탭 전환, 스크롤, 카드 클릭
   test("카테고리별 섹션: 탭 전환, 좌우 스크롤, 카드 클릭 시 상세 이동", async ({
     page,
   }) => {

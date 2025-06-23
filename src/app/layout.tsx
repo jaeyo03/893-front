@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+// import localFont from "next/font/local";
+import { Inter } from 'next/font/google'
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { cookies } from "next/headers";
 import { Toaster } from "react-hot-toast";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const pretendard = localFont({
-  src: "../fonts/PretendardVariable.woff2",
-  display: "swap",
-  weight: "45 920",
-  variable: "--font-pretendard",
-});
+// const pretendard = localFont({
+//   src: "../fonts/PretendardVariable.woff2",
+//   display: "swap",
+//   weight: "45 920",
+//   variable: "--font-pretendard",
+// });
+const inter = Inter({ subsets: ['latin'] })
+
+// export const revalidate = 3600;
+// export const fetchCache = 'force-cache';
 
 export const metadata: Metadata = {
   title: "팔구삼 893",
@@ -31,7 +37,8 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${pretendard.variable} font-pretendard`}
+        className={inter.className}
+        // className={`${pretendard.variable} font-pretendard`}
       >
         <header className="sticky top-0 z-50 border-b bg-background">
           <div className="flex h-16 items-center px-32">
@@ -39,7 +46,7 @@ export default function RootLayout({
           </div>
         </header>
         {children}
-
+        <SpeedInsights />
         {/* Toaster 컴포넌트 추가 */}
         <Toaster
           position="top-center"

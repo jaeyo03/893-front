@@ -1,4 +1,13 @@
+// next.config.mjs
+import bundleAnalyzerPkg from "@next/bundle-analyzer";
+
+// analyzer 플러그인 초기화
+const withBundleAnalyzer = bundleAnalyzerPkg({
+  enabled: process.env.ANALYZE === "true",
+});
+
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -24,4 +33,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

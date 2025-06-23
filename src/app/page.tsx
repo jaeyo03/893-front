@@ -27,9 +27,6 @@ export const metadata: Metadata = {
   description: "중고 상품을 경매로 사고 팔 수 있는 팔구삼 893",
 };
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "no-store";
-
 export default function Home() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;

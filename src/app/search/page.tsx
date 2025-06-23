@@ -1,22 +1,16 @@
-import SearchInput from "@/components/templates/SearchBox";
 import PriceFilter from "@/components/molecules/searchpage/PriceFilter";
 import AuctionStatusFilter from "@/components/templates/searchpage/AuctionStatusFilter";
 import ProductStatusFilter from "@/components/templates/searchpage/ProductStatusFilter";
 import ProductSort from "@/components/molecules/searchpage/ProductSort";
 import FilterRefreshButton from "@/components/atoms/searchpage/FilterRefreshButton";
-import QueryProvider from "@/components/QueryProvider";
-import {cookies} from "next/headers";
 import ProductRelatedWrapper from "@/components/wrappers/search/ProductRelatedWrapper";
 import { Suspense } from "react";
 import CategoryFilterWrapper from "@/components/wrappers/search/CategoryFilterWrapper";
 import ProductResultWrapper from "@/components/wrappers/search/ProductResultWrapper";
 import SearchLoading from "@/components/SearchLoading";
+import SearchBoxWrapper from "@/components/wrappers/SearchBoxWrapper";
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ index?: string }> }) {
-	const cookieStore = cookies();
-	const accessToken = cookieStore.get('accessToken')?.value;
-	const isLoggedIn = accessToken ? true : false;
-	
 	const search = await searchParams;
   const key = new URLSearchParams(search).toString();
 	
@@ -27,9 +21,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 					<div className="font-bold text-xl">
 						경매에 참여하고 싶은 물건을 검색해보세요
 					</div>
-					<QueryProvider>
-						<SearchInput isLoggedIn={isLoggedIn}/>
-					</QueryProvider>
+					<SearchBoxWrapper/>
 				</div>
 				<ProductRelatedWrapper searchParams={search}/>
 				<div className="bg-graybg">
@@ -42,7 +34,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 							<div className="border-b-[1.5px] border-divider my-2"></div>
 							<CategoryFilterWrapper/>
 							<div className="border-b-[1.5px] border-divider my-2"></div>
-							{/* 아래 가격은 어떻게 하지 ㅠㅠ */}
 							<PriceFilter
 								minPrice={5000}
 								maxPrice={1000000}
@@ -55,7 +46,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 						<div className="w-4/5">
 							<ProductSort/>
 							<Suspense key={key} fallback={<div className="w-[985px] h-[1209px] flex justify-center items-center"><SearchLoading/></div>}>
-								<ProductResultWrapper searchParams={search} isLoggedIn={isLoggedIn}/>
+								<ProductResultWrapper searchParams={search}/>
 							</Suspense>
 						</div>
 					</div>

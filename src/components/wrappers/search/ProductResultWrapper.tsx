@@ -3,8 +3,12 @@ import QueryProvider from "@/components/QueryProvider";
 import AuctionCard from "@/components/AuctionCard";
 import SearchPagination from "@/components/molecules/searchpage/SearchPagination";
 import Image from "next/image";
+import { cookies } from "next/headers";
 
-export default async function ProductResultWrapper({ searchParams, isLoggedIn }: { searchParams: { [key: string]: string | string[] | undefined }, isLoggedIn: boolean }) {
+export default async function ProductResultWrapper({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const cookieStore = cookies();
+	const accessToken = cookieStore.get('accessToken')?.value;
+	const isLoggedIn = accessToken ? true : false;
   const products = await getSearchProducts(searchParams);
   const currentPage = searchParams.page ? parseInt(searchParams.page as string) : 1;
 

@@ -8,6 +8,7 @@ import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import ImageSlider from "@/components/detail/ImageSlider";
 import ProductHeader from "@/components/detail/ProductHeader";
 import RelatedProductsWrapper from "@/components/wrappers/detail/RelatedProductsWrapper";
+import DetailInfoWithBidWrapper from "@/components/wrappers/detail/DetailInfoWithBidWrapper";
 
 interface PageProps {
   params: { idx : string };
@@ -15,19 +16,13 @@ interface PageProps {
 
 export default async function DetailPage({ params }: PageProps) {
   const auctionId = parseInt(params?.idx);
-	
-	const cookieStore = cookies();
-  const isLoggedIn = cookieStore.has("accessToken");
 
 	if (isNaN(auctionId)) {
 		return notFound();
 	}
 
-	const [initialBidData, productData] = await Promise.all([
-		getBidData(auctionId),
-		getProductData(auctionId),
-	]);
-
+	const productData = await getProductData(auctionId);
+	
 	if (!productData) return notFound();
 
   return (
@@ -44,7 +39,7 @@ export default async function DetailPage({ params }: PageProps) {
 				</div>
 				<div className="flex-1 ml-6 max-w-[620px] mt-5">
 					<ProductHeader product={productData}/>
-					<DetailInfoWithBid isLoggedIn={isLoggedIn} initialBidData={initialBidData as AuctionBidData} product={productData} />
+					<DetailInfoWithBidWrapper auctionId={auctionId} />
 				</div>
 			</div>
 			<hr />

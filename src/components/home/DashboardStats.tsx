@@ -17,10 +17,6 @@ function StatCard({ label, value }: StatCardProps) {
 }
 
 export default async function DashboardStats() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/home/stats`,
-    { cache: "no-store" }
-  );
   const { data: dashboardStats }: { data: DashboardStatsResponse } = await getDashboardStats();
 
   const statDataList: StatCardProps[] = [

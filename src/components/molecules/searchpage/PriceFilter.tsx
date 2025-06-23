@@ -82,7 +82,7 @@ export default function PriceFilter({ minPrice, maxPrice }: PriceFilterProps) {
     <div>
       <div className="flex justify-between items-center px-4 py-2">
         <label htmlFor="price" className="font-bold text-md">
-          경매 시작가
+          경매 가격
         </label>
       </div>
       <div className="px-4 py-2 flex gap-2 items-center justify-center">

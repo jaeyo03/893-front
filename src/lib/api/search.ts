@@ -92,7 +92,9 @@ export async function getRelatedWords(
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/search/suggestions${encodedKeyword}`,
       {
-        cache: "no-store",
+        next : {
+          revalidate : 86400,
+        }
       }
     );
     if (!response.ok) {

@@ -3,32 +3,29 @@ import { cookies } from "next/headers";
 import DetailInfoWithBid from "../../../components/detail/DetailInfoWithBid";
 import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
 import { notFound } from "next/navigation";
-import QueryProvider from "@/components/QueryProvider";
 import { AuctionBidData } from "@/types/productData";
-import RelatedProducts from "@/components/detail/RelatedProducts";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import ImageSlider from "@/components/detail/ImageSlider";
 import ProductHeader from "@/components/detail/ProductHeader";
+import RelatedProductsWrapper from "@/components/wrappers/detail/RelatedProductsWrapper";
 
 interface PageProps {
   params: { idx : string };
 }
 
 export default async function DetailPage({ params }: PageProps) {
-  const cookieStore = cookies();
-	const auctionId = parseInt(params?.idx);
-	const accessToken = cookieStore.get('accessToken')?.value;
-	const cookieHeader = accessToken ? `accessToken=${accessToken}` : '';
+  const auctionId = parseInt(params?.idx);
+	
+	const cookieStore = cookies();
   const isLoggedIn = cookieStore.has("accessToken");
 
 	if (isNaN(auctionId)) {
 		return notFound();
 	}
 
-	const [initialBidData, productData, relatedItemData] = await Promise.all([
-		getBidData(auctionId, cookieHeader),
-		getProductData(auctionId, cookieHeader),
-		getRelatedItem(auctionId, cookieHeader)
+	const [initialBidData, productData] = await Promise.all([
+		getBidData(auctionId),
+		getProductData(auctionId),
 	]);
 
 	if (!productData) return notFound();
@@ -51,9 +48,7 @@ export default async function DetailPage({ params }: PageProps) {
 				</div>
 			</div>
 			<hr />
-			<QueryProvider>
-				<RelatedProducts relatedItem={relatedItemData.data || null} isLoggedIn={isLoggedIn} />
-			</QueryProvider>
+			<RelatedProductsWrapper params={params}/>
 		</>
   );
 }

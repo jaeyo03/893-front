@@ -5,8 +5,7 @@ import AuctionSoonList from "./AuctionSoonList";
 
 export default async function AuctionSoonItemList() {
 
-  const { data: auctionSoonItemList }: { data: AuctionSoonItem[] } =
-    await getAuctionSoonItems();
+  const { data: auctionSoonItemList }: { data: AuctionSoonItem[] } = await getAuctionSoonItems();
 
   const limited = Array.isArray(auctionSoonItemList)
     ? auctionSoonItemList.slice(0, 3)

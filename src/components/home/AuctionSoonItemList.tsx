@@ -1,16 +1,12 @@
-"use client";
-
-import { AuctionSoonItem } from "@/lib/api/home";
-import AuctionSoonList from "./AuctionSoonList";
+import type { AuctionSoonItem } from "@/lib/api/home";
+import { getAuctionSoonItems } from "@/lib/api/home";
 import EmptyState from "@/components/home/EmptyState";
+import AuctionSoonList from "./AuctionSoonList";
 
-interface AuctionSoomItemListProps {
-  auctionSoonItemList: AuctionSoonItem[];
-}
+export default async function AuctionSoonItemList() {
 
-export default function AuctionSoonItemList({
-  auctionSoonItemList,
-}: AuctionSoomItemListProps) {
+  const { data: auctionSoonItemList }: { data: AuctionSoonItem[] } = await getAuctionSoonItems();
+
   const limited = Array.isArray(auctionSoonItemList)
     ? auctionSoonItemList.slice(0, 3)
     : [];
@@ -25,10 +21,10 @@ export default function AuctionSoonItemList({
   }
 
   return (
-    <div className="flex justify-start gap-6">
-      {limited.map((item) => (
-        <AuctionSoonList key={item.auctionId} {...item} />
-      ))}
-    </div>
+      <div className="flex justify-start gap-6">
+        {limited.map((item) => (
+          <AuctionSoonList key={item.auctionId} {...item} />
+        ))}
+      </div>
   );
 }

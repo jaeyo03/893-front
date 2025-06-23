@@ -7,17 +7,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Image from "next/image";
-
+import {slides} from "@/lib/util/slides";
 export interface Slide {
   imageUrl: string;
   label?: string;
 }
 
-interface ImageCarouselProps {
-  slides: Slide[];
-}
 
-export default function ImageCarousel({ slides }: ImageCarouselProps) {
+export default function ImageCarousel() {
   return (
     <div className="relative w-full h-[250px]">
       {/* Swiper 캐러셀 */}

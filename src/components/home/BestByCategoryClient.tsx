@@ -1,20 +1,22 @@
+// components/home/BestByCategoryClient.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Flame, ChevronLeft, ChevronRight } from "lucide-react";
-import { BestCategoryGroup } from "@/lib/api/home";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import EmptyState from "./EmptyState";
-interface BestByCategoryProps {
+import type { BestCategoryGroup } from "@/lib/api/home";
+
+interface BestByCategoryClientProps {
   bestByCategory: BestCategoryGroup[];
 }
 
-export default function BestByCategory({
+export default function BestByCategoryClient({
   bestByCategory,
-}: BestByCategoryProps) {
+}: BestByCategoryClientProps) {
   const [selectedTab, setSelectedTab] = useState<number | null>(
-    bestByCategory[0]?.subCategoryId
+    bestByCategory[0]?.subCategoryId ?? null
   );
 
   const selectedCategory = bestByCategory.find(
@@ -22,7 +24,6 @@ export default function BestByCategory({
   );
 
   const router = useRouter();
-
   const scrollRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
@@ -43,8 +44,10 @@ export default function BestByCategory({
   const handleScroll = (direction: "left" | "right") => {
     const container = scrollRef.current;
     if (container) {
-      const scrollAmount = direction === "left" ? -200 : 200;
-      container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      container.scrollBy({
+        left: direction === "left" ? -200 : 200,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -54,7 +57,7 @@ export default function BestByCategory({
         <button
           onClick={() => handleScroll("left")}
           aria-label="왼쪽 스크롤"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white rounded-full"
         >
           <ChevronLeft size={20} />
         </button>
@@ -81,11 +84,10 @@ export default function BestByCategory({
             </button>
           ))}
         </div>
-
         <button
           onClick={() => handleScroll("right")}
           aria-label="오른쪽 스크롤"
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white  rounded-full"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1 bg-white rounded-full"
         >
           <ChevronRight size={20} />
         </button>

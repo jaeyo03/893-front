@@ -1,9 +1,6 @@
 // src/app/detail/[idx]/page.tsx (Server Component)
-import { cookies } from "next/headers";
-import DetailInfoWithBid from "../../../components/detail/DetailInfoWithBid";
-import { getBidData, getProductData, getRelatedItem } from "@/lib/api/auction";
+import { getProductData } from "@/lib/api/auction";
 import { notFound } from "next/navigation";
-import { AuctionBidData } from "@/types/productData";
 import GoodsInfo from "@/components/detail/Product/GoodsInfo";
 import ImageSlider from "@/components/detail/ImageSlider";
 import ProductHeader from "@/components/detail/ProductHeader";
